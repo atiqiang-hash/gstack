@@ -1,0 +1,52 @@
+name: Turkey Energy Dashboard
+
+# Rebuilds the BETAŞ EPC Intelligence dashboard (curated data + live RSS) and
+# publishes it to GitHub Pages. Runs on a schedule for 24/7 freshness, on
+# manual dispatch, and whenever the dashboard sources change on the default branch.
+#
+# One-time setup (repo owner): Settings → Pages → Build and deployment →
+# Source = "GitHub Actions". After that this workflow keeps the site live.
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'   # every 3 hours, 24/7
+  workflow_dispatch: {}
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'turkey-energy-dashboard/**'
+      - '.github/workflows/turkey-dashboard.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: turkey-dashboard-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build dashboard (curated data + live RSS aggregation)
+        working-directory: turkey-energy-dashboard
+        run: node generate.mjs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: turkey-energy-dashboard
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -6,7 +6,9 @@ canlı bir web panosu. Manus'taki tek seferlik statik raporun yükseltilmiş hal
 - **Gerçek veri, gerçek kaynak.** Her kart, tablo satırı ve istatistik gerçek bir
   habere/rapora dayanır ve tıklanabilir kaynak bağlantısı taşır (AA, Hitachi Energy,
   IEA, Ember, Transformers Magazine, EKAP, Borsa Gündem, Atlantic Council, Linxon…).
-- **Canlı RSS akışı.** Gerçek Türk/uluslararası enerji RSS beslemelerinden sektör
+- **İki dilli (TR / 中文).** Sağ üstteki TR / 中文 düğmesiyle tüm pano anında dil
+  değiştirir; tercih `localStorage`'da hatırlanır. Arama her iki dilde de eşleşir.
+- **Canlı RSS akışı.** 16 gerçek Türk/uluslararası enerji RSS beslemesinden sektör
   haberleri otomatik toplanır (`feeds.json`), anahtar kelimeyle süzülür.
 - **7/24 tazelik.** GitHub Actions her 3 saatte bir yeniden derler ve GitHub Pages'e
   yayımlar. Açık bırakılan sekme her 15 dakikada bir kendini yeniler.
@@ -42,7 +44,8 @@ open index.html          # macOS  (Linux: xdg-open, Windows: start)
 
 Tüm küratörlü içerik `data/news.json` içindedir — başka hiçbir yeri elle düzenlemeyin.
 Yeni bir haber/ihale eklemek için ilgili diziye bir nesne ekleyip `node generate.mjs`
-çalıştırın. Alanlar:
+çalıştırın. Her metin alanının bir de `_zh` (Çince) karşılığı vardır (örn. `title` +
+`title_zh`); `_zh` boş bırakılırsa o dilde Türkçe metin gösterilir. Alanlar:
 
 - `epc[]` — kart: `title, summary, importance(high|medium|low), date, source_name, source_url, tags[]`
 - `tenders[]` — tablo satırı: `project, org, scope, ikn, date, status(active|upcoming|result)`

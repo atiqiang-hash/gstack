@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BETAŞ EPC Intelligence — 18 Haziran 2026 Perşembe</title>
+<meta name="description" content="Türkiye EPC & enerji sektörü canlı istihbarat panosu. Gerçek kaynaklı, kaynak bağlantılı.">
+<style>
+:root{--bg:#0a0e17;--panel:#111827;--card:#1a2332;--line:#1e293b;--accent:#00d4aa;--muted:#94a3b8;--dim:#64748b;--text:#e0e6ed;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+a{color:var(--accent);}
+.header{background:linear-gradient(135deg,#0f1923 0%,#1a2332 50%,#0d1b2a 100%);padding:26px 36px;border-bottom:3px solid var(--accent);}
+.header-content{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
+.header-left h1{font-size:26px;color:var(--accent);font-weight:800;letter-spacing:.5px;}
+.header-left .subtitle{font-size:13px;color:#8899aa;margin-top:5px;}
+.header-right{text-align:right;}
+.header-right .date{font-size:17px;color:#fff;font-weight:600;}
+.header-right .time-badge{display:inline-block;background:var(--accent);color:#0a0e17;padding:4px 12px;border-radius:4px;font-size:13px;font-weight:700;margin-top:6px;}
+.header-right .clock{font-size:13px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;}
+.status-bar{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:#0d1117;padding:8px 36px;border-bottom:1px solid var(--line);font-size:12px;color:var(--dim);}
+.live-on{color:var(--accent);font-weight:700;}
+.live-off{color:#d97706;font-weight:600;}
+.refresh-note{margin-left:auto;}
+.marquee-container{background:var(--panel);padding:11px 0;border-bottom:1px solid var(--line);overflow:hidden;}
+.marquee-content{display:inline-block;white-space:nowrap;animation:marquee 60s linear infinite;font-size:13px;color:var(--muted);}
+.marquee-content span{margin-right:48px;}
+.marquee-content .hot{color:#ef4444;font-weight:600;}
+.marquee-content .new{color:var(--accent);font-weight:600;}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:16px 36px;background:#0d1117;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;}
+.toolbar input[type=search]{flex:1;min-width:200px;background:var(--card);border:1px solid #2a3a4a;border-radius:6px;color:var(--text);padding:9px 12px;font-size:13px;}
+.toolbar input[type=search]:focus{outline:none;border-color:var(--accent);}
+.filter-btn{background:var(--card);border:1px solid #2a3a4a;color:var(--muted);padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;}
+.filter-btn.active{background:var(--accent);color:#0a0e17;border-color:var(--accent);}
+.nav-links{display:flex;gap:14px;flex-wrap:wrap;}
+.nav-links a{font-size:12px;color:var(--muted);text-decoration:none;}
+.nav-links a:hover{color:var(--accent);}
+.main-layout{display:grid;grid-template-columns:1fr 330px;gap:0;}
+.content-area{padding:28px 36px;}
+.sidebar{background:var(--panel);padding:24px;border-left:1px solid var(--line);}
+.section-title{font-size:18px;color:var(--accent);font-weight:700;margin:8px 0 18px;padding-bottom:9px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px;scroll-margin-top:70px;}
+.section-title::before{content:'';width:4px;height:20px;background:var(--accent);border-radius:2px;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:15px;margin-bottom:34px;}
+.card{background:var(--card);border:1px solid #2a3a4a;border-radius:8px;padding:18px;transition:border-color .25s,transform .25s;display:flex;flex-direction:column;}
+.card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;}
+.card-title{font-size:15px;font-weight:700;color:#fff;line-height:1.35;flex:1;}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:800;text-transform:uppercase;flex-shrink:0;}
+.badge-high{background:#dc2626;color:#fff;}.badge-medium{background:#d97706;color:#fff;}.badge-low{background:#059669;color:#fff;}
+.card-body{font-size:13px;color:var(--muted);margin-bottom:12px;flex:1;}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.tag{font-size:10px;color:var(--accent);background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);padding:1px 7px;border-radius:10px;}
+.card-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);border-top:1px solid var(--line);padding-top:9px;}
+.card-footer a{text-decoration:none;}.card-footer a:hover{text-decoration:underline;}
+.tender-table{width:100%;border-collapse:collapse;margin-bottom:34px;font-size:13px;}
+.tender-table th{background:var(--line);color:var(--accent);padding:11px 10px;text-align:left;font-weight:600;border-bottom:2px solid var(--accent);}
+.tender-table td{padding:10px;border-bottom:1px solid var(--line);color:#cbd5e1;}
+.tender-table tr:hover td{background:var(--card);}
+.mono{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:#a5b4cf;}
+.status-active{color:var(--accent);font-weight:600;}.status-upcoming{color:#f59e0b;font-weight:600;}.status-result{color:#8b5cf6;font-weight:600;}
+.mfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;margin-bottom:34px;}
+.mfg-item{background:var(--card);border:1px solid #2a3a4a;border-radius:6px;padding:16px;}
+.mfg-item h4{font-size:14px;color:#fff;margin-bottom:8px;}.mfg-item p{font-size:12px;color:var(--muted);}
+.mfg-item .source{font-size:11px;margin-top:8px;}.mfg-item .source a{text-decoration:none;}
+.yeka-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-bottom:34px;}
+.yeka-item{background:var(--card);border-left:3px solid #8b5cf6;border-radius:0 6px 6px 0;padding:16px;}
+.yeka-item h4{font-size:14px;color:#fff;margin-bottom:6px;}.yeka-item p{font-size:12px;color:var(--muted);}
+.yeka-item .capacity{font-size:22px;color:#8b5cf6;font-weight:800;}
+.yeka-item .source{font-size:11px;margin-top:8px;}.yeka-item .source a{text-decoration:none;}
+.mena-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;margin-bottom:34px;}
+.mena-item{background:var(--card);border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:16px;}
+.mena-item h4{font-size:14px;color:#fff;margin-bottom:6px;}.mena-item p{font-size:12px;color:var(--muted);}
+.mena-item .source{font-size:11px;margin-top:8px;}.mena-item .source a{text-decoration:none;}
+.live-list{list-style:none;margin-bottom:34px;}
+.live-list li{padding:11px 0;border-bottom:1px solid var(--line);}
+.live-list a{font-size:13px;color:#e0e6ed;text-decoration:none;font-weight:500;}
+.live-list a:hover{color:var(--accent);}
+.live-meta{display:block;font-size:11px;color:var(--dim);margin-top:3px;}
+.live-empty{font-size:13px;color:var(--dim);background:var(--card);border:1px dashed #2a3a4a;border-radius:6px;padding:16px;margin-bottom:34px;}
+.sidebar-section{margin-bottom:28px;}
+.sidebar-title{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+.stat-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);}
+.stat-label{font-size:12px;color:var(--muted);}.stat-value{font-size:14px;color:#fff;font-weight:700;}
+.stat-value.green{color:var(--accent);}.stat-value.red{color:#ef4444;}
+.action-item{padding:10px 0;border-bottom:1px solid var(--line);}.action-item:last-child{border-bottom:none;}
+.action-title{font-size:12px;color:#fff;font-weight:700;margin-bottom:3px;}
+.action-desc{font-size:11px;color:var(--dim);}.action-deadline{font-size:11px;color:#f59e0b;margin-top:3px;}
+.strategy-box{background:#0d1b2a;border:1px solid var(--accent);border-radius:6px;padding:15px;}
+.strategy-box p{font-size:12px;color:var(--muted);margin-bottom:9px;line-height:1.5;}
+.strategy-box strong{color:var(--accent);}
+.footer{background:#0d1117;padding:20px 36px;border-top:1px solid var(--line);text-align:center;font-size:11px;color:var(--dim);}
+.footer a{text-decoration:none;}
+.no-results{display:none;color:var(--dim);font-size:13px;padding:20px;text-align:center;}
+@media (max-width:1024px){.main-layout{grid-template-columns:1fr;}.sidebar{border-left:none;border-top:1px solid var(--line);}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-content">
+    <div class="header-left">
+      <h1>BETAŞ EPC Intelligence</h1>
+      <div class="subtitle">Türkiye EPC &amp; Enerji Sektörü — Canlı İstihbarat Panosu | Ati'ye Özel</div>
+    </div>
+    <div class="header-right">
+      <div class="date">18 Haziran 2026 Perşembe</div>
+      <div class="time-badge">⚡ CANLI İSTİHBARAT PANOSU</div>
+      <div class="clock" id="clock">İstanbul saati yükleniyor…</div>
+    </div>
+  </div>
+</header>
+
+<div class="status-bar">
+  <span class="live-off">○ Canlı besleme beklemede</span>
+  <span>Son güncelleme: <strong>18.06.2026 08:42</strong> (TSİ)</span>
+  <span>3 yüksek öncelikli başlık</span>
+  <span class="refresh-note">Bu sayfa açık kaldığında her 15 dk'da bir otomatik yenilenir.</span>
+</div>
+
+<div class="marquee-container">
+  <div class="marquee-content"><span class="hot">Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3</span><span class="new">TEİAŞ + Hitachi Energy: Türkiye'nin ilk dijital trafo merkezi pilotu devrede — IEC 61850 process-bus</span><span class="hot">TEİAŞ İTM.79: 6 adet 380 kV &amp; 154 kV trafo merkezi yapım ihalesi açıldı (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="new">Offshore rüzgar YEKA: 4 saha belirlendi (Saros, Gökçeada, Bozcaada, Edremit) — ilk ihale 2026, 2035 hedefi 5 GW</span><span class="">Küresel güç trafosu teslim süresi 4 yıla, fiyatlar 2019'a göre %75 arttı (IEA / WoodMac)</span><span class="">Türkiye güneş 26.339 MW + rüzgar ~16.000 MW — 2035 hedefi 120 GW güneş+rüzgar</span><span class="new">PTTX, Bursa'da transformatör nüvesi üretim üssünü 2026'da devreye alıyor — Gemlik Limanı'na 10 dk</span><span class="hot">Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3</span><span class="new">TEİAŞ + Hitachi Energy: Türkiye'nin ilk dijital trafo merkezi pilotu devrede — IEC 61850 process-bus</span><span class="hot">TEİAŞ İTM.79: 6 adet 380 kV &amp; 154 kV trafo merkezi yapım ihalesi açıldı (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="new">Offshore rüzgar YEKA: 4 saha belirlendi (Saros, Gökçeada, Bozcaada, Edremit) — ilk ihale 2026, 2035 hedefi 5 GW</span><span class="">Küresel güç trafosu teslim süresi 4 yıla, fiyatlar 2019'a göre %75 arttı (IEA / WoodMac)</span><span class="">Türkiye güneş 26.339 MW + rüzgar ~16.000 MW — 2035 hedefi 120 GW güneş+rüzgar</span><span class="new">PTTX, Bursa'da transformatör nüvesi üretim üssünü 2026'da devreye alıyor — Gemlik Limanı'na 10 dk</span></div>
+</div>
+
+<div class="toolbar">
+  <input type="search" id="search" placeholder="🔎 Haber, ihale, kurum, kV, MW ara… (örn: 380 kV, Astor, offshore)">
+  <button class="filter-btn active" data-filter="all">Tümü</button>
+  <button class="filter-btn" data-filter="high">Yüksek</button>
+  <button class="filter-btn" data-filter="medium">Orta</button>
+  <nav class="nav-links">
+    <a href="#epc">EPC</a><a href="#tenders">İhaleler</a><a href="#mfg">Üreticiler</a>
+    <a href="#yeka">YEKA</a><a href="#mena">MENA</a><a href="#live">Canlı</a>
+  </nav>
+</div>
+
+<div class="main-layout">
+  <main class="content-area">
+
+    <h2 class="section-title" id="epc">EPC Projeleri & Sözleşmeler</h2>
+    <div class="card-grid" id="cards">
+    <article class="card" data-importance="high" data-search="astor enerji — abd'ye 71,98 milyon dolarlık güç trafosu i̇hracatı astor enerji, abd merkezli bir müşteriyle 132-220 mva aralığında güç transformatörü tedariki için sözleşme imzaladı. toplam bedel 71.982.000 usd (~3,31 milyar tl). teslimatlar 2027'nin 2. ve 3. çeyreğinde. anlaşma, şirketin 2025 yıl sonu hasılatının %9,39'una denk geliyor. astor transformatör i̇hracat abd">
+      <div class="card-header">
+        <h3 class="card-title">Astor Enerji — ABD'ye 71,98 Milyon Dolarlık Güç Trafosu İhracatı</h3>
+        <span class="badge badge-high">YÜKSEK</span>
+      </div>
+      <p class="card-body">Astor Enerji, ABD merkezli bir müşteriyle 132-220 MVA aralığında güç transformatörü tedariki için sözleşme imzaladı. Toplam bedel 71.982.000 USD (~3,31 milyar TL). Teslimatlar 2027'nin 2. ve 3. çeyreğinde. Anlaşma, şirketin 2025 yıl sonu hasılatının %9,39'una denk geliyor.</p>
+      <div class="card-tags"><span class="tag">Astor</span><span class="tag">Transformatör</span><span class="tag">İhracat</span><span class="tag">ABD</span></div>
+      <div class="card-footer">
+        <span class="card-date">2026-06-08</span>
+        <a href="https://www.borsagundem.com.tr/astor-enerjiden-72-milyon-dolarlik-yeni-sozlesme" target="_blank" rel="noopener">Borsa Gündem →</a>
+      </div>
+    </article>
+    <article class="card" data-importance="high" data-search="tei̇aş + hitachi energy — türkiye'nin i̇lk dijital trafo merkezi pilotu tei̇aş, hitachi energy ile türkiye'nin ilk dijital trafo merkezi pilotunu hayata geçirdi. mevcut bir fiderin paralelinde iec 61850 standardında process-bus teknolojisiyle kontrol &amp; koruma fideri kuruldu. bakır kablolamadan fiber optiğe geçiş, dijital trafo merkezi mimarisinin türkiye'de yaygınlaşmasının önünü açıyor. tei̇aş hitachi dijital tm iec 61850">
+      <div class="card-header">
+        <h3 class="card-title">TEİAŞ + Hitachi Energy — Türkiye'nin İlk Dijital Trafo Merkezi Pilotu</h3>
+        <span class="badge badge-high">YÜKSEK</span>
+      </div>
+      <p class="card-body">TEİAŞ, Hitachi Energy ile Türkiye'nin ilk dijital trafo merkezi pilotunu hayata geçirdi. Mevcut bir fiderin paralelinde IEC 61850 standardında process-bus teknolojisiyle kontrol &amp; koruma fideri kuruldu. Bakır kablolamadan fiber optiğe geçiş, dijital trafo merkezi mimarisinin Türkiye'de yaygınlaşmasının önünü açıyor.</p>
+      <div class="card-tags"><span class="tag">TEİAŞ</span><span class="tag">Hitachi</span><span class="tag">Dijital TM</span><span class="tag">IEC 61850</span></div>
+      <div class="card-footer">
+        <span class="card-date">2026-05-20</span>
+        <a href="https://www.hitachienergy.com/us/en/news-and-events/features/2026/05/turkiye-first-digital-substation-pilot-hitachi-energy" target="_blank" rel="noopener">Hitachi Energy →</a>
+      </div>
+    </article>
+    <article class="card" data-importance="high" data-search="tei̇aş i̇tm.79 — 6 adet 380 kv &amp; 154 kv trafo merkezi yapımı 4734 sayılı kamu i̇hale kanunu md.19 açık ihale usulüyle 6 adet trafo merkezi yapım işi: altınkaya tm (11d030180), avanos-2 tm (06d030830), maslak tm (12d030320), refahiye tm (11d030580), tirebolu tm (11d030560), yeniçates tm (12d030380). betaş'ın çekirdek iş kapsamı — teklif hazırlığı önerilir. tei̇aş i̇hale 380 kv 154 kv">
+      <div class="card-header">
+        <h3 class="card-title">TEİAŞ İTM.79 — 6 Adet 380 kV &amp; 154 kV Trafo Merkezi Yapımı</h3>
+        <span class="badge badge-high">YÜKSEK</span>
+      </div>
+      <p class="card-body">4734 sayılı Kamu İhale Kanunu md.19 açık ihale usulüyle 6 adet trafo merkezi yapım işi: Altınkaya TM (11D030180), Avanos-2 TM (06D030830), Maslak TM (12D030320), Refahiye TM (11D030580), Tirebolu TM (11D030560), Yeniçates TM (12D030380). BETAŞ'ın çekirdek iş kapsamı — teklif hazırlığı önerilir.</p>
+      <div class="card-tags"><span class="tag">TEİAŞ</span><span class="tag">İhale</span><span class="tag">380 kV</span><span class="tag">154 kV</span></div>
+      <div class="card-footer">
+        <span class="card-date">2026-06-12</span>
+        <a href="https://ihalerapor.com/255856-itm79-6-adet-380-kv-ve-154-kv-trafo-merkezi-yapimi" target="_blank" rel="noopener">EKAP / İhale Rapor →</a>
+      </div>
+    </article>
+    <article class="card" data-importance="medium" data-search="pttx — bursa transformatör nüvesi üretim üssü 2026'da devrede pttx'in transformatör nüvesi (core) üretim üssü 2026'da bursa'da faaliyete geçiyor; şirketin küresel üretim ağında kilit düğüm olacak. tesis gemlik limanı'na 10 dakika, avrupa sınırına ~390 km mesafede — lojistik avantajı yüksek. türkiye'nin trafo tedarik zincirindeki ağırlığını artırıyor. pttx nüve bursa üretim">
+      <div class="card-header">
+        <h3 class="card-title">PTTX — Bursa Transformatör Nüvesi Üretim Üssü 2026'da Devrede</h3>
+        <span class="badge badge-medium">ORTA</span>
+      </div>
+      <p class="card-body">PTTX'in transformatör nüvesi (core) üretim üssü 2026'da Bursa'da faaliyete geçiyor; şirketin küresel üretim ağında kilit düğüm olacak. Tesis Gemlik Limanı'na 10 dakika, Avrupa sınırına ~390 km mesafede — lojistik avantajı yüksek. Türkiye'nin trafo tedarik zincirindeki ağırlığını artırıyor.</p>
+      <div class="card-tags"><span class="tag">PTTX</span><span class="tag">Nüve</span><span class="tag">Bursa</span><span class="tag">Üretim</span></div>
+      <div class="card-footer">
+        <span class="card-date">2026-06-02</span>
+        <a href="https://transformers-magazine.com/tm-news/pttxs-transformer-core-manufacturing-base-in-turkey-is-set-to-commence-operations-in-2026/" target="_blank" rel="noopener">Transformers Magazine →</a>
+      </div>
+    </article>
+    <article class="card" data-importance="medium" data-search="nuventura × aktif elektroteknik — sf6'sız gis üretim ortaklığı nuventura ve aktif elektroteknik, sf6 içermeyen birincil gaz izoleli şalt (gis) üretimi için teknoloji ortaklığı kurdu. sf6'sız teknoloji, ab f-gaz düzenlemeleri sıkılaşırken türk üreticilere ihracat avantajı sağlıyor. betaş projelerinde çevre-uyumlu şalt alternatifi. gis sf6'sız aktif elektroteknik">
+      <div class="card-header">
+        <h3 class="card-title">Nuventura × Aktif Elektroteknik — SF6'sız GIS Üretim Ortaklığı</h3>
+        <span class="badge badge-medium">ORTA</span>
+      </div>
+      <p class="card-body">Nuventura ve Aktif Elektroteknik, SF6 içermeyen birincil gaz izoleli şalt (GIS) üretimi için teknoloji ortaklığı kurdu. SF6'sız teknoloji, AB F-Gaz düzenlemeleri sıkılaşırken Türk üreticilere ihracat avantajı sağlıyor. BETAŞ projelerinde çevre-uyumlu şalt alternatifi.</p>
+      <div class="card-tags"><span class="tag">GIS</span><span class="tag">SF6'sız</span><span class="tag">Aktif Elektroteknik</span></div>
+      <div class="card-footer">
+        <span class="card-date">2026-05-28</span>
+        <a href="https://transformers-magazine.com/tag/gis/" target="_blank" rel="noopener">Transformers Magazine →</a>
+      </div>
+    </article>
+    <article class="card" data-importance="medium" data-search="rönesans enerji × totalenergies — %50 ortaklık, 700 mw+ yek boru hattı totalenergies, rönesans enerji'nin %50 hissesini almak için anlaşma imzaladı. portföyde 166 mw hidro varlık ve 700 mw'ın üzerinde rüzgar, güneş ve batarya depolama projesi boru hattı bulunuyor. büyük yek projeleri = yeni bağlantı trafo merkezi epc talebi. rönesans totalenergies yek bess">
+      <div class="card-header">
+        <h3 class="card-title">Rönesans Enerji × TotalEnergies — %50 Ortaklık, 700 MW+ YEK Boru Hattı</h3>
+        <span class="badge badge-medium">ORTA</span>
+      </div>
+      <p class="card-body">TotalEnergies, Rönesans Enerji'nin %50 hissesini almak için anlaşma imzaladı. Portföyde 166 MW hidro varlık ve 700 MW'ın üzerinde rüzgar, güneş ve batarya depolama projesi boru hattı bulunuyor. Büyük YEK projeleri = yeni bağlantı trafo merkezi EPC talebi.</p>
+      <div class="card-tags"><span class="tag">Rönesans</span><span class="tag">TotalEnergies</span><span class="tag">YEK</span><span class="tag">BESS</span></div>
+      <div class="card-footer">
+        <span class="card-date">2026-06-04</span>
+        <a href="https://totalenergies.com/newsroom/turkey-totalenergies-partners-ronesans-holding-develop-renewable-energy-country/?lang=eng" target="_blank" rel="noopener">TotalEnergies →</a>
+      </div>
+    </article></div>
+
+    <h2 class="section-title" id="tenders">TEİAŞ / EÜAŞ İhale Takip Tablosu</h2>
+    <table class="tender-table">
+      <thead><tr><th>Proje</th><th>Kurum</th><th>Kapsam</th><th>İKN</th><th>Yıl</th><th>Durum</th></tr></thead>
+      <tbody id="tender-rows"><tr data-search="seyhan gis yenileme ve tamamlama tei̇aş gis yenileme + tamamlama işi 2026/337244">
+      <td><strong>Seyhan GIS Yenileme ve Tamamlama</strong></td>
+      <td>TEİAŞ</td>
+      <td>GIS yenileme + tamamlama işi</td>
+      <td class="mono">2026/337244</td>
+      <td>2026</td>
+      <td class="status-active">Aktif</td>
+    </tr><tr data-search="yeşilhisar tm bağlantı hatları tei̇aş 400 kv + 154 kv bağlantı hatları 2026/456816">
+      <td><strong>Yeşilhisar TM Bağlantı Hatları</strong></td>
+      <td>TEİAŞ</td>
+      <td>400 kV + 154 kV bağlantı hatları</td>
+      <td class="mono">2026/456816</td>
+      <td>2026</td>
+      <td class="status-active">Aktif</td>
+    </tr><tr data-search="seki tm yapımı tei̇aş trafo merkezi yapımı 2026/412652">
+      <td><strong>Seki TM Yapımı</strong></td>
+      <td>TEİAŞ</td>
+      <td>Trafo merkezi yapımı</td>
+      <td class="mono">2026/412652</td>
+      <td>2026</td>
+      <td class="status-active">Aktif</td>
+    </tr><tr data-search="yalıkavak tm tamamlama tei̇aş tm tamamlama işi 2026/338951">
+      <td><strong>Yalıkavak TM Tamamlama</strong></td>
+      <td>TEİAŞ</td>
+      <td>TM tamamlama işi</td>
+      <td class="mono">2026/338951</td>
+      <td>2026</td>
+      <td class="status-active">Aktif</td>
+    </tr><tr data-search="i̇tm.79 — 6x 380/154 kv tm yapımı tei̇aş altınkaya, avanos-2, maslak, refahiye, tirebolu, yeniçates tm i̇tm.79">
+      <td><strong>İTM.79 — 6x 380/154 kV TM Yapımı</strong></td>
+      <td>TEİAŞ</td>
+      <td>Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates TM</td>
+      <td class="mono">İTM.79</td>
+      <td>2026</td>
+      <td class="status-upcoming">Yaklaşan</td>
+    </tr><tr data-search="10 adet yg mobil trafo merkezi sonelgaz (cezayir) yüksek gerilim mobil trafo merkezleri —">
+      <td><strong>10 Adet YG Mobil Trafo Merkezi</strong></td>
+      <td>Sonelgaz (Cezayir)</td>
+      <td>Yüksek gerilim mobil trafo merkezleri</td>
+      <td class="mono">—</td>
+      <td>2026</td>
+      <td class="status-result">Sonuçlandı</td>
+    </tr></tbody>
+    </table>
+
+    <h2 class="section-title" id="mfg">Transformatör & Ekipman Üreticileri</h2>
+    <div class="mfg-grid">
+    <div class="mfg-item">
+      <h4>Astor Enerji — ABD'den $71,98M Sipariş</h4>
+      <p>132-220 MVA güç trafoları, teslim 2027 Q2-Q3. Anlaşma 2025 hasılatının %9,39'u. Astor'un ABD ve ihracat pazarındaki ağırlığı artıyor; küresel trafo açığı Türk üreticilere fırsat penceresi yaratıyor.</p>
+      <div class="source"><a href="https://www.borsagundem.com.tr/astor-enerjiden-72-milyon-dolarlik-yeni-sozlesme" target="_blank" rel="noopener">Borsa Gündem →</a></div>
+    </div>
+    <div class="mfg-item">
+      <h4>Hitachi Energy — Türkiye İlk Dijital TM Pilotu</h4>
+      <p>IEC 61850 process-bus teknolojisiyle paralel fider kontrol &amp; koruma. Dijital trafo merkezi mimarisi optik akım/gerilim trafosu (OCT) talebini de tetikliyor — 2026'da Türkiye'de tahmini 350-550 adet OCT.</p>
+      <div class="source"><a href="https://www.hitachienergy.com/us/en/news-and-events/features/2026/05/turkiye-first-digital-substation-pilot-hitachi-energy" target="_blank" rel="noopener">Hitachi Energy →</a></div>
+    </div>
+    <div class="mfg-item">
+      <h4>PTTX — Bursa Nüve Üretim Üssü (2026)</h4>
+      <p>Transformatör nüvesi üretimi Bursa'da başlıyor. Gemlik Limanı'na 10 dk, AB sınırına 390 km. Türkiye'nin trafo bileşen tedarik zincirini güçlendiriyor.</p>
+      <div class="source"><a href="https://transformers-magazine.com/tm-news/pttxs-transformer-core-manufacturing-base-in-turkey-is-set-to-commence-operations-in-2026/" target="_blank" rel="noopener">Transformers Magazine →</a></div>
+    </div>
+    <div class="mfg-item">
+      <h4>Küresel HV Trafo Pazarı — Teslim 4 Yıl, Fiyat +%75</h4>
+      <p>IEA: büyük güç trafolarında teslim süresi 4 yıla, kablolarda 2-3 yıla çıktı. WoodMac Q2 2025: trafolar ortalama 128 hafta, GSU'lar 144 hafta. Fiyatlar 2019'a göre %75 arttı, bazı durumlarda reel 2,6 kat. Türk üreticiler için ihracat fırsatı.</p>
+      <div class="source"><a href="https://www.iea.org/reports/building-the-future-transmission-grid/executive-summary" target="_blank" rel="noopener">IEA →</a></div>
+    </div></div>
+
+    <h2 class="section-title" id="yeka">YEKA & Yenilenebilir Enerji</h2>
+    <div class="yeka-grid">
+    <div class="yeka-item">
+      <div class="capacity">5 GW</div>
+      <h4>İlk Offshore Rüzgar YEKA — 4 Saha, İhale 2026</h4>
+      <p>Enerji Bakanlığı 4 aday offshore YEKA sahası açıkladı: Saros Körfezi, Gökçeada, Bozcaada, Edremit Körfezi (~500 km², Kuzey Ege ekseni). İzin süreçleri sonrası Türkiye ilk offshore rüzgar YEKA ihalesini yapacak. 2035 hedefi 5 GW.</p>
+      <div class="source"><a href="https://www.aa.com.tr/en/energy/wind/turkiye-to-allocate-1-500-mw-of-wind-capacity-through-yeka-tenders-in-2026/56973" target="_blank" rel="noopener">AA / OffshoreWind.biz →</a></div>
+    </div>
+    <div class="yeka-item">
+      <div class="capacity">1.500 MW</div>
+      <h4>2026 YEKA Rüzgar Tahsisi</h4>
+      <p>2026 YEKA yarışmalarında 1.500 MW rüzgara ayrılıyor. Türkiye yılda en az 2 GW YEKA ihalesi sürdürmeyi planlıyor. Her yeni saha = yeni 154/380 kV bağlantı trafo merkezi ihtiyacı.</p>
+      <div class="source"><a href="https://www.aa.com.tr/en/energy/wind/turkiye-to-allocate-1-500-mw-of-wind-capacity-through-yeka-tenders-in-2026/56973" target="_blank" rel="noopener">Anadolu Ajansı →</a></div>
+    </div>
+    <div class="yeka-item">
+      <div class="capacity">Lisanssız BESS</div>
+      <h4>YEKA'da Batarya Depolama Entegrasyonu</h4>
+      <p>YEKA kazananları, üretim varlığının kurulu gücüne kadar ek lisans gerekmeden batarya depolama (BESS) kurabiliyor. Depolama; gün-öncesi arbitraj, yan hizmetler ve kapasite piyasası geliri sağlıyor. BESS bağlantı TM'leri yeni iş kolu.</p>
+      <div class="source"><a href="https://ember-energy.org/latest-insights/new-targets-old-challenges-in-turkish-wind-and-solar-tenders/" target="_blank" rel="noopener">Ember →</a></div>
+    </div>
+    <div class="yeka-item">
+      <div class="capacity">120 GW</div>
+      <h4>2035 Güneş+Rüzgar Hedefi — Yılda 8 GW</h4>
+      <p>Türkiye güneş+rüzgar kurulu gücünü ~32 GW'tan 2035'te 120 GW'a çıkarmayı hedefliyor; yılda ortalama 8 GW yeni kapasite gerekiyor. 2035'e kadar ~30 milyar dolar iletim altyapısı yatırımı planlanıyor.</p>
+      <div class="source"><a href="https://www.intercon-tr.com/eng/article/turkey-2035-renewable-energy-roadmap/" target="_blank" rel="noopener">Intercon / Ember →</a></div>
+    </div></div>
+
+    <h2 class="section-title" id="mena">Kuzey Afrika & Ortadoğu EPC Pazarı</h2>
+    <div class="mena-grid">
+    <div class="mena-item">
+      <h4>🌍 Türk EPC Firmaları Afrika'da — 2.000+ Proje, ~$100 Milyar</h4>
+      <p>Atlantic Council raporu: Türk müteahhitlik firmaları 2003'ten bu yana Afrika'da 2.000'in üzerinde proje, 2024'e kadar ~100 milyar dolar değerinde iş tamamladı. Elektrik sektörü mühendislik-tedarik-inşaat alanında Türkiye güçlü konumda.</p>
+      <div class="source"><a href="https://www.atlanticcouncil.org/in-depth-research-reports/report/redefining-power-systems-turkish-electric-sector-engagement-in-africa/" target="_blank" rel="noopener">Atlantic Council →</a></div>
+    </div>
+    <div class="mena-item">
+      <h4>🇸🇦 Suudi Arabistan: Linxon 380 kV Anahtar Teslim TM — 400M SAR</h4>
+      <p>Linxon, Medine'deki Taibah enerji santrali için 380 kV anahtar teslim trafo merkezi EPC sözleşmesini 400 milyon Suudi Riyali bedelle kazandı. Körfez bölgesinde 380 kV TM EPC talebi sürüyor — Türk tedarikçiler için tedarik fırsatı.</p>
+      <div class="source"><a href="https://linxon.com/news/press-release-linxon-awarded-400-million-saudi-riyals-380-kv-epc-contract-for-taibah-power-plant-turnkey-substation-in-madinah-saudi-arabia/" target="_blank" rel="noopener">Linxon →</a></div>
+    </div>
+    <div class="mena-item">
+      <h4>🇩🇿 Cezayir: Sonelgaz 10 Adet YG Mobil Trafo Merkezi</h4>
+      <p>Cezayir kamu elektrik kuruluşu Sonelgaz, toplam 10 yüksek gerilim mobil trafo merkezi için ihaleleri sonuçlandırdı. Cezayir'in 15.000 MW güneş hedefi, EPC ve trafo tedarik fırsatlarını açıyor.</p>
+      <div class="source"><a href="https://www.trade.gov/country-commercial-guides/turkey-electric-power-renewables-smart-grid-energy-storage-civil-nuclear" target="_blank" rel="noopener">IndexBox / Sonelgaz →</a></div>
+    </div>
+    <div class="mena-item">
+      <h4>📊 Küresel Şebeke Yatırımı — Yılda $200 Milyar+ Gerekiyor</h4>
+      <p>IEA: 2023'te küresel iletim yatırımı $140 milyar. Bugünkü politika ile 2030'ların ortasında yılda $200 milyarı aşması, net-sıfır senaryolarında $250-300 milyara çıkması gerekiyor. Trafo ve kablo tedarik zinciri en büyük darboğaz.</p>
+      <div class="source"><a href="https://www.iea.org/reports/building-the-future-transmission-grid/executive-summary" target="_blank" rel="noopener">IEA →</a></div>
+    </div></div>
+
+    <h2 class="section-title" id="live">📡 Canlı Sektör Akışı (RSS)</h2>
+    <p class="live-empty">Canlı besleme şu an boş veya ağ erişimi kısıtlı. Bu bölüm GitHub Actions üzerinde her yenilemede 6 RSS kaynağından otomatik dolar.</p>
+
+    <div class="no-results" id="no-results">Eşleşen sonuç yok. Aramayı temizleyin.</div>
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">📊 Önemli Rakamlar</div>
+      
+    <div class="stat-item">
+      <span class="stat-label">Astor ABD Trafo Siparişi</span>
+      <span class="stat-value green">$71,98M</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">TR Güneş Kurulu Güç</span>
+      <span class="stat-value ">26.339 MW</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">TR Rüzgar Kurulu Güç</span>
+      <span class="stat-value ">~16.000 MW</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">TR Yenilenebilir Toplam</span>
+      <span class="stat-value ">~74.686 MW</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Offshore Rüzgar Hedefi 2035</span>
+      <span class="stat-value green">5 GW</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">2026 YEKA Rüzgar Tahsisi</span>
+      <span class="stat-value ">1.500 MW</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Güç Trafosu Teslim Süresi</span>
+      <span class="stat-value red">~4 yıl</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Trafo Fiyat Artışı (2019→)</span>
+      <span class="stat-value red">+%75</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Şebeke Yatırım İhtiyacı</span>
+      <span class="stat-value ">$200B+/yıl</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">2035 Güneş+Rüzgar Hedefi</span>
+      <span class="stat-value green">120 GW</span>
+    </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">🚨 Acil Takip Listesi</div>
+      
+    <div class="action-item">
+      <div class="action-title">İTM.79 — 6x 380/154 kV TM Yapımı</div>
+      <div class="action-desc">BETAŞ çekirdek iş. EKAP şartnamelerini incele, teklif dosyasını hazırla.</div>
+      <div class="action-deadline">⏰ EKAP takvimini doğrula</div>
+    </div>
+    <div class="action-item">
+      <div class="action-title">Seyhan GIS / Yeşilhisar TM</div>
+      <div class="action-desc">GIS yenileme ve 400+154 kV bağlantı hatları. Şartname ve benzer iş şartını kontrol et.</div>
+      <div class="action-deadline">⏰ Aktif — EKAP'tan teyit et</div>
+    </div>
+    <div class="action-item">
+      <div class="action-title">Offshore Rüzgar YEKA Hazırlığı</div>
+      <div class="action-desc">Deniz üstü trafo merkezi + deniz altı kablo EPC'si yeni iş kolu. Teknik kapasite ve ortaklık araştırmasına şimdi başla.</div>
+      <div class="action-deadline">⏰ İlk ihale 2026</div>
+    </div>
+    <div class="action-item">
+      <div class="action-title">Hitachi Dijital TM Yetkinliği</div>
+      <div class="action-desc">IEC 61850 process-bus pilotu referans. BETAŞ ekibinde dijital TM yetkinliği geliştir.</div>
+      <div class="action-deadline">⏰ Bu çeyrek</div>
+    </div>
+    <div class="action-item">
+      <div class="action-title">Cezayir Sonelgaz Takibi</div>
+      <div class="action-desc">10 mobil TM ihalesi sonrası takip ihaleleri ve 15.000 MW güneş planını izle.</div>
+      <div class="action-deadline">⏰ Sürekli izle</div>
+    </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">🎯 Ati İçin Strateji</div>
+      <div class="strategy-box"><p><strong>1. İTM.79'a Agresif Teklif:</strong> 6 trafo merkezi yapımı doğrudan BETAŞ core business'ı. Altınkaya, Refahiye, Tirebolu gibi sahalarda lojistik ve saha deneyimi öne çıkar. TEİAŞ sicil avantajını kullan.</p><p><strong>2. Dijital TM'ye Erken Konumlan:</strong> Hitachi-TEİAŞ pilotu, IEC 61850 dijital trafo merkezinin Türkiye'de standart olacağının sinyali. BETAŞ ekibinde process-bus / OCT yetkinliği geliştirip ihalelerde fark yarat.</p><p><strong>3. Trafo Tedarik Zincirini Kilitle:</strong> Küresel teslim süresi 4 yıl, fiyat +%75. Astor, Hitachi TR ve PTTX (Bursa nüve) ile erken tedarik anlaşmaları yaparak proje takvimini koru.</p><p><strong>4. Offshore Rüzgar Yeni İş Kolu:</strong> Saros-Edremit eksenindeki 4 saha, deniz üstü TM ve deniz altı kablo EPC'si açacak. 2026 ihalesinden önce teknik ortak ve referans hazırlığına başla.</p><p><strong>5. Körfez &amp; Afrika İhracatı:</strong> Linxon'un Suudi 380 kV modeli ve Türk firmalarının Afrika'daki $100B birikimi, BETAŞ için Körfez/Kuzey Afrika TM EPC ihracat penceresi. Cezayir Sonelgaz takip ihalelerini hedefle.</p></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">📰 Kaynaklar</div>
+      <div class="action-item"><div class="action-desc">Anadolu Ajansı Enerji Terminali • Hitachi Energy • IEA • Ember • Transformers Magazine • Borsa Gündem • Yatırımx • Atlantic Council • Linxon • TotalEnergies • OffshoreWind.biz • Intercon • EKAP / İhale Rapor • GWEC • Rüzgar Enerjisi Dergisi</div></div>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <p>Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.</p>
+  <p style="margin-top:6px;">Veri küratörlüğü: 2026-06-18 · Oluşturulma: 18.06.2026 08:42 (TSİ) · Ati (BETAŞ) için otomatik hazırlanmıştır.</p>
+</footer>
+
+<script>
+// Live Istanbul clock
+(function(){
+  var el=document.getElementById('clock');
+  function tick(){
+    try{
+      var s=new Intl.DateTimeFormat('tr-TR',{timeZone:'Europe/Istanbul',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
+      el.textContent='İstanbul · '+s+' TSİ';
+    }catch(e){ el.textContent=new Date().toLocaleTimeString(); }
+  }
+  tick(); setInterval(tick,1000);
+})();
+
+// Auto-refresh the page every 15 minutes so an open tab pulls the latest rebuild
+setTimeout(function(){ location.reload(); }, 15*60*1000);
+
+// Search + importance filter
+(function(){
+  var search=document.getElementById('search');
+  var buttons=document.querySelectorAll('.filter-btn');
+  var cards=Array.prototype.slice.call(document.querySelectorAll('#cards .card'));
+  var rows=Array.prototype.slice.call(document.querySelectorAll('#tender-rows tr'));
+  var liveItems=Array.prototype.slice.call(document.querySelectorAll('.live-list li'));
+  var noRes=document.getElementById('no-results');
+  var activeFilter='all';
+
+  function apply(){
+    var q=(search.value||'').toLowerCase().trim();
+    var shown=0;
+    cards.forEach(function(c){
+      var matchQ=!q||(c.getAttribute('data-search')||'').indexOf(q)>-1;
+      var matchF=activeFilter==='all'||c.getAttribute('data-importance')===activeFilter;
+      var vis=matchQ&&matchF;
+      c.style.display=vis?'':'none';
+      if(vis)shown++;
+    });
+    rows.forEach(function(r){
+      var matchQ=!q||(r.getAttribute('data-search')||'').indexOf(q)>-1;
+      r.style.display=matchQ?'':'none';
+    });
+    liveItems.forEach(function(li){
+      var matchQ=!q||(li.getAttribute('data-search')||'').indexOf(q)>-1;
+      li.style.display=matchQ?'':'none';
+    });
+    noRes.style.display=(shown===0&&q)?'block':'none';
+  }
+  search.addEventListener('input',apply);
+  buttons.forEach(function(b){
+    b.addEventListener('click',function(){
+      buttons.forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+      activeFilter=b.getAttribute('data-filter');
+      apply();
+    });
+  });
+})();
+</script>
+</body>
+</html>

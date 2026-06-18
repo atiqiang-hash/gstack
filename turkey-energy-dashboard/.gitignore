@@ -1,0 +1,2 @@
+# Build-timestamp artifact, regenerated on every `node generate.mjs` run.
+data/last-build.json

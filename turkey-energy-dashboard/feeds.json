@@ -1,0 +1,19 @@
+{
+  "comment": "Gerçek RSS beslemeleri. GitHub Actions (açık ağ) üzerinde çekilir; egress kısıtlı ortamlarda atlanır. Anahtar kelime filtresi ile sektörel haberler süzülür.",
+  "keywords": [
+    "trafo", "transformatör", "transformer", "teiaş", "teias", "eüaş", "euas", "tedaş",
+    "şalt", "gis", "substation", "trafo merkezi", "ihale", "tender", "epc",
+    "yeka", "rüzgar", "wind", "güneş", "solar", "ges", "res", "offshore",
+    "depolama", "battery", "bess", "iletim", "şebeke", "grid", "kv", "mw", "gw",
+    "astor", "hitachi", "siemens", "abb", "schneider", "yeo", "girişim", "kalyon", "rönesans",
+    "enerji", "energy", "elektrik", "electricity", "sonelgaz", "cezayir", "algeria"
+  ],
+  "feeds": [
+    { "name": "Anadolu Ajansı — Enerji", "url": "https://www.aa.com.tr/tr/rss/default?cat=enerji" },
+    { "name": "Enerji Günlüğü", "url": "https://www.enerjigunlugu.net/rss" },
+    { "name": "Enerji Portalı", "url": "https://www.enerjiportali.com/feed/" },
+    { "name": "Rüzgar Enerjisi Dergisi", "url": "https://www.ruzgarenerjisi.com.tr/feed/" },
+    { "name": "Transformers Magazine — Turkey", "url": "https://transformers-magazine.com/tag/turkey/feed/" },
+    { "name": "Enerji Günlüğü — Yenilenebilir", "url": "https://www.enerjigunlugu.net/rss/yenilenebilir-enerji" }
+  ]
+}

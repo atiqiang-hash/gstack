@@ -1,0 +1,202 @@
+{
+  "meta": {
+    "report_title": "BETAŞ EPC Intelligence",
+    "subtitle": "Türkiye EPC & Enerji Sektörü — Canlı İstihbarat Panosu | Ati'ye Özel",
+    "owner": "Ati (BETAŞ)",
+    "language": "tr",
+    "note": "Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.",
+    "curated_through": "2026-06-18"
+  },
+  "tickers": [
+    { "type": "hot", "text": "Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3" },
+    { "type": "new", "text": "TEİAŞ + Hitachi Energy: Türkiye'nin ilk dijital trafo merkezi pilotu devrede — IEC 61850 process-bus" },
+    { "type": "hot", "text": "TEİAŞ İTM.79: 6 adet 380 kV & 154 kV trafo merkezi yapım ihalesi açıldı (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)" },
+    { "type": "new", "text": "Offshore rüzgar YEKA: 4 saha belirlendi (Saros, Gökçeada, Bozcaada, Edremit) — ilk ihale 2026, 2035 hedefi 5 GW" },
+    { "type": "info", "text": "Küresel güç trafosu teslim süresi 4 yıla, fiyatlar 2019'a göre %75 arttı (IEA / WoodMac)" },
+    { "type": "info", "text": "Türkiye güneş 26.339 MW + rüzgar ~16.000 MW — 2035 hedefi 120 GW güneş+rüzgar" },
+    { "type": "new", "text": "PTTX, Bursa'da transformatör nüvesi üretim üssünü 2026'da devreye alıyor — Gemlik Limanı'na 10 dk" }
+  ],
+  "epc": [
+    {
+      "id": "astor-us-72m",
+      "title": "Astor Enerji — ABD'ye 71,98 Milyon Dolarlık Güç Trafosu İhracatı",
+      "summary": "Astor Enerji, ABD merkezli bir müşteriyle 132-220 MVA aralığında güç transformatörü tedariki için sözleşme imzaladı. Toplam bedel 71.982.000 USD (~3,31 milyar TL). Teslimatlar 2027'nin 2. ve 3. çeyreğinde. Anlaşma, şirketin 2025 yıl sonu hasılatının %9,39'una denk geliyor.",
+      "importance": "high",
+      "date": "2026-06-08",
+      "source_name": "Borsa Gündem",
+      "source_url": "https://www.borsagundem.com.tr/astor-enerjiden-72-milyon-dolarlik-yeni-sozlesme",
+      "tags": ["Astor", "Transformatör", "İhracat", "ABD"]
+    },
+    {
+      "id": "teias-hitachi-digital-ss",
+      "title": "TEİAŞ + Hitachi Energy — Türkiye'nin İlk Dijital Trafo Merkezi Pilotu",
+      "summary": "TEİAŞ, Hitachi Energy ile Türkiye'nin ilk dijital trafo merkezi pilotunu hayata geçirdi. Mevcut bir fiderin paralelinde IEC 61850 standardında process-bus teknolojisiyle kontrol & koruma fideri kuruldu. Bakır kablolamadan fiber optiğe geçiş, dijital trafo merkezi mimarisinin Türkiye'de yaygınlaşmasının önünü açıyor.",
+      "importance": "high",
+      "date": "2026-05-20",
+      "source_name": "Hitachi Energy",
+      "source_url": "https://www.hitachienergy.com/us/en/news-and-events/features/2026/05/turkiye-first-digital-substation-pilot-hitachi-energy",
+      "tags": ["TEİAŞ", "Hitachi", "Dijital TM", "IEC 61850"]
+    },
+    {
+      "id": "teias-itm79",
+      "title": "TEİAŞ İTM.79 — 6 Adet 380 kV & 154 kV Trafo Merkezi Yapımı",
+      "summary": "4734 sayılı Kamu İhale Kanunu md.19 açık ihale usulüyle 6 adet trafo merkezi yapım işi: Altınkaya TM (11D030180), Avanos-2 TM (06D030830), Maslak TM (12D030320), Refahiye TM (11D030580), Tirebolu TM (11D030560), Yeniçates TM (12D030380). BETAŞ'ın çekirdek iş kapsamı — teklif hazırlığı önerilir.",
+      "importance": "high",
+      "date": "2026-06-12",
+      "source_name": "EKAP / İhale Rapor",
+      "source_url": "https://ihalerapor.com/255856-itm79-6-adet-380-kv-ve-154-kv-trafo-merkezi-yapimi",
+      "tags": ["TEİAŞ", "İhale", "380 kV", "154 kV"]
+    },
+    {
+      "id": "pttx-bursa-core",
+      "title": "PTTX — Bursa Transformatör Nüvesi Üretim Üssü 2026'da Devrede",
+      "summary": "PTTX'in transformatör nüvesi (core) üretim üssü 2026'da Bursa'da faaliyete geçiyor; şirketin küresel üretim ağında kilit düğüm olacak. Tesis Gemlik Limanı'na 10 dakika, Avrupa sınırına ~390 km mesafede — lojistik avantajı yüksek. Türkiye'nin trafo tedarik zincirindeki ağırlığını artırıyor.",
+      "importance": "medium",
+      "date": "2026-06-02",
+      "source_name": "Transformers Magazine",
+      "source_url": "https://transformers-magazine.com/tm-news/pttxs-transformer-core-manufacturing-base-in-turkey-is-set-to-commence-operations-in-2026/",
+      "tags": ["PTTX", "Nüve", "Bursa", "Üretim"]
+    },
+    {
+      "id": "nuventura-aktif-sf6free-gis",
+      "title": "Nuventura × Aktif Elektroteknik — SF6'sız GIS Üretim Ortaklığı",
+      "summary": "Nuventura ve Aktif Elektroteknik, SF6 içermeyen birincil gaz izoleli şalt (GIS) üretimi için teknoloji ortaklığı kurdu. SF6'sız teknoloji, AB F-Gaz düzenlemeleri sıkılaşırken Türk üreticilere ihracat avantajı sağlıyor. BETAŞ projelerinde çevre-uyumlu şalt alternatifi.",
+      "importance": "medium",
+      "date": "2026-05-28",
+      "source_name": "Transformers Magazine",
+      "source_url": "https://transformers-magazine.com/tag/gis/",
+      "tags": ["GIS", "SF6'sız", "Aktif Elektroteknik"]
+    },
+    {
+      "id": "ronesans-total-enerji",
+      "title": "Rönesans Enerji × TotalEnergies — %50 Ortaklık, 700 MW+ YEK Boru Hattı",
+      "summary": "TotalEnergies, Rönesans Enerji'nin %50 hissesini almak için anlaşma imzaladı. Portföyde 166 MW hidro varlık ve 700 MW'ın üzerinde rüzgar, güneş ve batarya depolama projesi boru hattı bulunuyor. Büyük YEK projeleri = yeni bağlantı trafo merkezi EPC talebi.",
+      "importance": "medium",
+      "date": "2026-06-04",
+      "source_name": "TotalEnergies",
+      "source_url": "https://totalenergies.com/newsroom/turkey-totalenergies-partners-ronesans-holding-develop-renewable-energy-country/?lang=eng",
+      "tags": ["Rönesans", "TotalEnergies", "YEK", "BESS"]
+    }
+  ],
+  "tenders": [
+    { "project": "Seyhan GIS Yenileme ve Tamamlama", "org": "TEİAŞ", "scope": "GIS yenileme + tamamlama işi", "ikn": "2026/337244", "date": "2026", "status": "active" },
+    { "project": "Yeşilhisar TM Bağlantı Hatları", "org": "TEİAŞ", "scope": "400 kV + 154 kV bağlantı hatları", "ikn": "2026/456816", "date": "2026", "status": "active" },
+    { "project": "Seki TM Yapımı", "org": "TEİAŞ", "scope": "Trafo merkezi yapımı", "ikn": "2026/412652", "date": "2026", "status": "active" },
+    { "project": "Yalıkavak TM Tamamlama", "org": "TEİAŞ", "scope": "TM tamamlama işi", "ikn": "2026/338951", "date": "2026", "status": "active" },
+    { "project": "İTM.79 — 6x 380/154 kV TM Yapımı", "org": "TEİAŞ", "scope": "Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates TM", "ikn": "İTM.79", "date": "2026", "status": "upcoming" },
+    { "project": "10 Adet YG Mobil Trafo Merkezi", "org": "Sonelgaz (Cezayir)", "scope": "Yüksek gerilim mobil trafo merkezleri", "ikn": "—", "date": "2026", "status": "result" }
+  ],
+  "manufacturers": [
+    {
+      "title": "Astor Enerji — ABD'den $71,98M Sipariş",
+      "body": "132-220 MVA güç trafoları, teslim 2027 Q2-Q3. Anlaşma 2025 hasılatının %9,39'u. Astor'un ABD ve ihracat pazarındaki ağırlığı artıyor; küresel trafo açığı Türk üreticilere fırsat penceresi yaratıyor.",
+      "source_name": "Borsa Gündem",
+      "source_url": "https://www.borsagundem.com.tr/astor-enerjiden-72-milyon-dolarlik-yeni-sozlesme"
+    },
+    {
+      "title": "Hitachi Energy — Türkiye İlk Dijital TM Pilotu",
+      "body": "IEC 61850 process-bus teknolojisiyle paralel fider kontrol & koruma. Dijital trafo merkezi mimarisi optik akım/gerilim trafosu (OCT) talebini de tetikliyor — 2026'da Türkiye'de tahmini 350-550 adet OCT.",
+      "source_name": "Hitachi Energy",
+      "source_url": "https://www.hitachienergy.com/us/en/news-and-events/features/2026/05/turkiye-first-digital-substation-pilot-hitachi-energy"
+    },
+    {
+      "title": "PTTX — Bursa Nüve Üretim Üssü (2026)",
+      "body": "Transformatör nüvesi üretimi Bursa'da başlıyor. Gemlik Limanı'na 10 dk, AB sınırına 390 km. Türkiye'nin trafo bileşen tedarik zincirini güçlendiriyor.",
+      "source_name": "Transformers Magazine",
+      "source_url": "https://transformers-magazine.com/tm-news/pttxs-transformer-core-manufacturing-base-in-turkey-is-set-to-commence-operations-in-2026/"
+    },
+    {
+      "title": "Küresel HV Trafo Pazarı — Teslim 4 Yıl, Fiyat +%75",
+      "body": "IEA: büyük güç trafolarında teslim süresi 4 yıla, kablolarda 2-3 yıla çıktı. WoodMac Q2 2025: trafolar ortalama 128 hafta, GSU'lar 144 hafta. Fiyatlar 2019'a göre %75 arttı, bazı durumlarda reel 2,6 kat. Türk üreticiler için ihracat fırsatı.",
+      "source_name": "IEA",
+      "source_url": "https://www.iea.org/reports/building-the-future-transmission-grid/executive-summary"
+    }
+  ],
+  "yeka": [
+    {
+      "capacity": "5 GW",
+      "title": "İlk Offshore Rüzgar YEKA — 4 Saha, İhale 2026",
+      "body": "Enerji Bakanlığı 4 aday offshore YEKA sahası açıkladı: Saros Körfezi, Gökçeada, Bozcaada, Edremit Körfezi (~500 km², Kuzey Ege ekseni). İzin süreçleri sonrası Türkiye ilk offshore rüzgar YEKA ihalesini yapacak. 2035 hedefi 5 GW.",
+      "source_name": "AA / OffshoreWind.biz",
+      "source_url": "https://www.aa.com.tr/en/energy/wind/turkiye-to-allocate-1-500-mw-of-wind-capacity-through-yeka-tenders-in-2026/56973"
+    },
+    {
+      "capacity": "1.500 MW",
+      "title": "2026 YEKA Rüzgar Tahsisi",
+      "body": "2026 YEKA yarışmalarında 1.500 MW rüzgara ayrılıyor. Türkiye yılda en az 2 GW YEKA ihalesi sürdürmeyi planlıyor. Her yeni saha = yeni 154/380 kV bağlantı trafo merkezi ihtiyacı.",
+      "source_name": "Anadolu Ajansı",
+      "source_url": "https://www.aa.com.tr/en/energy/wind/turkiye-to-allocate-1-500-mw-of-wind-capacity-through-yeka-tenders-in-2026/56973"
+    },
+    {
+      "capacity": "Lisanssız BESS",
+      "title": "YEKA'da Batarya Depolama Entegrasyonu",
+      "body": "YEKA kazananları, üretim varlığının kurulu gücüne kadar ek lisans gerekmeden batarya depolama (BESS) kurabiliyor. Depolama; gün-öncesi arbitraj, yan hizmetler ve kapasite piyasası geliri sağlıyor. BESS bağlantı TM'leri yeni iş kolu.",
+      "source_name": "Ember",
+      "source_url": "https://ember-energy.org/latest-insights/new-targets-old-challenges-in-turkish-wind-and-solar-tenders/"
+    },
+    {
+      "capacity": "120 GW",
+      "title": "2035 Güneş+Rüzgar Hedefi — Yılda 8 GW",
+      "body": "Türkiye güneş+rüzgar kurulu gücünü ~32 GW'tan 2035'te 120 GW'a çıkarmayı hedefliyor; yılda ortalama 8 GW yeni kapasite gerekiyor. 2035'e kadar ~30 milyar dolar iletim altyapısı yatırımı planlanıyor.",
+      "source_name": "Intercon / Ember",
+      "source_url": "https://www.intercon-tr.com/eng/article/turkey-2035-renewable-energy-roadmap/"
+    }
+  ],
+  "mena": [
+    {
+      "title": "🌍 Türk EPC Firmaları Afrika'da — 2.000+ Proje, ~$100 Milyar",
+      "body": "Atlantic Council raporu: Türk müteahhitlik firmaları 2003'ten bu yana Afrika'da 2.000'in üzerinde proje, 2024'e kadar ~100 milyar dolar değerinde iş tamamladı. Elektrik sektörü mühendislik-tedarik-inşaat alanında Türkiye güçlü konumda.",
+      "source_name": "Atlantic Council",
+      "source_url": "https://www.atlanticcouncil.org/in-depth-research-reports/report/redefining-power-systems-turkish-electric-sector-engagement-in-africa/"
+    },
+    {
+      "title": "🇸🇦 Suudi Arabistan: Linxon 380 kV Anahtar Teslim TM — 400M SAR",
+      "body": "Linxon, Medine'deki Taibah enerji santrali için 380 kV anahtar teslim trafo merkezi EPC sözleşmesini 400 milyon Suudi Riyali bedelle kazandı. Körfez bölgesinde 380 kV TM EPC talebi sürüyor — Türk tedarikçiler için tedarik fırsatı.",
+      "source_name": "Linxon",
+      "source_url": "https://linxon.com/news/press-release-linxon-awarded-400-million-saudi-riyals-380-kv-epc-contract-for-taibah-power-plant-turnkey-substation-in-madinah-saudi-arabia/"
+    },
+    {
+      "title": "🇩🇿 Cezayir: Sonelgaz 10 Adet YG Mobil Trafo Merkezi",
+      "body": "Cezayir kamu elektrik kuruluşu Sonelgaz, toplam 10 yüksek gerilim mobil trafo merkezi için ihaleleri sonuçlandırdı. Cezayir'in 15.000 MW güneş hedefi, EPC ve trafo tedarik fırsatlarını açıyor.",
+      "source_name": "IndexBox / Sonelgaz",
+      "source_url": "https://www.trade.gov/country-commercial-guides/turkey-electric-power-renewables-smart-grid-energy-storage-civil-nuclear"
+    },
+    {
+      "title": "📊 Küresel Şebeke Yatırımı — Yılda $200 Milyar+ Gerekiyor",
+      "body": "IEA: 2023'te küresel iletim yatırımı $140 milyar. Bugünkü politika ile 2030'ların ortasında yılda $200 milyarı aşması, net-sıfır senaryolarında $250-300 milyara çıkması gerekiyor. Trafo ve kablo tedarik zinciri en büyük darboğaz.",
+      "source_name": "IEA",
+      "source_url": "https://www.iea.org/reports/building-the-future-transmission-grid/executive-summary"
+    }
+  ],
+  "stats": [
+    { "label": "Astor ABD Trafo Siparişi", "value": "$71,98M", "accent": "green" },
+    { "label": "TR Güneş Kurulu Güç", "value": "26.339 MW", "accent": "" },
+    { "label": "TR Rüzgar Kurulu Güç", "value": "~16.000 MW", "accent": "" },
+    { "label": "TR Yenilenebilir Toplam", "value": "~74.686 MW", "accent": "" },
+    { "label": "Offshore Rüzgar Hedefi 2035", "value": "5 GW", "accent": "green" },
+    { "label": "2026 YEKA Rüzgar Tahsisi", "value": "1.500 MW", "accent": "" },
+    { "label": "Güç Trafosu Teslim Süresi", "value": "~4 yıl", "accent": "red" },
+    { "label": "Trafo Fiyat Artışı (2019→)", "value": "+%75", "accent": "red" },
+    { "label": "Şebeke Yatırım İhtiyacı", "value": "$200B+/yıl", "accent": "" },
+    { "label": "2035 Güneş+Rüzgar Hedefi", "value": "120 GW", "accent": "green" }
+  ],
+  "actions": [
+    { "title": "İTM.79 — 6x 380/154 kV TM Yapımı", "desc": "BETAŞ çekirdek iş. EKAP şartnamelerini incele, teklif dosyasını hazırla.", "deadline": "EKAP takvimini doğrula" },
+    { "title": "Seyhan GIS / Yeşilhisar TM", "desc": "GIS yenileme ve 400+154 kV bağlantı hatları. Şartname ve benzer iş şartını kontrol et.", "deadline": "Aktif — EKAP'tan teyit et" },
+    { "title": "Offshore Rüzgar YEKA Hazırlığı", "desc": "Deniz üstü trafo merkezi + deniz altı kablo EPC'si yeni iş kolu. Teknik kapasite ve ortaklık araştırmasına şimdi başla.", "deadline": "İlk ihale 2026" },
+    { "title": "Hitachi Dijital TM Yetkinliği", "desc": "IEC 61850 process-bus pilotu referans. BETAŞ ekibinde dijital TM yetkinliği geliştir.", "deadline": "Bu çeyrek" },
+    { "title": "Cezayir Sonelgaz Takibi", "desc": "10 mobil TM ihalesi sonrası takip ihaleleri ve 15.000 MW güneş planını izle.", "deadline": "Sürekli izle" }
+  ],
+  "strategy": [
+    { "title": "1. İTM.79'a Agresif Teklif", "body": "6 trafo merkezi yapımı doğrudan BETAŞ core business'ı. Altınkaya, Refahiye, Tirebolu gibi sahalarda lojistik ve saha deneyimi öne çıkar. TEİAŞ sicil avantajını kullan." },
+    { "title": "2. Dijital TM'ye Erken Konumlan", "body": "Hitachi-TEİAŞ pilotu, IEC 61850 dijital trafo merkezinin Türkiye'de standart olacağının sinyali. BETAŞ ekibinde process-bus / OCT yetkinliği geliştirip ihalelerde fark yarat." },
+    { "title": "3. Trafo Tedarik Zincirini Kilitle", "body": "Küresel teslim süresi 4 yıl, fiyat +%75. Astor, Hitachi TR ve PTTX (Bursa nüve) ile erken tedarik anlaşmaları yaparak proje takvimini koru." },
+    { "title": "4. Offshore Rüzgar Yeni İş Kolu", "body": "Saros-Edremit eksenindeki 4 saha, deniz üstü TM ve deniz altı kablo EPC'si açacak. 2026 ihalesinden önce teknik ortak ve referans hazırlığına başla." },
+    { "title": "5. Körfez & Afrika İhracatı", "body": "Linxon'un Suudi 380 kV modeli ve Türk firmalarının Afrika'daki $100B birikimi, BETAŞ için Körfez/Kuzey Afrika TM EPC ihracat penceresi. Cezayir Sonelgaz takip ihalelerini hedefle." }
+  ],
+  "sources_footer": [
+    "Anadolu Ajansı Enerji Terminali", "Hitachi Energy", "IEA", "Ember", "Transformers Magazine",
+    "Borsa Gündem", "Yatırımx", "Atlantic Council", "Linxon", "TotalEnergies", "OffshoreWind.biz",
+    "Intercon", "EKAP / İhale Rapor", "GWEC", "Rüzgar Enerjisi Dergisi"
+  ]
+}

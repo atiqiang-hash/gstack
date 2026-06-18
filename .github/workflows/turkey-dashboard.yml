@@ -36,6 +36,13 @@ jobs:
           node-version: '22'
       - name: Build dashboard (curated data + live RSS aggregation)
         working-directory: turkey-energy-dashboard
+        # Optional live-headline machine translation (off unless you set the
+        # repo variable DASH_TRANSLATE to "google" or "libre"). Libre also reads
+        # the LIBRETRANSLATE_URL variable and LIBRETRANSLATE_API_KEY secret.
+        env:
+          TRANSLATE: ${{ vars.DASH_TRANSLATE }}
+          LIBRETRANSLATE_URL: ${{ vars.LIBRETRANSLATE_URL }}
+          LIBRETRANSLATE_API_KEY: ${{ secrets.LIBRETRANSLATE_API_KEY }}
         run: node generate.mjs
       - uses: actions/upload-pages-artifact@v3
         with:

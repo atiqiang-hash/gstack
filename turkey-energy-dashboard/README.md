@@ -6,10 +6,11 @@ canlı bir web panosu. Manus'taki tek seferlik statik raporun yükseltilmiş hal
 - **Gerçek veri, gerçek kaynak.** Her kart, tablo satırı ve istatistik gerçek bir
   habere/rapora dayanır ve tıklanabilir kaynak bağlantısı taşır (AA, Hitachi Energy,
   IEA, Ember, Transformers Magazine, EKAP, Borsa Gündem, Atlantic Council, Linxon…).
-- **İki dilli (TR / 中文).** Sağ üstteki TR / 中文 düğmesiyle tüm pano anında dil
-  değiştirir; tercih `localStorage`'da hatırlanır. Arama her iki dilde de eşleşir.
+- **Üç dilli (TR / EN / 中文).** Sağ üstteki TR / EN / 中文 düğmesiyle tüm pano anında
+  dil değiştirir; tercih `localStorage`'da hatırlanır. Arama üç dilde de eşleşir.
 - **Canlı RSS akışı.** 16 gerçek Türk/uluslararası enerji RSS beslemesinden sektör
-  haberleri otomatik toplanır (`feeds.json`), anahtar kelimeyle süzülür.
+  haberleri otomatik toplanır (`feeds.json`), anahtar kelimeyle süzülür. İsteğe bağlı
+  makine çevirisiyle canlı başlıklar üç dile de çevrilebilir (aşağıya bakın).
 - **7/24 tazelik.** GitHub Actions her 3 saatte bir yeniden derler ve GitHub Pages'e
   yayımlar. Açık bırakılan sekme her 15 dakikada bir kendini yeniler.
 - **Tek dosya, her yerde açılır.** `index.html` bağımsızdır — çift tıklayıp yerelde
@@ -44,8 +45,9 @@ open index.html          # macOS  (Linux: xdg-open, Windows: start)
 
 Tüm küratörlü içerik `data/news.json` içindedir — başka hiçbir yeri elle düzenlemeyin.
 Yeni bir haber/ihale eklemek için ilgili diziye bir nesne ekleyip `node generate.mjs`
-çalıştırın. Her metin alanının bir de `_zh` (Çince) karşılığı vardır (örn. `title` +
-`title_zh`); `_zh` boş bırakılırsa o dilde Türkçe metin gösterilir. Alanlar:
+çalıştırın. Her metin alanının `_en` (İngilizce) ve `_zh` (Çince) karşılığı vardır
+(örn. `title` + `title_en` + `title_zh`); bir dil boş bırakılırsa o dilde Türkçe metin
+gösterilir. Alanlar:
 
 - `epc[]` — kart: `title, summary, importance(high|medium|low), date, source_name, source_url, tags[]`
 - `tenders[]` — tablo satırı: `project, org, scope, ikn, date, status(active|upcoming|result)`
@@ -54,6 +56,28 @@ Yeni bir haber/ihale eklemek için ilgili diziye bir nesne ekleyip `node generat
 - `actions[]` — `title, desc, deadline`
 - `strategy[]` — `title, body`
 - `tickers[]` — `type(hot|new|info), text`
+
+## Canlı başlık makine çevirisi (isteğe bağlı, varsayılan KAPALI)
+
+Canlı RSS başlıkları normalde kaynak dilinde (TR/EN) gösterilir. İstenirse her başlık
+TR + EN + 中文'ye çevrilip dil düğmesine bağlanabilir. Çeviri **best-effort**'tur:
+herhangi bir çağrı başarısız olursa başlık orijinal diliyle kalır, pano yine derlenir.
+
+```bash
+# Ücretsiz, anahtarsız (resmi olmayan Google uç noktası)
+TRANSLATE=google node generate.mjs
+
+# Kendi LibreTranslate sunucunuzla
+TRANSLATE=libre LIBRETRANSLATE_URL=https://libretranslate.example node generate.mjs
+# (gerekirse LIBRETRANSLATE_API_KEY ekleyin)
+
+TRANSLATE_MAX=18   # derleme başına çevrilecek başlık sayısı (varsayılan 18)
+```
+
+GitHub Actions'ta açmak için: **Settings → Secrets and variables → Actions → Variables**
+altında `DASH_TRANSLATE` değişkenini `google` (veya `libre`) yapın. Libre için ayrıca
+`LIBRETRANSLATE_URL` değişkenini ve gerekiyorsa `LIBRETRANSLATE_API_KEY` secret'ını ekleyin.
+Değişken boşsa çeviri kapalı kalır.
 
 ## 7/24 yayına alma (GitHub Pages) — tek seferlik kurulum
 

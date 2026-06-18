@@ -4,23 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BETAŞ EPC Intelligence — 18 Haziran 2026 Perşembe</title>
-<meta name="description" content="Türkiye EPC & enerji sektörü canlı istihbarat panosu (TR/中文). Gerçek kaynaklı, kaynak bağlantılı.">
+<meta name="description" content="Türkiye EPC & energy live intelligence dashboard (TR/EN/中文). Real sources, linked.">
 <style>
 :root{--bg:#0a0e17;--panel:#111827;--card:#1a2332;--line:#1e293b;--accent:#00d4aa;--muted:#94a3b8;--dim:#64748b;--text:#e0e6ed;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
 a{color:var(--accent);}
-/* language toggle visibility */
-body:not(.show-zh) .lang-zh{display:none;}
-body.show-zh .lang-tr{display:none;}
+/* language visibility (3-way) */
+.lang-tr,.lang-en,.lang-zh{display:none;}
+body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inline;}
 .header{background:linear-gradient(135deg,#0f1923 0%,#1a2332 50%,#0d1b2a 100%);padding:26px 36px;border-bottom:3px solid var(--accent);}
 .header-content{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
 .header-left h1{font-size:26px;color:var(--accent);font-weight:800;letter-spacing:.5px;}
 .header-left .subtitle{font-size:13px;color:#8899aa;margin-top:5px;}
 .header-right{text-align:right;}
-.lang-toggle{display:inline-flex;gap:0;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;margin-bottom:8px;}
-.lang-btn{background:var(--card);border:none;color:var(--muted);padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+.lang-toggle{display:inline-flex;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.lang-btn{background:var(--card);border:none;border-left:1px solid #2a3a4a;color:var(--muted);padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;}
+.lang-btn:first-child{border-left:none;}
 .lang-btn.active{background:var(--accent);color:#0a0e17;}
 .header-right .date{font-size:17px;color:#fff;font-weight:600;}
 .header-right .time-badge{display:inline-block;background:var(--accent);color:#0a0e17;padding:4px 12px;border-radius:4px;font-size:13px;font-weight:700;margin-top:6px;}
@@ -28,6 +29,7 @@ body.show-zh .lang-tr{display:none;}
 .status-bar{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:#0d1117;padding:8px 36px;border-bottom:1px solid var(--line);font-size:12px;color:var(--dim);}
 .live-on{color:var(--accent);font-weight:700;}
 .live-off{color:#d97706;font-weight:600;}
+.tr-on{color:#8b5cf6;font-weight:600;}
 .refresh-note{margin-left:auto;}
 .marquee-container{background:var(--panel);padding:11px 0;border-bottom:1px solid var(--line);overflow:hidden;}
 .marquee-content{display:inline-block;white-space:nowrap;animation:marquee 60s linear infinite;font-size:13px;color:var(--muted);}
@@ -102,365 +104,371 @@ body.show-zh .lang-tr{display:none;}
 @media (max-width:1024px){.main-layout{grid-template-columns:1fr;}.sidebar{border-left:none;border-top:1px solid var(--line);}}
 </style>
 </head>
-<body>
+<body class="lmode-tr">
 
 <header class="header">
   <div class="header-content">
     <div class="header-left">
       <h1>BETAŞ EPC Intelligence</h1>
-      <div class="subtitle"><span class="lang-tr">Türkiye EPC &amp; Enerji Sektörü — Canlı İstihbarat Panosu | Ati'ye Özel</span><span class="lang-zh">土耳其 EPC 与能源行业 — 全天候实时情报面板 | Ati 专属</span></div>
+      <div class="subtitle"><span class="lang-tr">Türkiye EPC &amp; Enerji Sektörü — Canlı İstihbarat Panosu | Ati'ye Özel</span><span class="lang-en">Türkiye EPC &amp; Energy Sector — Live Intelligence Dashboard | For Ati</span><span class="lang-zh">土耳其 EPC 与能源行业 — 全天候实时情报面板 | Ati 专属</span></div>
     </div>
     <div class="header-right">
       <div class="lang-toggle">
         <button class="lang-btn" data-lang="tr">TR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
         <button class="lang-btn" data-lang="zh">中文</button>
       </div>
-      <div class="date"><span class="lang-tr">18 Haziran 2026 Perşembe</span><span class="lang-zh">2026年6月18日星期四</span></div>
-      <div class="time-badge"><span class="lang-tr">⚡ CANLI İSTİHBARAT PANOSU</span><span class="lang-zh">⚡ 全天候实时情报面板</span></div>
+      <div class="date"><span class="lang-tr">18 Haziran 2026 Perşembe</span><span class="lang-en">Thursday, June 18, 2026</span><span class="lang-zh">2026年6月18日星期四</span></div>
+      <div class="time-badge"><span class="lang-tr">⚡ CANLI İSTİHBARAT PANOSU</span><span class="lang-en">⚡ LIVE INTELLIGENCE DASHBOARD</span><span class="lang-zh">⚡ 全天候实时情报面板</span></div>
       <div class="clock" id="clock">…</div>
     </div>
   </div>
 </header>
 
 <div class="status-bar">
-  <span class="live-off"><span class="lang-tr">○ Canlı besleme beklemede</span><span class="lang-zh">○ 实时流待启用</span></span>
-  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-zh">最后更新：</span> <strong>18.06.2026 17:16</strong> <span class="lang-tr">(TSİ)</span><span class="lang-zh">（土耳其时间）</span></span>
-  <span><span class="lang-tr">3 yüksek öncelikli başlık</span><span class="lang-zh">3 条高优先级头条</span></span>
-  <span class="refresh-note"><span class="lang-tr">Sayfa açık kaldığında her 15 dk'da bir otomatik yenilenir.</span><span class="lang-zh">页面保持打开时每 15 分钟自动刷新。</span></span>
+  <span class="live-off"><span class="lang-tr">○ Canlı besleme beklemede</span><span class="lang-en">○ Live feed pending</span><span class="lang-zh">○ 实时流待启用</span></span>
+  
+  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-en">Last updated:</span><span class="lang-zh">最后更新：</span> <strong>18.06.2026 17:36</strong> <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span></span>
+  <span><span class="lang-tr">3 yüksek öncelikli başlık</span><span class="lang-en">3 high-priority items</span><span class="lang-zh">3 条高优先级头条</span></span>
+  <span class="refresh-note"><span class="lang-tr">Sayfa açık kaldığında her 15 dk'da bir otomatik yenilenir.</span><span class="lang-en">Auto-refreshes every 15 min while open.</span><span class="lang-zh">页面保持打开时每 15 分钟自动刷新。</span></span>
 </div>
 
 <div class="marquee-container">
-  <div class="marquee-content"><span class="hot"><span class="lang-tr">Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3</span><span class="lang-zh">Astor Enerji 向美国签下 7,198 万美元电力变压器出口合同（2026年6月8日）— 132-220 MVA，2027年Q2-Q3交货</span></span><span class="new"><span class="lang-tr">TEİAŞ + Hitachi Energy: Türkiye'nin ilk dijital trafo merkezi pilotu devrede — IEC 61850 process-bus</span><span class="lang-zh">TEİAŞ + Hitachi Energy：土耳其首个数字化变电站试点投运 — IEC 61850 process-bus</span></span><span class="hot"><span class="lang-tr">TEİAŞ İTM.79: 6 adet 380 kV &amp; 154 kV trafo merkezi yapım ihalesi açıldı (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="lang-zh">TEİAŞ İTM.79：6 座 380 kV 和 154 kV 变电站新建招标开标（Altınkaya、Avanos-2、Maslak、Refahiye、Tirebolu、Yeniçates）</span></span><span class="new"><span class="lang-tr">Offshore rüzgar YEKA: 4 saha belirlendi (Saros, Gökçeada, Bozcaada, Edremit) — ilk ihale 2026, 2035 hedefi 5 GW</span><span class="lang-zh">海上风电 YEKA：4 个海域选定（Saros、Gökçeada、Bozcaada、Edremit）— 2026年首拍，2035目标5 GW</span></span><span class=""><span class="lang-tr">Küresel güç trafosu teslim süresi 4 yıla, fiyatlar 2019'a göre %75 arttı (IEA / WoodMac)</span><span class="lang-zh">全球电力变压器交货期长达4年，价格较2019年上涨75%（IEA / WoodMac）</span></span><span class=""><span class="lang-tr">Türkiye güneş 26.339 MW + rüzgar ~16.000 MW — 2035 hedefi 120 GW güneş+rüzgar</span><span class="lang-zh">土耳其光伏 26,339 MW + 风电约16,000 MW — 2035目标120 GW光伏+风电</span></span><span class="new"><span class="lang-tr">PTTX, Bursa'da transformatör nüvesi üretim üssünü 2026'da devreye alıyor — Gemlik Limanı'na 10 dk</span><span class="lang-zh">PTTX 于2026年在布尔萨投运变压器铁芯生产基地 — 距盖姆利克港10分钟</span></span><span class="hot"><span class="lang-tr">Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3</span><span class="lang-zh">Astor Enerji 向美国签下 7,198 万美元电力变压器出口合同（2026年6月8日）— 132-220 MVA，2027年Q2-Q3交货</span></span><span class="new"><span class="lang-tr">TEİAŞ + Hitachi Energy: Türkiye'nin ilk dijital trafo merkezi pilotu devrede — IEC 61850 process-bus</span><span class="lang-zh">TEİAŞ + Hitachi Energy：土耳其首个数字化变电站试点投运 — IEC 61850 process-bus</span></span><span class="hot"><span class="lang-tr">TEİAŞ İTM.79: 6 adet 380 kV &amp; 154 kV trafo merkezi yapım ihalesi açıldı (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="lang-zh">TEİAŞ İTM.79：6 座 380 kV 和 154 kV 变电站新建招标开标（Altınkaya、Avanos-2、Maslak、Refahiye、Tirebolu、Yeniçates）</span></span><span class="new"><span class="lang-tr">Offshore rüzgar YEKA: 4 saha belirlendi (Saros, Gökçeada, Bozcaada, Edremit) — ilk ihale 2026, 2035 hedefi 5 GW</span><span class="lang-zh">海上风电 YEKA：4 个海域选定（Saros、Gökçeada、Bozcaada、Edremit）— 2026年首拍，2035目标5 GW</span></span><span class=""><span class="lang-tr">Küresel güç trafosu teslim süresi 4 yıla, fiyatlar 2019'a göre %75 arttı (IEA / WoodMac)</span><span class="lang-zh">全球电力变压器交货期长达4年，价格较2019年上涨75%（IEA / WoodMac）</span></span><span class=""><span class="lang-tr">Türkiye güneş 26.339 MW + rüzgar ~16.000 MW — 2035 hedefi 120 GW güneş+rüzgar</span><span class="lang-zh">土耳其光伏 26,339 MW + 风电约16,000 MW — 2035目标120 GW光伏+风电</span></span><span class="new"><span class="lang-tr">PTTX, Bursa'da transformatör nüvesi üretim üssünü 2026'da devreye alıyor — Gemlik Limanı'na 10 dk</span><span class="lang-zh">PTTX 于2026年在布尔萨投运变压器铁芯生产基地 — 距盖姆利克港10分钟</span></span></div>
+  <div class="marquee-content"><span class="hot"><span class="lang-tr">Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3</span><span class="lang-en">Astor Enerji signs $71.98M power transformer export contract to the US (8 June 2026) — 132-220 MVA, delivery 2027 Q2-Q3</span><span class="lang-zh">Astor Enerji 向美国签下 7,198 万美元电力变压器出口合同（2026年6月8日）— 132-220 MVA，2027年Q2-Q3交货</span></span><span class="new"><span class="lang-tr">TEİAŞ + Hitachi Energy: Türkiye'nin ilk dijital trafo merkezi pilotu devrede — IEC 61850 process-bus</span><span class="lang-en">TEİAŞ + Hitachi Energy: Türkiye's first digital substation pilot is live — IEC 61850 process-bus</span><span class="lang-zh">TEİAŞ + Hitachi Energy：土耳其首个数字化变电站试点投运 — IEC 61850 process-bus</span></span><span class="hot"><span class="lang-tr">TEİAŞ İTM.79: 6 adet 380 kV &amp; 154 kV trafo merkezi yapım ihalesi açıldı (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="lang-en">TEİAŞ İTM.79: tender opened for 6 substations at 380 kV &amp; 154 kV (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="lang-zh">TEİAŞ İTM.79：6 座 380 kV 和 154 kV 变电站新建招标开标（Altınkaya、Avanos-2、Maslak、Refahiye、Tirebolu、Yeniçates）</span></span><span class="new"><span class="lang-tr">Offshore rüzgar YEKA: 4 saha belirlendi (Saros, Gökçeada, Bozcaada, Edremit) — ilk ihale 2026, 2035 hedefi 5 GW</span><span class="lang-en">Offshore wind YEKA: 4 sites designated (Saros, Gökçeada, Bozcaada, Edremit) — first tender 2026, 5 GW target by 2035</span><span class="lang-zh">海上风电 YEKA：4 个海域选定（Saros、Gökçeada、Bozcaada、Edremit）— 2026年首拍，2035目标5 GW</span></span><span class=""><span class="lang-tr">Küresel güç trafosu teslim süresi 4 yıla, fiyatlar 2019'a göre %75 arttı (IEA / WoodMac)</span><span class="lang-en">Global power transformer lead times hit 4 years, prices up 75% since 2019 (IEA / WoodMac)</span><span class="lang-zh">全球电力变压器交货期长达4年，价格较2019年上涨75%（IEA / WoodMac）</span></span><span class=""><span class="lang-tr">Türkiye güneş 26.339 MW + rüzgar ~16.000 MW — 2035 hedefi 120 GW güneş+rüzgar</span><span class="lang-en">Türkiye solar 26,339 MW + wind ~16,000 MW — 2035 target 120 GW solar+wind</span><span class="lang-zh">土耳其光伏 26,339 MW + 风电约16,000 MW — 2035目标120 GW光伏+风电</span></span><span class="new"><span class="lang-tr">PTTX, Bursa'da transformatör nüvesi üretim üssünü 2026'da devreye alıyor — Gemlik Limanı'na 10 dk</span><span class="lang-en">PTTX brings its Bursa transformer-core plant online in 2026 — 10 min from Gemlik Port</span><span class="lang-zh">PTTX 于2026年在布尔萨投运变压器铁芯生产基地 — 距盖姆利克港10分钟</span></span><span class="hot"><span class="lang-tr">Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3</span><span class="lang-en">Astor Enerji signs $71.98M power transformer export contract to the US (8 June 2026) — 132-220 MVA, delivery 2027 Q2-Q3</span><span class="lang-zh">Astor Enerji 向美国签下 7,198 万美元电力变压器出口合同（2026年6月8日）— 132-220 MVA，2027年Q2-Q3交货</span></span><span class="new"><span class="lang-tr">TEİAŞ + Hitachi Energy: Türkiye'nin ilk dijital trafo merkezi pilotu devrede — IEC 61850 process-bus</span><span class="lang-en">TEİAŞ + Hitachi Energy: Türkiye's first digital substation pilot is live — IEC 61850 process-bus</span><span class="lang-zh">TEİAŞ + Hitachi Energy：土耳其首个数字化变电站试点投运 — IEC 61850 process-bus</span></span><span class="hot"><span class="lang-tr">TEİAŞ İTM.79: 6 adet 380 kV &amp; 154 kV trafo merkezi yapım ihalesi açıldı (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="lang-en">TEİAŞ İTM.79: tender opened for 6 substations at 380 kV &amp; 154 kV (Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates)</span><span class="lang-zh">TEİAŞ İTM.79：6 座 380 kV 和 154 kV 变电站新建招标开标（Altınkaya、Avanos-2、Maslak、Refahiye、Tirebolu、Yeniçates）</span></span><span class="new"><span class="lang-tr">Offshore rüzgar YEKA: 4 saha belirlendi (Saros, Gökçeada, Bozcaada, Edremit) — ilk ihale 2026, 2035 hedefi 5 GW</span><span class="lang-en">Offshore wind YEKA: 4 sites designated (Saros, Gökçeada, Bozcaada, Edremit) — first tender 2026, 5 GW target by 2035</span><span class="lang-zh">海上风电 YEKA：4 个海域选定（Saros、Gökçeada、Bozcaada、Edremit）— 2026年首拍，2035目标5 GW</span></span><span class=""><span class="lang-tr">Küresel güç trafosu teslim süresi 4 yıla, fiyatlar 2019'a göre %75 arttı (IEA / WoodMac)</span><span class="lang-en">Global power transformer lead times hit 4 years, prices up 75% since 2019 (IEA / WoodMac)</span><span class="lang-zh">全球电力变压器交货期长达4年，价格较2019年上涨75%（IEA / WoodMac）</span></span><span class=""><span class="lang-tr">Türkiye güneş 26.339 MW + rüzgar ~16.000 MW — 2035 hedefi 120 GW güneş+rüzgar</span><span class="lang-en">Türkiye solar 26,339 MW + wind ~16,000 MW — 2035 target 120 GW solar+wind</span><span class="lang-zh">土耳其光伏 26,339 MW + 风电约16,000 MW — 2035目标120 GW光伏+风电</span></span><span class="new"><span class="lang-tr">PTTX, Bursa'da transformatör nüvesi üretim üssünü 2026'da devreye alıyor — Gemlik Limanı'na 10 dk</span><span class="lang-en">PTTX brings its Bursa transformer-core plant online in 2026 — 10 min from Gemlik Port</span><span class="lang-zh">PTTX 于2026年在布尔萨投运变压器铁芯生产基地 — 距盖姆利克港10分钟</span></span></div>
 </div>
 
 <div class="toolbar">
   <input type="search" id="search"
     data-ph-tr="🔎 Haber, ihale, kurum, kV, MW ara… (örn: 380 kV, Astor, offshore)"
+    data-ph-en="🔎 Search news, tenders, orgs, kV, MW… (e.g. 380 kV, Astor, offshore)"
     data-ph-zh="🔎 搜索新闻、招标、机构、kV、MW…（如：380 kV、Astor、offshore）"
     placeholder="🔎 …">
-  <button class="filter-btn active" data-filter="all"><span class="lang-tr">Tümü</span><span class="lang-zh">全部</span></button>
-  <button class="filter-btn" data-filter="high"><span class="lang-tr">Yüksek</span><span class="lang-zh">高</span></button>
-  <button class="filter-btn" data-filter="medium"><span class="lang-tr">Orta</span><span class="lang-zh">中</span></button>
+  <button class="filter-btn active" data-filter="all"><span class="lang-tr">Tümü</span><span class="lang-en">All</span><span class="lang-zh">全部</span></button>
+  <button class="filter-btn" data-filter="high"><span class="lang-tr">Yüksek</span><span class="lang-en">High</span><span class="lang-zh">高</span></button>
+  <button class="filter-btn" data-filter="medium"><span class="lang-tr">Orta</span><span class="lang-en">Med</span><span class="lang-zh">中</span></button>
   <nav class="nav-links">
     <a href="#epc">EPC</a>
-    <a href="#tenders"><span class="lang-tr">İhaleler</span><span class="lang-zh">招标</span></a>
-    <a href="#mfg"><span class="lang-tr">Üreticiler</span><span class="lang-zh">制造商</span></a>
+    <a href="#tenders"><span class="lang-tr">İhaleler</span><span class="lang-en">Tenders</span><span class="lang-zh">招标</span></a>
+    <a href="#mfg"><span class="lang-tr">Üreticiler</span><span class="lang-en">Makers</span><span class="lang-zh">制造商</span></a>
     <a href="#yeka">YEKA</a>
     <a href="#mena">MENA</a>
-    <a href="#live"><span class="lang-tr">Canlı</span><span class="lang-zh">实时</span></a>
+    <a href="#live"><span class="lang-tr">Canlı</span><span class="lang-en">Live</span><span class="lang-zh">实时</span></a>
   </nav>
 </div>
 
 <div class="main-layout">
   <main class="content-area">
 
-    <h2 class="section-title" id="epc"><span class="lang-tr">EPC Projeleri &amp; Sözleşmeler</span><span class="lang-zh">EPC 项目与合同</span></h2>
+    <h2 class="section-title" id="epc"><span class="lang-tr">EPC Projeleri &amp; Sözleşmeler</span><span class="lang-en">EPC Projects &amp; Contracts</span><span class="lang-zh">EPC 项目与合同</span></h2>
     <div class="card-grid" id="cards">
-    <article class="card" data-importance="high" data-search="astor enerji — abd'ye 71,98 milyon dolarlık güç trafosu i̇hracatı astor enerji, abd merkezli bir müşteriyle 132-220 mva aralığında güç transformatörü tedariki için sözleşme imzaladı. toplam bedel 71.982.000 usd (~3,31 milyar tl). teslimatlar 2027'nin 2. ve 3. çeyreğinde. anlaşma, şirketin 2025 yıl sonu hasılatının %9,39'una denk geliyor. astor transformatör i̇hracat abd astor enerji — 向美国出口 7,198 万美元电力变压器 astor enerji 与一家美国客户签约供应 132-220 mva 电力变压器。合同总额 7,198.2 万美元（约 33.1 亿里拉）。交货期为 2027 年第二、第三季度。该合同相当于公司 2025 年底营收的 9.39%。 astor 变压器 出口 美国">
+    <article class="card" data-importance="high" data-search="astor enerji — abd'ye 71,98 milyon dolarlık güç trafosu i̇hracatı astor enerji, abd merkezli bir müşteriyle 132-220 mva aralığında güç transformatörü tedariki için sözleşme imzaladı. toplam bedel 71.982.000 usd (~3,31 milyar tl). teslimatlar 2027'nin 2. ve 3. çeyreğinde. anlaşma, şirketin 2025 yıl sonu hasılatının %9,39'una denk geliyor. astor transformatör i̇hracat abd astor enerji — $71.98m power transformer export to the us astor enerji signed a contract with a us-based customer to supply 132-220 mva power transformers. total value $71,982,000 (~tl 3.31bn). deliveries in q2-q3 2027. the deal equals 9.39% of the company's end-2025 revenue. astor transformer export usa astor enerji — 向美国出口 7,198 万美元电力变压器 astor enerji 与一家美国客户签约供应 132-220 mva 电力变压器。合同总额 7,198.2 万美元（约 33.1 亿里拉）。交货期为 2027 年第二、第三季度。该合同相当于公司 2025 年底营收的 9.39%。 astor 变压器 出口 美国">
       <div class="card-header">
-        <h3 class="card-title"><span class="lang-tr">Astor Enerji — ABD'ye 71,98 Milyon Dolarlık Güç Trafosu İhracatı</span><span class="lang-zh">Astor Enerji — 向美国出口 7,198 万美元电力变压器</span></h3>
-        <span class="badge badge-high"><span class="lang-tr">YÜKSEK</span><span class="lang-zh">高</span></span>
+        <h3 class="card-title"><span class="lang-tr">Astor Enerji — ABD'ye 71,98 Milyon Dolarlık Güç Trafosu İhracatı</span><span class="lang-en">Astor Enerji — $71.98M Power Transformer Export to the US</span><span class="lang-zh">Astor Enerji — 向美国出口 7,198 万美元电力变压器</span></h3>
+        <span class="badge badge-high"><span class="lang-tr">YÜKSEK</span><span class="lang-en">HIGH</span><span class="lang-zh">高</span></span>
       </div>
-      <p class="card-body"><span class="lang-tr">Astor Enerji, ABD merkezli bir müşteriyle 132-220 MVA aralığında güç transformatörü tedariki için sözleşme imzaladı. Toplam bedel 71.982.000 USD (~3,31 milyar TL). Teslimatlar 2027'nin 2. ve 3. çeyreğinde. Anlaşma, şirketin 2025 yıl sonu hasılatının %9,39'una denk geliyor.</span><span class="lang-zh">Astor Enerji 与一家美国客户签约供应 132-220 MVA 电力变压器。合同总额 7,198.2 万美元（约 33.1 亿里拉）。交货期为 2027 年第二、第三季度。该合同相当于公司 2025 年底营收的 9.39%。</span></p>
-      <div class="card-tags"><span class="tag"><span class="lang-tr">Astor</span><span class="lang-zh">Astor</span></span><span class="tag"><span class="lang-tr">Transformatör</span><span class="lang-zh">变压器</span></span><span class="tag"><span class="lang-tr">İhracat</span><span class="lang-zh">出口</span></span><span class="tag"><span class="lang-tr">ABD</span><span class="lang-zh">美国</span></span></div>
+      <p class="card-body"><span class="lang-tr">Astor Enerji, ABD merkezli bir müşteriyle 132-220 MVA aralığında güç transformatörü tedariki için sözleşme imzaladı. Toplam bedel 71.982.000 USD (~3,31 milyar TL). Teslimatlar 2027'nin 2. ve 3. çeyreğinde. Anlaşma, şirketin 2025 yıl sonu hasılatının %9,39'una denk geliyor.</span><span class="lang-en">Astor Enerji signed a contract with a US-based customer to supply 132-220 MVA power transformers. Total value $71,982,000 (~TL 3.31bn). Deliveries in Q2-Q3 2027. The deal equals 9.39% of the company's end-2025 revenue.</span><span class="lang-zh">Astor Enerji 与一家美国客户签约供应 132-220 MVA 电力变压器。合同总额 7,198.2 万美元（约 33.1 亿里拉）。交货期为 2027 年第二、第三季度。该合同相当于公司 2025 年底营收的 9.39%。</span></p>
+      <div class="card-tags"><span class="tag"><span class="lang-tr">Astor</span><span class="lang-en">Astor</span><span class="lang-zh">Astor</span></span><span class="tag"><span class="lang-tr">Transformatör</span><span class="lang-en">Transformer</span><span class="lang-zh">变压器</span></span><span class="tag"><span class="lang-tr">İhracat</span><span class="lang-en">Export</span><span class="lang-zh">出口</span></span><span class="tag"><span class="lang-tr">ABD</span><span class="lang-en">USA</span><span class="lang-zh">美国</span></span></div>
       <div class="card-footer">
         <span class="card-date">2026-06-08</span>
         <a href="https://www.borsagundem.com.tr/astor-enerjiden-72-milyon-dolarlik-yeni-sozlesme" target="_blank" rel="noopener">Borsa Gündem →</a>
       </div>
     </article>
-    <article class="card" data-importance="high" data-search="tei̇aş + hitachi energy — türkiye'nin i̇lk dijital trafo merkezi pilotu tei̇aş, hitachi energy ile türkiye'nin ilk dijital trafo merkezi pilotunu hayata geçirdi. mevcut bir fiderin paralelinde iec 61850 standardında process-bus teknolojisiyle kontrol &amp; koruma fideri kuruldu. bakır kablolamadan fiber optiğe geçiş, dijital trafo merkezi mimarisinin türkiye'de yaygınlaşmasının önünü açıyor. tei̇aş hitachi dijital tm iec 61850 tei̇aş + hitachi energy — 土耳其首个数字化变电站试点 tei̇aş 与 hitachi energy 落地土耳其首个数字化变电站试点。在既有间隔的并联间隔上，采用 iec 61850 标准的 process-bus 技术建设了控制与保护间隔。从铜缆转向光纤，为数字化变电站架构在土耳其的普及铺平道路。 tei̇aş hitachi 数字变电站 iec 61850">
+    <article class="card" data-importance="high" data-search="tei̇aş + hitachi energy — türkiye'nin i̇lk dijital trafo merkezi pilotu tei̇aş, hitachi energy ile türkiye'nin ilk dijital trafo merkezi pilotunu hayata geçirdi. mevcut bir fiderin paralelinde iec 61850 standardında process-bus teknolojisiyle kontrol &amp; koruma fideri kuruldu. bakır kablolamadan fiber optiğe geçiş, dijital trafo merkezi mimarisinin türkiye'de yaygınlaşmasının önünü açıyor. tei̇aş hitachi dijital tm iec 61850 tei̇aş + hitachi energy — türkiye's first digital substation pilot tei̇aş and hitachi energy delivered türkiye's first digital substation pilot. a control &amp; protection bay was built on a parallel feeder using iec 61850 process-bus technology. the shift from copper wiring to fiber optics paves the way for digital substation architecture across türkiye. tei̇aş hitachi digital ss iec 61850 tei̇aş + hitachi energy — 土耳其首个数字化变电站试点 tei̇aş 与 hitachi energy 落地土耳其首个数字化变电站试点。在既有间隔的并联间隔上，采用 iec 61850 标准的 process-bus 技术建设了控制与保护间隔。从铜缆转向光纤，为数字化变电站架构在土耳其的普及铺平道路。 tei̇aş hitachi 数字变电站 iec 61850">
       <div class="card-header">
-        <h3 class="card-title"><span class="lang-tr">TEİAŞ + Hitachi Energy — Türkiye'nin İlk Dijital Trafo Merkezi Pilotu</span><span class="lang-zh">TEİAŞ + Hitachi Energy — 土耳其首个数字化变电站试点</span></h3>
-        <span class="badge badge-high"><span class="lang-tr">YÜKSEK</span><span class="lang-zh">高</span></span>
+        <h3 class="card-title"><span class="lang-tr">TEİAŞ + Hitachi Energy — Türkiye'nin İlk Dijital Trafo Merkezi Pilotu</span><span class="lang-en">TEİAŞ + Hitachi Energy — Türkiye's First Digital Substation Pilot</span><span class="lang-zh">TEİAŞ + Hitachi Energy — 土耳其首个数字化变电站试点</span></h3>
+        <span class="badge badge-high"><span class="lang-tr">YÜKSEK</span><span class="lang-en">HIGH</span><span class="lang-zh">高</span></span>
       </div>
-      <p class="card-body"><span class="lang-tr">TEİAŞ, Hitachi Energy ile Türkiye'nin ilk dijital trafo merkezi pilotunu hayata geçirdi. Mevcut bir fiderin paralelinde IEC 61850 standardında process-bus teknolojisiyle kontrol &amp; koruma fideri kuruldu. Bakır kablolamadan fiber optiğe geçiş, dijital trafo merkezi mimarisinin Türkiye'de yaygınlaşmasının önünü açıyor.</span><span class="lang-zh">TEİAŞ 与 Hitachi Energy 落地土耳其首个数字化变电站试点。在既有间隔的并联间隔上，采用 IEC 61850 标准的 process-bus 技术建设了控制与保护间隔。从铜缆转向光纤，为数字化变电站架构在土耳其的普及铺平道路。</span></p>
-      <div class="card-tags"><span class="tag"><span class="lang-tr">TEİAŞ</span><span class="lang-zh">TEİAŞ</span></span><span class="tag"><span class="lang-tr">Hitachi</span><span class="lang-zh">Hitachi</span></span><span class="tag"><span class="lang-tr">Dijital TM</span><span class="lang-zh">数字变电站</span></span><span class="tag"><span class="lang-tr">IEC 61850</span><span class="lang-zh">IEC 61850</span></span></div>
+      <p class="card-body"><span class="lang-tr">TEİAŞ, Hitachi Energy ile Türkiye'nin ilk dijital trafo merkezi pilotunu hayata geçirdi. Mevcut bir fiderin paralelinde IEC 61850 standardında process-bus teknolojisiyle kontrol &amp; koruma fideri kuruldu. Bakır kablolamadan fiber optiğe geçiş, dijital trafo merkezi mimarisinin Türkiye'de yaygınlaşmasının önünü açıyor.</span><span class="lang-en">TEİAŞ and Hitachi Energy delivered Türkiye's first digital substation pilot. A control &amp; protection bay was built on a parallel feeder using IEC 61850 process-bus technology. The shift from copper wiring to fiber optics paves the way for digital substation architecture across Türkiye.</span><span class="lang-zh">TEİAŞ 与 Hitachi Energy 落地土耳其首个数字化变电站试点。在既有间隔的并联间隔上，采用 IEC 61850 标准的 process-bus 技术建设了控制与保护间隔。从铜缆转向光纤，为数字化变电站架构在土耳其的普及铺平道路。</span></p>
+      <div class="card-tags"><span class="tag"><span class="lang-tr">TEİAŞ</span><span class="lang-en">TEİAŞ</span><span class="lang-zh">TEİAŞ</span></span><span class="tag"><span class="lang-tr">Hitachi</span><span class="lang-en">Hitachi</span><span class="lang-zh">Hitachi</span></span><span class="tag"><span class="lang-tr">Dijital TM</span><span class="lang-en">Digital SS</span><span class="lang-zh">数字变电站</span></span><span class="tag"><span class="lang-tr">IEC 61850</span><span class="lang-en">IEC 61850</span><span class="lang-zh">IEC 61850</span></span></div>
       <div class="card-footer">
         <span class="card-date">2026-05-20</span>
         <a href="https://www.hitachienergy.com/us/en/news-and-events/features/2026/05/turkiye-first-digital-substation-pilot-hitachi-energy" target="_blank" rel="noopener">Hitachi Energy →</a>
       </div>
     </article>
-    <article class="card" data-importance="high" data-search="tei̇aş i̇tm.79 — 6 adet 380 kv &amp; 154 kv trafo merkezi yapımı 4734 sayılı kamu i̇hale kanunu md.19 açık ihale usulüyle 6 adet trafo merkezi yapım işi: altınkaya tm (11d030180), avanos-2 tm (06d030830), maslak tm (12d030320), refahiye tm (11d030580), tirebolu tm (11d030560), yeniçates tm (12d030380). betaş'ın çekirdek iş kapsamı — teklif hazırlığı önerilir. tei̇aş i̇hale 380 kv 154 kv tei̇aş i̇tm.79 — 6 座 380 kv 和 154 kv 变电站新建 依据第4734号《政府采购法》第19条以公开招标方式实施6座变电站新建：altınkaya（11d030180）、avanos-2（06d030830）、maslak（12d030320）、refahiye（11d030580）、tirebolu（11d030560）、yeniçates（12d030380）。属 betaş 核心业务范围 — 建议立即备标。 tei̇aş 招标 380 kv 154 kv">
+    <article class="card" data-importance="high" data-search="tei̇aş i̇tm.79 — 6 adet 380 kv &amp; 154 kv trafo merkezi yapımı 4734 sayılı kamu i̇hale kanunu md.19 açık ihale usulüyle 6 adet trafo merkezi yapım işi: altınkaya tm (11d030180), avanos-2 tm (06d030830), maslak tm (12d030320), refahiye tm (11d030580), tirebolu tm (11d030560), yeniçates tm (12d030380). betaş'ın çekirdek iş kapsamı — teklif hazırlığı önerilir. tei̇aş i̇hale 380 kv 154 kv tei̇aş i̇tm.79 — construction of 6 substations at 380 kv &amp; 154 kv open tender under public procurement law no. 4734 art. 19 for 6 substations: altınkaya tm (11d030180), avanos-2 tm (06d030830), maslak tm (12d030320), refahiye tm (11d030580), tirebolu tm (11d030560), yeniçates tm (12d030380). core betaş scope — bid preparation advised. tei̇aş tender 380 kv 154 kv tei̇aş i̇tm.79 — 6 座 380 kv 和 154 kv 变电站新建 依据第4734号《政府采购法》第19条以公开招标方式实施6座变电站新建：altınkaya（11d030180）、avanos-2（06d030830）、maslak（12d030320）、refahiye（11d030580）、tirebolu（11d030560）、yeniçates（12d030380）。属 betaş 核心业务范围 — 建议立即备标。 tei̇aş 招标 380 kv 154 kv">
       <div class="card-header">
-        <h3 class="card-title"><span class="lang-tr">TEİAŞ İTM.79 — 6 Adet 380 kV &amp; 154 kV Trafo Merkezi Yapımı</span><span class="lang-zh">TEİAŞ İTM.79 — 6 座 380 kV 和 154 kV 变电站新建</span></h3>
-        <span class="badge badge-high"><span class="lang-tr">YÜKSEK</span><span class="lang-zh">高</span></span>
+        <h3 class="card-title"><span class="lang-tr">TEİAŞ İTM.79 — 6 Adet 380 kV &amp; 154 kV Trafo Merkezi Yapımı</span><span class="lang-en">TEİAŞ İTM.79 — Construction of 6 Substations at 380 kV &amp; 154 kV</span><span class="lang-zh">TEİAŞ İTM.79 — 6 座 380 kV 和 154 kV 变电站新建</span></h3>
+        <span class="badge badge-high"><span class="lang-tr">YÜKSEK</span><span class="lang-en">HIGH</span><span class="lang-zh">高</span></span>
       </div>
-      <p class="card-body"><span class="lang-tr">4734 sayılı Kamu İhale Kanunu md.19 açık ihale usulüyle 6 adet trafo merkezi yapım işi: Altınkaya TM (11D030180), Avanos-2 TM (06D030830), Maslak TM (12D030320), Refahiye TM (11D030580), Tirebolu TM (11D030560), Yeniçates TM (12D030380). BETAŞ'ın çekirdek iş kapsamı — teklif hazırlığı önerilir.</span><span class="lang-zh">依据第4734号《政府采购法》第19条以公开招标方式实施6座变电站新建：Altınkaya（11D030180）、Avanos-2（06D030830）、Maslak（12D030320）、Refahiye（11D030580）、Tirebolu（11D030560）、Yeniçates（12D030380）。属 BETAŞ 核心业务范围 — 建议立即备标。</span></p>
-      <div class="card-tags"><span class="tag"><span class="lang-tr">TEİAŞ</span><span class="lang-zh">TEİAŞ</span></span><span class="tag"><span class="lang-tr">İhale</span><span class="lang-zh">招标</span></span><span class="tag"><span class="lang-tr">380 kV</span><span class="lang-zh">380 kV</span></span><span class="tag"><span class="lang-tr">154 kV</span><span class="lang-zh">154 kV</span></span></div>
+      <p class="card-body"><span class="lang-tr">4734 sayılı Kamu İhale Kanunu md.19 açık ihale usulüyle 6 adet trafo merkezi yapım işi: Altınkaya TM (11D030180), Avanos-2 TM (06D030830), Maslak TM (12D030320), Refahiye TM (11D030580), Tirebolu TM (11D030560), Yeniçates TM (12D030380). BETAŞ'ın çekirdek iş kapsamı — teklif hazırlığı önerilir.</span><span class="lang-en">Open tender under Public Procurement Law No. 4734 Art. 19 for 6 substations: Altınkaya TM (11D030180), Avanos-2 TM (06D030830), Maslak TM (12D030320), Refahiye TM (11D030580), Tirebolu TM (11D030560), Yeniçates TM (12D030380). Core BETAŞ scope — bid preparation advised.</span><span class="lang-zh">依据第4734号《政府采购法》第19条以公开招标方式实施6座变电站新建：Altınkaya（11D030180）、Avanos-2（06D030830）、Maslak（12D030320）、Refahiye（11D030580）、Tirebolu（11D030560）、Yeniçates（12D030380）。属 BETAŞ 核心业务范围 — 建议立即备标。</span></p>
+      <div class="card-tags"><span class="tag"><span class="lang-tr">TEİAŞ</span><span class="lang-en">TEİAŞ</span><span class="lang-zh">TEİAŞ</span></span><span class="tag"><span class="lang-tr">İhale</span><span class="lang-en">Tender</span><span class="lang-zh">招标</span></span><span class="tag"><span class="lang-tr">380 kV</span><span class="lang-en">380 kV</span><span class="lang-zh">380 kV</span></span><span class="tag"><span class="lang-tr">154 kV</span><span class="lang-en">154 kV</span><span class="lang-zh">154 kV</span></span></div>
       <div class="card-footer">
         <span class="card-date">2026-06-12</span>
         <a href="https://ihalerapor.com/255856-itm79-6-adet-380-kv-ve-154-kv-trafo-merkezi-yapimi" target="_blank" rel="noopener">EKAP / İhale Rapor →</a>
       </div>
     </article>
-    <article class="card" data-importance="medium" data-search="pttx — bursa transformatör nüvesi üretim üssü 2026'da devrede pttx'in transformatör nüvesi (core) üretim üssü 2026'da bursa'da faaliyete geçiyor; şirketin küresel üretim ağında kilit düğüm olacak. tesis gemlik limanı'na 10 dakika, avrupa sınırına ~390 km mesafede — lojistik avantajı yüksek. türkiye'nin trafo tedarik zincirindeki ağırlığını artırıyor. pttx nüve bursa üretim pttx — 布尔萨变压器铁芯生产基地 2026 年投运 pttx 的变压器铁芯生产基地将于 2026 年在布尔萨投产，成为其全球制造网络的关键节点。基地距盖姆利克港 10 分钟、距欧洲边境约 390 公里，物流优势突出，进一步提升土耳其在变压器供应链中的地位。 pttx 铁芯 布尔萨 制造">
+    <article class="card" data-importance="medium" data-search="pttx — bursa transformatör nüvesi üretim üssü 2026'da devrede pttx'in transformatör nüvesi (core) üretim üssü 2026'da bursa'da faaliyete geçiyor; şirketin küresel üretim ağında kilit düğüm olacak. tesis gemlik limanı'na 10 dakika, avrupa sınırına ~390 km mesafede — lojistik avantajı yüksek. türkiye'nin trafo tedarik zincirindeki ağırlığını artırıyor. pttx nüve bursa üretim pttx — bursa transformer-core plant live in 2026 pttx's transformer-core production base comes online in bursa in 2026, becoming a key node in its global manufacturing network. the site is 10 minutes from gemlik port and ~390 km from the european border — a strong logistics edge that deepens türkiye's role in the transformer supply chain. pttx core bursa manufacturing pttx — 布尔萨变压器铁芯生产基地 2026 年投运 pttx 的变压器铁芯生产基地将于 2026 年在布尔萨投产，成为其全球制造网络的关键节点。基地距盖姆利克港 10 分钟、距欧洲边境约 390 公里，物流优势突出，进一步提升土耳其在变压器供应链中的地位。 pttx 铁芯 布尔萨 制造">
       <div class="card-header">
-        <h3 class="card-title"><span class="lang-tr">PTTX — Bursa Transformatör Nüvesi Üretim Üssü 2026'da Devrede</span><span class="lang-zh">PTTX — 布尔萨变压器铁芯生产基地 2026 年投运</span></h3>
-        <span class="badge badge-medium"><span class="lang-tr">ORTA</span><span class="lang-zh">中</span></span>
+        <h3 class="card-title"><span class="lang-tr">PTTX — Bursa Transformatör Nüvesi Üretim Üssü 2026'da Devrede</span><span class="lang-en">PTTX — Bursa Transformer-Core Plant Live in 2026</span><span class="lang-zh">PTTX — 布尔萨变压器铁芯生产基地 2026 年投运</span></h3>
+        <span class="badge badge-medium"><span class="lang-tr">ORTA</span><span class="lang-en">MED</span><span class="lang-zh">中</span></span>
       </div>
-      <p class="card-body"><span class="lang-tr">PTTX'in transformatör nüvesi (core) üretim üssü 2026'da Bursa'da faaliyete geçiyor; şirketin küresel üretim ağında kilit düğüm olacak. Tesis Gemlik Limanı'na 10 dakika, Avrupa sınırına ~390 km mesafede — lojistik avantajı yüksek. Türkiye'nin trafo tedarik zincirindeki ağırlığını artırıyor.</span><span class="lang-zh">PTTX 的变压器铁芯生产基地将于 2026 年在布尔萨投产，成为其全球制造网络的关键节点。基地距盖姆利克港 10 分钟、距欧洲边境约 390 公里，物流优势突出，进一步提升土耳其在变压器供应链中的地位。</span></p>
-      <div class="card-tags"><span class="tag"><span class="lang-tr">PTTX</span><span class="lang-zh">PTTX</span></span><span class="tag"><span class="lang-tr">Nüve</span><span class="lang-zh">铁芯</span></span><span class="tag"><span class="lang-tr">Bursa</span><span class="lang-zh">布尔萨</span></span><span class="tag"><span class="lang-tr">Üretim</span><span class="lang-zh">制造</span></span></div>
+      <p class="card-body"><span class="lang-tr">PTTX'in transformatör nüvesi (core) üretim üssü 2026'da Bursa'da faaliyete geçiyor; şirketin küresel üretim ağında kilit düğüm olacak. Tesis Gemlik Limanı'na 10 dakika, Avrupa sınırına ~390 km mesafede — lojistik avantajı yüksek. Türkiye'nin trafo tedarik zincirindeki ağırlığını artırıyor.</span><span class="lang-en">PTTX's transformer-core production base comes online in Bursa in 2026, becoming a key node in its global manufacturing network. The site is 10 minutes from Gemlik Port and ~390 km from the European border — a strong logistics edge that deepens Türkiye's role in the transformer supply chain.</span><span class="lang-zh">PTTX 的变压器铁芯生产基地将于 2026 年在布尔萨投产，成为其全球制造网络的关键节点。基地距盖姆利克港 10 分钟、距欧洲边境约 390 公里，物流优势突出，进一步提升土耳其在变压器供应链中的地位。</span></p>
+      <div class="card-tags"><span class="tag"><span class="lang-tr">PTTX</span><span class="lang-en">PTTX</span><span class="lang-zh">PTTX</span></span><span class="tag"><span class="lang-tr">Nüve</span><span class="lang-en">Core</span><span class="lang-zh">铁芯</span></span><span class="tag"><span class="lang-tr">Bursa</span><span class="lang-en">Bursa</span><span class="lang-zh">布尔萨</span></span><span class="tag"><span class="lang-tr">Üretim</span><span class="lang-en">Manufacturing</span><span class="lang-zh">制造</span></span></div>
       <div class="card-footer">
         <span class="card-date">2026-06-02</span>
         <a href="https://transformers-magazine.com/tm-news/pttxs-transformer-core-manufacturing-base-in-turkey-is-set-to-commence-operations-in-2026/" target="_blank" rel="noopener">Transformers Magazine →</a>
       </div>
     </article>
-    <article class="card" data-importance="medium" data-search="nuventura × aktif elektroteknik — sf6'sız gis üretim ortaklığı nuventura ve aktif elektroteknik, sf6 içermeyen birincil gaz izoleli şalt (gis) üretimi için teknoloji ortaklığı kurdu. sf6'sız teknoloji, ab f-gaz düzenlemeleri sıkılaşırken türk üreticilere ihracat avantajı sağlıyor. betaş projelerinde çevre-uyumlu şalt alternatifi. gis sf6'sız aktif elektroteknik nuventura × aktif elektroteknik — 无sf6 gis 制造合作 nuventura 与 aktif elektroteknik 就生产无 sf6 的一次侧气体绝缘开关设备（gis）建立技术合作。随着欧盟含氟气体法规收紧，无 sf6 技术为土耳其制造商带来出口优势，也为 betaş 项目提供环保型开关设备选择。 gis 无sf6 aktif elektroteknik">
+    <article class="card" data-importance="medium" data-search="nuventura × aktif elektroteknik — sf6'sız gis üretim ortaklığı nuventura ve aktif elektroteknik, sf6 içermeyen birincil gaz izoleli şalt (gis) üretimi için teknoloji ortaklığı kurdu. sf6'sız teknoloji, ab f-gaz düzenlemeleri sıkılaşırken türk üreticilere ihracat avantajı sağlıyor. betaş projelerinde çevre-uyumlu şalt alternatifi. gis sf6'sız aktif elektroteknik nuventura × aktif elektroteknik — sf6-free gis manufacturing partnership nuventura and aktif elektroteknik formed a technology partnership to manufacture sf6-free primary gas-insulated switchgear (gis). as eu f-gas rules tighten, sf6-free technology gives turkish makers an export edge and offers betaş projects an environmentally compliant switchgear option. gis sf6-free aktif elektroteknik nuventura × aktif elektroteknik — 无sf6 gis 制造合作 nuventura 与 aktif elektroteknik 就生产无 sf6 的一次侧气体绝缘开关设备（gis）建立技术合作。随着欧盟含氟气体法规收紧，无 sf6 技术为土耳其制造商带来出口优势，也为 betaş 项目提供环保型开关设备选择。 gis 无sf6 aktif elektroteknik">
       <div class="card-header">
-        <h3 class="card-title"><span class="lang-tr">Nuventura × Aktif Elektroteknik — SF6'sız GIS Üretim Ortaklığı</span><span class="lang-zh">Nuventura × Aktif Elektroteknik — 无SF6 GIS 制造合作</span></h3>
-        <span class="badge badge-medium"><span class="lang-tr">ORTA</span><span class="lang-zh">中</span></span>
+        <h3 class="card-title"><span class="lang-tr">Nuventura × Aktif Elektroteknik — SF6'sız GIS Üretim Ortaklığı</span><span class="lang-en">Nuventura × Aktif Elektroteknik — SF6-free GIS Manufacturing Partnership</span><span class="lang-zh">Nuventura × Aktif Elektroteknik — 无SF6 GIS 制造合作</span></h3>
+        <span class="badge badge-medium"><span class="lang-tr">ORTA</span><span class="lang-en">MED</span><span class="lang-zh">中</span></span>
       </div>
-      <p class="card-body"><span class="lang-tr">Nuventura ve Aktif Elektroteknik, SF6 içermeyen birincil gaz izoleli şalt (GIS) üretimi için teknoloji ortaklığı kurdu. SF6'sız teknoloji, AB F-Gaz düzenlemeleri sıkılaşırken Türk üreticilere ihracat avantajı sağlıyor. BETAŞ projelerinde çevre-uyumlu şalt alternatifi.</span><span class="lang-zh">Nuventura 与 Aktif Elektroteknik 就生产无 SF6 的一次侧气体绝缘开关设备（GIS）建立技术合作。随着欧盟含氟气体法规收紧，无 SF6 技术为土耳其制造商带来出口优势，也为 BETAŞ 项目提供环保型开关设备选择。</span></p>
-      <div class="card-tags"><span class="tag"><span class="lang-tr">GIS</span><span class="lang-zh">GIS</span></span><span class="tag"><span class="lang-tr">SF6'sız</span><span class="lang-zh">无SF6</span></span><span class="tag"><span class="lang-tr">Aktif Elektroteknik</span><span class="lang-zh">Aktif Elektroteknik</span></span></div>
+      <p class="card-body"><span class="lang-tr">Nuventura ve Aktif Elektroteknik, SF6 içermeyen birincil gaz izoleli şalt (GIS) üretimi için teknoloji ortaklığı kurdu. SF6'sız teknoloji, AB F-Gaz düzenlemeleri sıkılaşırken Türk üreticilere ihracat avantajı sağlıyor. BETAŞ projelerinde çevre-uyumlu şalt alternatifi.</span><span class="lang-en">Nuventura and Aktif Elektroteknik formed a technology partnership to manufacture SF6-free primary gas-insulated switchgear (GIS). As EU F-Gas rules tighten, SF6-free technology gives Turkish makers an export edge and offers BETAŞ projects an environmentally compliant switchgear option.</span><span class="lang-zh">Nuventura 与 Aktif Elektroteknik 就生产无 SF6 的一次侧气体绝缘开关设备（GIS）建立技术合作。随着欧盟含氟气体法规收紧，无 SF6 技术为土耳其制造商带来出口优势，也为 BETAŞ 项目提供环保型开关设备选择。</span></p>
+      <div class="card-tags"><span class="tag"><span class="lang-tr">GIS</span><span class="lang-en">GIS</span><span class="lang-zh">GIS</span></span><span class="tag"><span class="lang-tr">SF6'sız</span><span class="lang-en">SF6-free</span><span class="lang-zh">无SF6</span></span><span class="tag"><span class="lang-tr">Aktif Elektroteknik</span><span class="lang-en">Aktif Elektroteknik</span><span class="lang-zh">Aktif Elektroteknik</span></span></div>
       <div class="card-footer">
         <span class="card-date">2026-05-28</span>
         <a href="https://transformers-magazine.com/tag/gis/" target="_blank" rel="noopener">Transformers Magazine →</a>
       </div>
     </article>
-    <article class="card" data-importance="medium" data-search="rönesans enerji × totalenergies — %50 ortaklık, 700 mw+ yek boru hattı totalenergies, rönesans enerji'nin %50 hissesini almak için anlaşma imzaladı. portföyde 166 mw hidro varlık ve 700 mw'ın üzerinde rüzgar, güneş ve batarya depolama projesi boru hattı bulunuyor. büyük yek projeleri = yeni bağlantı trafo merkezi epc talebi. rönesans totalenergies yek bess rönesans enerji × totalenergies — 50% 股权，700 mw+ 可再生项目储备 totalenergies 签约收购 rönesans enerji 50% 股权。投资组合含 166 mw 水电资产，以及超过 700 mw 的风电、光伏和电池储能项目储备。大型可再生项目 = 新增并网变电站 epc 需求。 rönesans totalenergies 可再生 储能">
+    <article class="card" data-importance="medium" data-search="rönesans enerji × totalenergies — %50 ortaklık, 700 mw+ yek boru hattı totalenergies, rönesans enerji'nin %50 hissesini almak için anlaşma imzaladı. portföyde 166 mw hidro varlık ve 700 mw'ın üzerinde rüzgar, güneş ve batarya depolama projesi boru hattı bulunuyor. büyük yek projeleri = yeni bağlantı trafo merkezi epc talebi. rönesans totalenergies yek bess rönesans enerji × totalenergies — 50% stake, 700 mw+ renewables pipeline totalenergies signed to acquire a 50% stake in rönesans enerji. the portfolio holds 166 mw of hydro assets plus a pipeline of over 700 mw of wind, solar and battery storage. large renewable projects mean new grid-connection substation epc demand. rönesans totalenergies renewables bess rönesans enerji × totalenergies — 50% 股权，700 mw+ 可再生项目储备 totalenergies 签约收购 rönesans enerji 50% 股权。投资组合含 166 mw 水电资产，以及超过 700 mw 的风电、光伏和电池储能项目储备。大型可再生项目 = 新增并网变电站 epc 需求。 rönesans totalenergies 可再生 储能">
       <div class="card-header">
-        <h3 class="card-title"><span class="lang-tr">Rönesans Enerji × TotalEnergies — %50 Ortaklık, 700 MW+ YEK Boru Hattı</span><span class="lang-zh">Rönesans Enerji × TotalEnergies — 50% 股权，700 MW+ 可再生项目储备</span></h3>
-        <span class="badge badge-medium"><span class="lang-tr">ORTA</span><span class="lang-zh">中</span></span>
+        <h3 class="card-title"><span class="lang-tr">Rönesans Enerji × TotalEnergies — %50 Ortaklık, 700 MW+ YEK Boru Hattı</span><span class="lang-en">Rönesans Enerji × TotalEnergies — 50% Stake, 700 MW+ Renewables Pipeline</span><span class="lang-zh">Rönesans Enerji × TotalEnergies — 50% 股权，700 MW+ 可再生项目储备</span></h3>
+        <span class="badge badge-medium"><span class="lang-tr">ORTA</span><span class="lang-en">MED</span><span class="lang-zh">中</span></span>
       </div>
-      <p class="card-body"><span class="lang-tr">TotalEnergies, Rönesans Enerji'nin %50 hissesini almak için anlaşma imzaladı. Portföyde 166 MW hidro varlık ve 700 MW'ın üzerinde rüzgar, güneş ve batarya depolama projesi boru hattı bulunuyor. Büyük YEK projeleri = yeni bağlantı trafo merkezi EPC talebi.</span><span class="lang-zh">TotalEnergies 签约收购 Rönesans Enerji 50% 股权。投资组合含 166 MW 水电资产，以及超过 700 MW 的风电、光伏和电池储能项目储备。大型可再生项目 = 新增并网变电站 EPC 需求。</span></p>
-      <div class="card-tags"><span class="tag"><span class="lang-tr">Rönesans</span><span class="lang-zh">Rönesans</span></span><span class="tag"><span class="lang-tr">TotalEnergies</span><span class="lang-zh">TotalEnergies</span></span><span class="tag"><span class="lang-tr">YEK</span><span class="lang-zh">可再生</span></span><span class="tag"><span class="lang-tr">BESS</span><span class="lang-zh">储能</span></span></div>
+      <p class="card-body"><span class="lang-tr">TotalEnergies, Rönesans Enerji'nin %50 hissesini almak için anlaşma imzaladı. Portföyde 166 MW hidro varlık ve 700 MW'ın üzerinde rüzgar, güneş ve batarya depolama projesi boru hattı bulunuyor. Büyük YEK projeleri = yeni bağlantı trafo merkezi EPC talebi.</span><span class="lang-en">TotalEnergies signed to acquire a 50% stake in Rönesans Enerji. The portfolio holds 166 MW of hydro assets plus a pipeline of over 700 MW of wind, solar and battery storage. Large renewable projects mean new grid-connection substation EPC demand.</span><span class="lang-zh">TotalEnergies 签约收购 Rönesans Enerji 50% 股权。投资组合含 166 MW 水电资产，以及超过 700 MW 的风电、光伏和电池储能项目储备。大型可再生项目 = 新增并网变电站 EPC 需求。</span></p>
+      <div class="card-tags"><span class="tag"><span class="lang-tr">Rönesans</span><span class="lang-en">Rönesans</span><span class="lang-zh">Rönesans</span></span><span class="tag"><span class="lang-tr">TotalEnergies</span><span class="lang-en">TotalEnergies</span><span class="lang-zh">TotalEnergies</span></span><span class="tag"><span class="lang-tr">YEK</span><span class="lang-en">Renewables</span><span class="lang-zh">可再生</span></span><span class="tag"><span class="lang-tr">BESS</span><span class="lang-en">BESS</span><span class="lang-zh">储能</span></span></div>
       <div class="card-footer">
         <span class="card-date">2026-06-04</span>
         <a href="https://totalenergies.com/newsroom/turkey-totalenergies-partners-ronesans-holding-develop-renewable-energy-country/?lang=eng" target="_blank" rel="noopener">TotalEnergies →</a>
       </div>
     </article></div>
 
-    <h2 class="section-title" id="tenders"><span class="lang-tr">TEİAŞ / EÜAŞ İhale Takip Tablosu</span><span class="lang-zh">TEİAŞ / EÜAŞ 招标跟踪表</span></h2>
+    <h2 class="section-title" id="tenders"><span class="lang-tr">TEİAŞ / EÜAŞ İhale Takip Tablosu</span><span class="lang-en">TEİAŞ / EÜAŞ Tender Tracker</span><span class="lang-zh">TEİAŞ / EÜAŞ 招标跟踪表</span></h2>
     <table class="tender-table">
       <thead><tr>
-        <th><span class="lang-tr">Proje</span><span class="lang-zh">项目</span></th><th><span class="lang-tr">Kurum</span><span class="lang-zh">机构</span></th><th><span class="lang-tr">Kapsam</span><span class="lang-zh">范围</span></th>
-        <th><span class="lang-tr">İKN</span><span class="lang-zh">招标号</span></th><th><span class="lang-tr">Yıl</span><span class="lang-zh">年份</span></th><th><span class="lang-tr">Durum</span><span class="lang-zh">状态</span></th>
+        <th><span class="lang-tr">Proje</span><span class="lang-en">Project</span><span class="lang-zh">项目</span></th><th><span class="lang-tr">Kurum</span><span class="lang-en">Org</span><span class="lang-zh">机构</span></th><th><span class="lang-tr">Kapsam</span><span class="lang-en">Scope</span><span class="lang-zh">范围</span></th>
+        <th><span class="lang-tr">İKN</span><span class="lang-en">Ref</span><span class="lang-zh">招标号</span></th><th><span class="lang-tr">Yıl</span><span class="lang-en">Year</span><span class="lang-zh">年份</span></th><th><span class="lang-tr">Durum</span><span class="lang-en">Status</span><span class="lang-zh">状态</span></th>
       </tr></thead>
-      <tbody id="tender-rows"><tr data-search="seyhan gis yenileme ve tamamlama tei̇aş gis yenileme + tamamlama işi 2026/337244 seyhan gis 改造与收尾 gis 改造 + 收尾工程">
-      <td><strong><span class="lang-tr">Seyhan GIS Yenileme ve Tamamlama</span><span class="lang-zh">Seyhan GIS 改造与收尾</span></strong></td>
+      <tbody id="tender-rows"><tr data-search="seyhan gis yenileme ve tamamlama tei̇aş gis yenileme + tamamlama işi 2026/337244 seyhan gis renewal &amp; completion gis renewal + completion works seyhan gis 改造与收尾 gis 改造 + 收尾工程">
+      <td><strong><span class="lang-tr">Seyhan GIS Yenileme ve Tamamlama</span><span class="lang-en">Seyhan GIS Renewal &amp; Completion</span><span class="lang-zh">Seyhan GIS 改造与收尾</span></strong></td>
       <td>TEİAŞ</td>
-      <td><span class="lang-tr">GIS yenileme + tamamlama işi</span><span class="lang-zh">GIS 改造 + 收尾工程</span></td>
+      <td><span class="lang-tr">GIS yenileme + tamamlama işi</span><span class="lang-en">GIS renewal + completion works</span><span class="lang-zh">GIS 改造 + 收尾工程</span></td>
       <td class="mono">2026/337244</td>
       <td>2026</td>
-      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-zh">进行中</span></td>
-    </tr><tr data-search="yeşilhisar tm bağlantı hatları tei̇aş 400 kv + 154 kv bağlantı hatları 2026/456816 yeşilhisar 变电站接入线路 400 kv + 154 kv 接入线路">
-      <td><strong><span class="lang-tr">Yeşilhisar TM Bağlantı Hatları</span><span class="lang-zh">Yeşilhisar 变电站接入线路</span></strong></td>
+      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-en">Active</span><span class="lang-zh">进行中</span></td>
+    </tr><tr data-search="yeşilhisar tm bağlantı hatları tei̇aş 400 kv + 154 kv bağlantı hatları 2026/456816 yeşilhisar ss connection lines 400 kv + 154 kv connection lines yeşilhisar 变电站接入线路 400 kv + 154 kv 接入线路">
+      <td><strong><span class="lang-tr">Yeşilhisar TM Bağlantı Hatları</span><span class="lang-en">Yeşilhisar SS Connection Lines</span><span class="lang-zh">Yeşilhisar 变电站接入线路</span></strong></td>
       <td>TEİAŞ</td>
-      <td><span class="lang-tr">400 kV + 154 kV bağlantı hatları</span><span class="lang-zh">400 kV + 154 kV 接入线路</span></td>
+      <td><span class="lang-tr">400 kV + 154 kV bağlantı hatları</span><span class="lang-en">400 kV + 154 kV connection lines</span><span class="lang-zh">400 kV + 154 kV 接入线路</span></td>
       <td class="mono">2026/456816</td>
       <td>2026</td>
-      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-zh">进行中</span></td>
-    </tr><tr data-search="seki tm yapımı tei̇aş trafo merkezi yapımı 2026/412652 seki 变电站新建 变电站新建工程">
-      <td><strong><span class="lang-tr">Seki TM Yapımı</span><span class="lang-zh">Seki 变电站新建</span></strong></td>
+      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-en">Active</span><span class="lang-zh">进行中</span></td>
+    </tr><tr data-search="seki tm yapımı tei̇aş trafo merkezi yapımı 2026/412652 seki ss construction substation construction seki 变电站新建 变电站新建工程">
+      <td><strong><span class="lang-tr">Seki TM Yapımı</span><span class="lang-en">Seki SS Construction</span><span class="lang-zh">Seki 变电站新建</span></strong></td>
       <td>TEİAŞ</td>
-      <td><span class="lang-tr">Trafo merkezi yapımı</span><span class="lang-zh">变电站新建工程</span></td>
+      <td><span class="lang-tr">Trafo merkezi yapımı</span><span class="lang-en">Substation construction</span><span class="lang-zh">变电站新建工程</span></td>
       <td class="mono">2026/412652</td>
       <td>2026</td>
-      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-zh">进行中</span></td>
-    </tr><tr data-search="yalıkavak tm tamamlama tei̇aş tm tamamlama işi 2026/338951 yalıkavak 变电站收尾 变电站收尾工程">
-      <td><strong><span class="lang-tr">Yalıkavak TM Tamamlama</span><span class="lang-zh">Yalıkavak 变电站收尾</span></strong></td>
+      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-en">Active</span><span class="lang-zh">进行中</span></td>
+    </tr><tr data-search="yalıkavak tm tamamlama tei̇aş tm tamamlama işi 2026/338951 yalıkavak ss completion ss completion works yalıkavak 变电站收尾 变电站收尾工程">
+      <td><strong><span class="lang-tr">Yalıkavak TM Tamamlama</span><span class="lang-en">Yalıkavak SS Completion</span><span class="lang-zh">Yalıkavak 变电站收尾</span></strong></td>
       <td>TEİAŞ</td>
-      <td><span class="lang-tr">TM tamamlama işi</span><span class="lang-zh">变电站收尾工程</span></td>
+      <td><span class="lang-tr">TM tamamlama işi</span><span class="lang-en">SS completion works</span><span class="lang-zh">变电站收尾工程</span></td>
       <td class="mono">2026/338951</td>
       <td>2026</td>
-      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-zh">进行中</span></td>
-    </tr><tr data-search="i̇tm.79 — 6x 380/154 kv tm yapımı tei̇aş altınkaya, avanos-2, maslak, refahiye, tirebolu, yeniçates tm i̇tm.79 i̇tm.79 — 6 座 380/154 kv 变电站新建 altınkaya、avanos-2、maslak、refahiye、tirebolu、yeniçates 变电站">
-      <td><strong><span class="lang-tr">İTM.79 — 6x 380/154 kV TM Yapımı</span><span class="lang-zh">İTM.79 — 6 座 380/154 kV 变电站新建</span></strong></td>
+      <td class="status-active"><span class="lang-tr">Aktif</span><span class="lang-en">Active</span><span class="lang-zh">进行中</span></td>
+    </tr><tr data-search="i̇tm.79 — 6x 380/154 kv tm yapımı tei̇aş altınkaya, avanos-2, maslak, refahiye, tirebolu, yeniçates tm i̇tm.79 i̇tm.79 — 6x 380/154 kv ss construction altınkaya, avanos-2, maslak, refahiye, tirebolu, yeniçates ss i̇tm.79 — 6 座 380/154 kv 变电站新建 altınkaya、avanos-2、maslak、refahiye、tirebolu、yeniçates 变电站">
+      <td><strong><span class="lang-tr">İTM.79 — 6x 380/154 kV TM Yapımı</span><span class="lang-en">İTM.79 — 6x 380/154 kV SS Construction</span><span class="lang-zh">İTM.79 — 6 座 380/154 kV 变电站新建</span></strong></td>
       <td>TEİAŞ</td>
-      <td><span class="lang-tr">Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates TM</span><span class="lang-zh">Altınkaya、Avanos-2、Maslak、Refahiye、Tirebolu、Yeniçates 变电站</span></td>
+      <td><span class="lang-tr">Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates TM</span><span class="lang-en">Altınkaya, Avanos-2, Maslak, Refahiye, Tirebolu, Yeniçates SS</span><span class="lang-zh">Altınkaya、Avanos-2、Maslak、Refahiye、Tirebolu、Yeniçates 变电站</span></td>
       <td class="mono">İTM.79</td>
       <td>2026</td>
-      <td class="status-upcoming"><span class="lang-tr">Yaklaşan</span><span class="lang-zh">即将</span></td>
-    </tr><tr data-search="10 adet yg mobil trafo merkezi sonelgaz (cezayir) yüksek gerilim mobil trafo merkezleri — 10 座高压移动变电站 高压移动变电站">
-      <td><strong><span class="lang-tr">10 Adet YG Mobil Trafo Merkezi</span><span class="lang-zh">10 座高压移动变电站</span></strong></td>
+      <td class="status-upcoming"><span class="lang-tr">Yaklaşan</span><span class="lang-en">Upcoming</span><span class="lang-zh">即将</span></td>
+    </tr><tr data-search="10 adet yg mobil trafo merkezi sonelgaz (cezayir) yüksek gerilim mobil trafo merkezleri — 10 hv mobile substations high-voltage mobile substations 10 座高压移动变电站 高压移动变电站">
+      <td><strong><span class="lang-tr">10 Adet YG Mobil Trafo Merkezi</span><span class="lang-en">10 HV Mobile Substations</span><span class="lang-zh">10 座高压移动变电站</span></strong></td>
       <td>Sonelgaz (Cezayir)</td>
-      <td><span class="lang-tr">Yüksek gerilim mobil trafo merkezleri</span><span class="lang-zh">高压移动变电站</span></td>
+      <td><span class="lang-tr">Yüksek gerilim mobil trafo merkezleri</span><span class="lang-en">High-voltage mobile substations</span><span class="lang-zh">高压移动变电站</span></td>
       <td class="mono">—</td>
       <td>2026</td>
-      <td class="status-result"><span class="lang-tr">Sonuçlandı</span><span class="lang-zh">已结束</span></td>
+      <td class="status-result"><span class="lang-tr">Sonuçlandı</span><span class="lang-en">Awarded</span><span class="lang-zh">已结束</span></td>
     </tr></tbody>
     </table>
 
-    <h2 class="section-title" id="mfg"><span class="lang-tr">Transformatör &amp; Ekipman Üreticileri</span><span class="lang-zh">变压器与设备制造商动态</span></h2>
+    <h2 class="section-title" id="mfg"><span class="lang-tr">Transformatör &amp; Ekipman Üreticileri</span><span class="lang-en">Transformer &amp; Equipment Makers</span><span class="lang-zh">变压器与设备制造商动态</span></h2>
     <div class="mfg-grid">
     <div class="mfg-item">
-      <h4><span class="lang-tr">Astor Enerji — ABD'den $71,98M Sipariş</span><span class="lang-zh">Astor Enerji — 来自美国的 7,198 万美元订单</span></h4>
-      <p><span class="lang-tr">132-220 MVA güç trafoları, teslim 2027 Q2-Q3. Anlaşma 2025 hasılatının %9,39'u. Astor'un ABD ve ihracat pazarındaki ağırlığı artıyor; küresel trafo açığı Türk üreticilere fırsat penceresi yaratıyor.</span><span class="lang-zh">132-220 MVA 电力变压器，2027 年 Q2-Q3 交货。合同相当于 2025 年营收的 9.39%。Astor 在美国及出口市场的份额持续上升；全球变压器短缺为土耳其制造商打开机会窗口。</span></p>
+      <h4><span class="lang-tr">Astor Enerji — ABD'den $71,98M Sipariş</span><span class="lang-en">Astor Enerji — $71.98M Order from the US</span><span class="lang-zh">Astor Enerji — 来自美国的 7,198 万美元订单</span></h4>
+      <p><span class="lang-tr">132-220 MVA güç trafoları, teslim 2027 Q2-Q3. Anlaşma 2025 hasılatının %9,39'u. Astor'un ABD ve ihracat pazarındaki ağırlığı artıyor; küresel trafo açığı Türk üreticilere fırsat penceresi yaratıyor.</span><span class="lang-en">132-220 MVA power transformers, delivery 2027 Q2-Q3. The deal equals 9.39% of 2025 revenue. Astor's weight in the US and export markets keeps rising; the global transformer shortage opens an opportunity window for Turkish makers.</span><span class="lang-zh">132-220 MVA 电力变压器，2027 年 Q2-Q3 交货。合同相当于 2025 年营收的 9.39%。Astor 在美国及出口市场的份额持续上升；全球变压器短缺为土耳其制造商打开机会窗口。</span></p>
       <div class="source"><a href="https://www.borsagundem.com.tr/astor-enerjiden-72-milyon-dolarlik-yeni-sozlesme" target="_blank" rel="noopener">Borsa Gündem →</a></div>
     </div>
     <div class="mfg-item">
-      <h4><span class="lang-tr">Hitachi Energy — Türkiye İlk Dijital TM Pilotu</span><span class="lang-zh">Hitachi Energy — 土耳其首个数字变电站试点</span></h4>
-      <p><span class="lang-tr">IEC 61850 process-bus teknolojisiyle paralel fider kontrol &amp; koruma. Dijital trafo merkezi mimarisi optik akım/gerilim trafosu (OCT) talebini de tetikliyor — 2026'da Türkiye'de tahmini 350-550 adet OCT.</span><span class="lang-zh">采用 IEC 61850 process-bus 技术的并联间隔控制与保护。数字变电站架构同时拉动光学电流/电压互感器（OCT）需求 — 预计 2026 年土耳其约需 350-550 台 OCT。</span></p>
+      <h4><span class="lang-tr">Hitachi Energy — Türkiye İlk Dijital TM Pilotu</span><span class="lang-en">Hitachi Energy — Türkiye's First Digital SS Pilot</span><span class="lang-zh">Hitachi Energy — 土耳其首个数字变电站试点</span></h4>
+      <p><span class="lang-tr">IEC 61850 process-bus teknolojisiyle paralel fider kontrol &amp; koruma. Dijital trafo merkezi mimarisi optik akım/gerilim trafosu (OCT) talebini de tetikliyor — 2026'da Türkiye'de tahmini 350-550 adet OCT.</span><span class="lang-en">Parallel-feeder control &amp; protection using IEC 61850 process-bus. Digital substation architecture also drives demand for optical current/voltage transformers (OCT) — an estimated 350-550 OCT units in Türkiye in 2026.</span><span class="lang-zh">采用 IEC 61850 process-bus 技术的并联间隔控制与保护。数字变电站架构同时拉动光学电流/电压互感器（OCT）需求 — 预计 2026 年土耳其约需 350-550 台 OCT。</span></p>
       <div class="source"><a href="https://www.hitachienergy.com/us/en/news-and-events/features/2026/05/turkiye-first-digital-substation-pilot-hitachi-energy" target="_blank" rel="noopener">Hitachi Energy →</a></div>
     </div>
     <div class="mfg-item">
-      <h4><span class="lang-tr">PTTX — Bursa Nüve Üretim Üssü (2026)</span><span class="lang-zh">PTTX — 布尔萨铁芯生产基地（2026）</span></h4>
-      <p><span class="lang-tr">Transformatör nüvesi üretimi Bursa'da başlıyor. Gemlik Limanı'na 10 dk, AB sınırına 390 km. Türkiye'nin trafo bileşen tedarik zincirini güçlendiriyor.</span><span class="lang-zh">变压器铁芯生产在布尔萨启动。距盖姆利克港 10 分钟、距欧盟边境 390 公里。强化土耳其变压器零部件供应链。</span></p>
+      <h4><span class="lang-tr">PTTX — Bursa Nüve Üretim Üssü (2026)</span><span class="lang-en">PTTX — Bursa Core Plant (2026)</span><span class="lang-zh">PTTX — 布尔萨铁芯生产基地（2026）</span></h4>
+      <p><span class="lang-tr">Transformatör nüvesi üretimi Bursa'da başlıyor. Gemlik Limanı'na 10 dk, AB sınırına 390 km. Türkiye'nin trafo bileşen tedarik zincirini güçlendiriyor.</span><span class="lang-en">Transformer-core production begins in Bursa. 10 min from Gemlik Port, 390 km from the EU border. Strengthens Türkiye's transformer-component supply chain.</span><span class="lang-zh">变压器铁芯生产在布尔萨启动。距盖姆利克港 10 分钟、距欧盟边境 390 公里。强化土耳其变压器零部件供应链。</span></p>
       <div class="source"><a href="https://transformers-magazine.com/tm-news/pttxs-transformer-core-manufacturing-base-in-turkey-is-set-to-commence-operations-in-2026/" target="_blank" rel="noopener">Transformers Magazine →</a></div>
     </div>
     <div class="mfg-item">
-      <h4><span class="lang-tr">Küresel HV Trafo Pazarı — Teslim 4 Yıl, Fiyat +%75</span><span class="lang-zh">全球高压变压器市场 — 交货4年，价格涨75%</span></h4>
-      <p><span class="lang-tr">IEA: büyük güç trafolarında teslim süresi 4 yıla, kablolarda 2-3 yıla çıktı. WoodMac Q2 2025: trafolar ortalama 128 hafta, GSU'lar 144 hafta. Fiyatlar 2019'a göre %75 arttı, bazı durumlarda reel 2,6 kat. Türk üreticiler için ihracat fırsatı.</span><span class="lang-zh">IEA：大型电力变压器交货期升至4年，电缆升至2-3年。WoodMac 2025年Q2：变压器平均128周，升压变压器144周。价格较2019年上涨75%，部分实际涨至2.6倍。对土耳其制造商是出口机会。</span></p>
+      <h4><span class="lang-tr">Küresel HV Trafo Pazarı — Teslim 4 Yıl, Fiyat +%75</span><span class="lang-en">Global HV Transformer Market — 4-Year Lead, +75% Price</span><span class="lang-zh">全球高压变压器市场 — 交货4年，价格涨75%</span></h4>
+      <p><span class="lang-tr">IEA: büyük güç trafolarında teslim süresi 4 yıla, kablolarda 2-3 yıla çıktı. WoodMac Q2 2025: trafolar ortalama 128 hafta, GSU'lar 144 hafta. Fiyatlar 2019'a göre %75 arttı, bazı durumlarda reel 2,6 kat. Türk üreticiler için ihracat fırsatı.</span><span class="lang-en">IEA: lead times for large power transformers reached 4 years, cables 2-3 years. WoodMac Q2 2025: transformers average 128 weeks, GSUs 144 weeks. Prices up 75% vs 2019, in some cases 2.6x in real terms. An export opportunity for Turkish makers.</span><span class="lang-zh">IEA：大型电力变压器交货期升至4年，电缆升至2-3年。WoodMac 2025年Q2：变压器平均128周，升压变压器144周。价格较2019年上涨75%，部分实际涨至2.6倍。对土耳其制造商是出口机会。</span></p>
       <div class="source"><a href="https://www.iea.org/reports/building-the-future-transmission-grid/executive-summary" target="_blank" rel="noopener">IEA →</a></div>
     </div></div>
 
-    <h2 class="section-title" id="yeka"><span class="lang-tr">YEKA &amp; Yenilenebilir Enerji</span><span class="lang-zh">YEKA 与可再生能源</span></h2>
+    <h2 class="section-title" id="yeka"><span class="lang-tr">YEKA &amp; Yenilenebilir Enerji</span><span class="lang-en">YEKA &amp; Renewables</span><span class="lang-zh">YEKA 与可再生能源</span></h2>
     <div class="yeka-grid">
     <div class="yeka-item">
-      <div class="capacity"><span class="lang-tr">5 GW</span><span class="lang-zh">5 GW</span></div>
-      <h4><span class="lang-tr">İlk Offshore Rüzgar YEKA — 4 Saha, İhale 2026</span><span class="lang-zh">首个海上风电 YEKA — 4 海域，2026 招标</span></h4>
-      <p><span class="lang-tr">Enerji Bakanlığı 4 aday offshore YEKA sahası açıkladı: Saros Körfezi, Gökçeada, Bozcaada, Edremit Körfezi (~500 km², Kuzey Ege ekseni). İzin süreçleri sonrası Türkiye ilk offshore rüzgar YEKA ihalesini yapacak. 2035 hedefi 5 GW.</span><span class="lang-zh">能源部公布 4 个候选海上 YEKA 海域：萨罗斯湾、Gökçeada、Bozcaada、埃德雷米特湾（约 500 km²，以北爱琴海为核心）。许可流程完成后，土耳其将举行首个海上风电 YEKA 招标。2035 目标 5 GW。</span></p>
+      <div class="capacity"><span class="lang-tr">5 GW</span><span class="lang-en">5 GW</span><span class="lang-zh">5 GW</span></div>
+      <h4><span class="lang-tr">İlk Offshore Rüzgar YEKA — 4 Saha, İhale 2026</span><span class="lang-en">First Offshore Wind YEKA — 4 Sites, Tender 2026</span><span class="lang-zh">首个海上风电 YEKA — 4 海域，2026 招标</span></h4>
+      <p><span class="lang-tr">Enerji Bakanlığı 4 aday offshore YEKA sahası açıkladı: Saros Körfezi, Gökçeada, Bozcaada, Edremit Körfezi (~500 km², Kuzey Ege ekseni). İzin süreçleri sonrası Türkiye ilk offshore rüzgar YEKA ihalesini yapacak. 2035 hedefi 5 GW.</span><span class="lang-en">The Ministry of Energy named 4 candidate offshore YEKA sites: Saros Bay, Gökçeada, Bozcaada, Edremit Bay (~500 km², a Northern Aegean core). After permitting, Türkiye will hold its first offshore wind YEKA auction. 2035 target 5 GW.</span><span class="lang-zh">能源部公布 4 个候选海上 YEKA 海域：萨罗斯湾、Gökçeada、Bozcaada、埃德雷米特湾（约 500 km²，以北爱琴海为核心）。许可流程完成后，土耳其将举行首个海上风电 YEKA 招标。2035 目标 5 GW。</span></p>
       <div class="source"><a href="https://www.aa.com.tr/en/energy/wind/turkiye-to-allocate-1-500-mw-of-wind-capacity-through-yeka-tenders-in-2026/56973" target="_blank" rel="noopener">AA / OffshoreWind.biz →</a></div>
     </div>
     <div class="yeka-item">
-      <div class="capacity"><span class="lang-tr">1.500 MW</span><span class="lang-zh">1.500 MW</span></div>
-      <h4><span class="lang-tr">2026 YEKA Rüzgar Tahsisi</span><span class="lang-zh">2026 YEKA 风电配额</span></h4>
-      <p><span class="lang-tr">2026 YEKA yarışmalarında 1.500 MW rüzgara ayrılıyor. Türkiye yılda en az 2 GW YEKA ihalesi sürdürmeyi planlıyor. Her yeni saha = yeni 154/380 kV bağlantı trafo merkezi ihtiyacı.</span><span class="lang-zh">2026 YEKA 竞拍中 1,500 MW 划给风电。土耳其计划每年维持至少 2 GW 的 YEKA 招标。每个新场区 = 新增 154/380 kV 并网变电站需求。</span></p>
+      <div class="capacity"><span class="lang-tr">1.500 MW</span><span class="lang-en">1.500 MW</span><span class="lang-zh">1.500 MW</span></div>
+      <h4><span class="lang-tr">2026 YEKA Rüzgar Tahsisi</span><span class="lang-en">2026 YEKA Wind Allocation</span><span class="lang-zh">2026 YEKA 风电配额</span></h4>
+      <p><span class="lang-tr">2026 YEKA yarışmalarında 1.500 MW rüzgara ayrılıyor. Türkiye yılda en az 2 GW YEKA ihalesi sürdürmeyi planlıyor. Her yeni saha = yeni 154/380 kV bağlantı trafo merkezi ihtiyacı.</span><span class="lang-en">1,500 MW is allocated to wind in the 2026 YEKA auctions. Türkiye plans at least 2 GW of YEKA tenders per year. Every new site = new 154/380 kV grid-connection substation need.</span><span class="lang-zh">2026 YEKA 竞拍中 1,500 MW 划给风电。土耳其计划每年维持至少 2 GW 的 YEKA 招标。每个新场区 = 新增 154/380 kV 并网变电站需求。</span></p>
       <div class="source"><a href="https://www.aa.com.tr/en/energy/wind/turkiye-to-allocate-1-500-mw-of-wind-capacity-through-yeka-tenders-in-2026/56973" target="_blank" rel="noopener">Anadolu Ajansı →</a></div>
     </div>
     <div class="yeka-item">
-      <div class="capacity"><span class="lang-tr">Lisanssız BESS</span><span class="lang-zh">免牌照储能</span></div>
-      <h4><span class="lang-tr">YEKA'da Batarya Depolama Entegrasyonu</span><span class="lang-zh">YEKA 电池储能一体化</span></h4>
-      <p><span class="lang-tr">YEKA kazananları, üretim varlığının kurulu gücüne kadar ek lisans gerekmeden batarya depolama (BESS) kurabiliyor. Depolama; gün-öncesi arbitraj, yan hizmetler ve kapasite piyasası geliri sağlıyor. BESS bağlantı TM'leri yeni iş kolu.</span><span class="lang-zh">YEKA 中标方可在不需额外牌照的情况下，按发电资产装机容量配建电池储能（BESS）。储能可带来日前套利、辅助服务及容量市场收益。BESS 并网变电站是新业务线。</span></p>
+      <div class="capacity"><span class="lang-tr">Lisanssız BESS</span><span class="lang-en">Unlicensed BESS</span><span class="lang-zh">免牌照储能</span></div>
+      <h4><span class="lang-tr">YEKA'da Batarya Depolama Entegrasyonu</span><span class="lang-en">Battery Storage Integration in YEKA</span><span class="lang-zh">YEKA 电池储能一体化</span></h4>
+      <p><span class="lang-tr">YEKA kazananları, üretim varlığının kurulu gücüne kadar ek lisans gerekmeden batarya depolama (BESS) kurabiliyor. Depolama; gün-öncesi arbitraj, yan hizmetler ve kapasite piyasası geliri sağlıyor. BESS bağlantı TM'leri yeni iş kolu.</span><span class="lang-en">YEKA winners can install battery storage (BESS) up to the rated capacity of the generation asset without an extra licence. Storage earns from day-ahead arbitrage, ancillary services and the capacity market. BESS connection substations are a new line of business.</span><span class="lang-zh">YEKA 中标方可在不需额外牌照的情况下，按发电资产装机容量配建电池储能（BESS）。储能可带来日前套利、辅助服务及容量市场收益。BESS 并网变电站是新业务线。</span></p>
       <div class="source"><a href="https://ember-energy.org/latest-insights/new-targets-old-challenges-in-turkish-wind-and-solar-tenders/" target="_blank" rel="noopener">Ember →</a></div>
     </div>
     <div class="yeka-item">
-      <div class="capacity"><span class="lang-tr">120 GW</span><span class="lang-zh">120 GW</span></div>
-      <h4><span class="lang-tr">2035 Güneş+Rüzgar Hedefi — Yılda 8 GW</span><span class="lang-zh">2035 光伏+风电目标 — 每年 8 GW</span></h4>
-      <p><span class="lang-tr">Türkiye güneş+rüzgar kurulu gücünü ~32 GW'tan 2035'te 120 GW'a çıkarmayı hedefliyor; yılda ortalama 8 GW yeni kapasite gerekiyor. 2035'e kadar ~30 milyar dolar iletim altyapısı yatırımı planlanıyor.</span><span class="lang-zh">土耳其计划将光伏+风电装机从约 32 GW 提升至 2035 年的 120 GW，年均需新增 8 GW。到 2035 年计划投资约 300 亿美元用于输电基础设施。</span></p>
+      <div class="capacity"><span class="lang-tr">120 GW</span><span class="lang-en">120 GW</span><span class="lang-zh">120 GW</span></div>
+      <h4><span class="lang-tr">2035 Güneş+Rüzgar Hedefi — Yılda 8 GW</span><span class="lang-en">2035 Solar+Wind Target — 8 GW/yr</span><span class="lang-zh">2035 光伏+风电目标 — 每年 8 GW</span></h4>
+      <p><span class="lang-tr">Türkiye güneş+rüzgar kurulu gücünü ~32 GW'tan 2035'te 120 GW'a çıkarmayı hedefliyor; yılda ortalama 8 GW yeni kapasite gerekiyor. 2035'e kadar ~30 milyar dolar iletim altyapısı yatırımı planlanıyor.</span><span class="lang-en">Türkiye aims to raise solar+wind capacity from ~32 GW to 120 GW by 2035; an average 8 GW of new capacity per year is needed. ~$30bn of transmission investment is planned through 2035.</span><span class="lang-zh">土耳其计划将光伏+风电装机从约 32 GW 提升至 2035 年的 120 GW，年均需新增 8 GW。到 2035 年计划投资约 300 亿美元用于输电基础设施。</span></p>
       <div class="source"><a href="https://www.intercon-tr.com/eng/article/turkey-2035-renewable-energy-roadmap/" target="_blank" rel="noopener">Intercon / Ember →</a></div>
     </div></div>
 
-    <h2 class="section-title" id="mena"><span class="lang-tr">Kuzey Afrika &amp; Ortadoğu EPC Pazarı</span><span class="lang-zh">北非与中东 EPC 市场</span></h2>
+    <h2 class="section-title" id="mena"><span class="lang-tr">Kuzey Afrika &amp; Ortadoğu EPC Pazarı</span><span class="lang-en">North Africa &amp; Middle East EPC Market</span><span class="lang-zh">北非与中东 EPC 市场</span></h2>
     <div class="mena-grid">
     <div class="mena-item">
-      <h4><span class="lang-tr">🌍 Türk EPC Firmaları Afrika'da — 2.000+ Proje, ~$100 Milyar</span><span class="lang-zh">🌍 土耳其 EPC 企业在非洲 — 2,000+ 项目，约 1,000 亿美元</span></h4>
-      <p><span class="lang-tr">Atlantic Council raporu: Türk müteahhitlik firmaları 2003'ten bu yana Afrika'da 2.000'in üzerinde proje, 2024'e kadar ~100 milyar dolar değerinde iş tamamladı. Elektrik sektörü mühendislik-tedarik-inşaat alanında Türkiye güçlü konumda.</span><span class="lang-zh">大西洋理事会报告：自 2003 年以来，土耳其承包企业在非洲完成超过 2,000 个项目，截至 2024 年累计金额约 1,000 亿美元。在电力行业的工程-采购-施工领域，土耳其地位稳固。</span></p>
+      <h4><span class="lang-tr">🌍 Türk EPC Firmaları Afrika'da — 2.000+ Proje, ~$100 Milyar</span><span class="lang-en">🌍 Turkish EPC Firms in Africa — 2,000+ Projects, ~$100bn</span><span class="lang-zh">🌍 土耳其 EPC 企业在非洲 — 2,000+ 项目，约 1,000 亿美元</span></h4>
+      <p><span class="lang-tr">Atlantic Council raporu: Türk müteahhitlik firmaları 2003'ten bu yana Afrika'da 2.000'in üzerinde proje, 2024'e kadar ~100 milyar dolar değerinde iş tamamladı. Elektrik sektörü mühendislik-tedarik-inşaat alanında Türkiye güçlü konumda.</span><span class="lang-en">Atlantic Council report: since 2003 Turkish contractors have completed over 2,000 projects in Africa, worth ~$100bn through 2024. Türkiye holds a strong position in power-sector engineering-procurement-construction.</span><span class="lang-zh">大西洋理事会报告：自 2003 年以来，土耳其承包企业在非洲完成超过 2,000 个项目，截至 2024 年累计金额约 1,000 亿美元。在电力行业的工程-采购-施工领域，土耳其地位稳固。</span></p>
       <div class="source"><a href="https://www.atlanticcouncil.org/in-depth-research-reports/report/redefining-power-systems-turkish-electric-sector-engagement-in-africa/" target="_blank" rel="noopener">Atlantic Council →</a></div>
     </div>
     <div class="mena-item">
-      <h4><span class="lang-tr">🇸🇦 Suudi Arabistan: Linxon 380 kV Anahtar Teslim TM — 400M SAR</span><span class="lang-zh">🇸🇦 沙特：Linxon 380 kV 交钥匙变电站 — 4 亿里亚尔</span></h4>
-      <p><span class="lang-tr">Linxon, Medine'deki Taibah enerji santrali için 380 kV anahtar teslim trafo merkezi EPC sözleşmesini 400 milyon Suudi Riyali bedelle kazandı. Körfez bölgesinde 380 kV TM EPC talebi sürüyor — Türk tedarikçiler için tedarik fırsatı.</span><span class="lang-zh">Linxon 以 4 亿沙特里亚尔中标麦地那 Taibah 电站的 380 kV 交钥匙变电站 EPC 合同。海湾地区 380 kV 变电站 EPC 需求持续 — 对土耳其供应商是供货机会。</span></p>
+      <h4><span class="lang-tr">🇸🇦 Suudi Arabistan: Linxon 380 kV Anahtar Teslim TM — 400M SAR</span><span class="lang-en">🇸🇦 Saudi Arabia: Linxon 380 kV Turnkey SS — SAR 400M</span><span class="lang-zh">🇸🇦 沙特：Linxon 380 kV 交钥匙变电站 — 4 亿里亚尔</span></h4>
+      <p><span class="lang-tr">Linxon, Medine'deki Taibah enerji santrali için 380 kV anahtar teslim trafo merkezi EPC sözleşmesini 400 milyon Suudi Riyali bedelle kazandı. Körfez bölgesinde 380 kV TM EPC talebi sürüyor — Türk tedarikçiler için tedarik fırsatı.</span><span class="lang-en">Linxon won the 380 kV turnkey substation EPC for the Taibah power plant in Madinah for SAR 400m. Gulf demand for 380 kV substation EPC continues — a supply opportunity for Turkish vendors.</span><span class="lang-zh">Linxon 以 4 亿沙特里亚尔中标麦地那 Taibah 电站的 380 kV 交钥匙变电站 EPC 合同。海湾地区 380 kV 变电站 EPC 需求持续 — 对土耳其供应商是供货机会。</span></p>
       <div class="source"><a href="https://linxon.com/news/press-release-linxon-awarded-400-million-saudi-riyals-380-kv-epc-contract-for-taibah-power-plant-turnkey-substation-in-madinah-saudi-arabia/" target="_blank" rel="noopener">Linxon →</a></div>
     </div>
     <div class="mena-item">
-      <h4><span class="lang-tr">🇩🇿 Cezayir: Sonelgaz 10 Adet YG Mobil Trafo Merkezi</span><span class="lang-zh">🇩🇿 阿尔及利亚：Sonelgaz 10 座高压移动变电站</span></h4>
-      <p><span class="lang-tr">Cezayir kamu elektrik kuruluşu Sonelgaz, toplam 10 yüksek gerilim mobil trafo merkezi için ihaleleri sonuçlandırdı. Cezayir'in 15.000 MW güneş hedefi, EPC ve trafo tedarik fırsatlarını açıyor.</span><span class="lang-zh">阿尔及利亚国有电力企业 Sonelgaz 完成共 10 座高压移动变电站的招标。阿尔及利亚 15,000 MW 光伏目标正在打开 EPC 与变压器供货机会。</span></p>
+      <h4><span class="lang-tr">🇩🇿 Cezayir: Sonelgaz 10 Adet YG Mobil Trafo Merkezi</span><span class="lang-en">🇩🇿 Algeria: Sonelgaz 10 HV Mobile Substations</span><span class="lang-zh">🇩🇿 阿尔及利亚：Sonelgaz 10 座高压移动变电站</span></h4>
+      <p><span class="lang-tr">Cezayir kamu elektrik kuruluşu Sonelgaz, toplam 10 yüksek gerilim mobil trafo merkezi için ihaleleri sonuçlandırdı. Cezayir'in 15.000 MW güneş hedefi, EPC ve trafo tedarik fırsatlarını açıyor.</span><span class="lang-en">Algeria's state utility Sonelgaz finalized tenders for a total of 10 HV mobile substations. Algeria's 15,000 MW solar target is opening EPC and transformer supply opportunities.</span><span class="lang-zh">阿尔及利亚国有电力企业 Sonelgaz 完成共 10 座高压移动变电站的招标。阿尔及利亚 15,000 MW 光伏目标正在打开 EPC 与变压器供货机会。</span></p>
       <div class="source"><a href="https://www.trade.gov/country-commercial-guides/turkey-electric-power-renewables-smart-grid-energy-storage-civil-nuclear" target="_blank" rel="noopener">IndexBox / Sonelgaz →</a></div>
     </div>
     <div class="mena-item">
-      <h4><span class="lang-tr">📊 Küresel Şebeke Yatırımı — Yılda $200 Milyar+ Gerekiyor</span><span class="lang-zh">📊 全球电网投资 — 每年需 2,000 亿美元以上</span></h4>
-      <p><span class="lang-tr">IEA: 2023'te küresel iletim yatırımı $140 milyar. Bugünkü politika ile 2030'ların ortasında yılda $200 milyarı aşması, net-sıfır senaryolarında $250-300 milyara çıkması gerekiyor. Trafo ve kablo tedarik zinciri en büyük darboğaz.</span><span class="lang-zh">IEA：2023 年全球输电投资 1,400 亿美元。按当前政策，到 2030 年代中期需超过每年 2,000 亿美元，在净零情景下需达 2,500-3,000 亿美元。变压器与电缆供应链是最大瓶颈。</span></p>
+      <h4><span class="lang-tr">📊 Küresel Şebeke Yatırımı — Yılda $200 Milyar+ Gerekiyor</span><span class="lang-en">📊 Global Grid Investment — $200bn+/yr Needed</span><span class="lang-zh">📊 全球电网投资 — 每年需 2,000 亿美元以上</span></h4>
+      <p><span class="lang-tr">IEA: 2023'te küresel iletim yatırımı $140 milyar. Bugünkü politika ile 2030'ların ortasında yılda $200 milyarı aşması, net-sıfır senaryolarında $250-300 milyara çıkması gerekiyor. Trafo ve kablo tedarik zinciri en büyük darboğaz.</span><span class="lang-en">IEA: global transmission investment was $140bn in 2023. Under current policy it must exceed $200bn/yr by the mid-2030s, and reach $250-300bn in net-zero scenarios. Transformer and cable supply chains are the biggest bottleneck.</span><span class="lang-zh">IEA：2023 年全球输电投资 1,400 亿美元。按当前政策，到 2030 年代中期需超过每年 2,000 亿美元，在净零情景下需达 2,500-3,000 亿美元。变压器与电缆供应链是最大瓶颈。</span></p>
       <div class="source"><a href="https://www.iea.org/reports/building-the-future-transmission-grid/executive-summary" target="_blank" rel="noopener">IEA →</a></div>
     </div></div>
 
-    <h2 class="section-title" id="live"><span class="lang-tr">📡 Canlı Sektör Akışı (RSS)</span><span class="lang-zh">📡 实时行业资讯流（RSS）</span></h2>
-    <p class="live-empty"><span class="lang-tr">Canlı besleme şu an boş veya ağ erişimi kısıtlı. Bu bölüm GitHub Actions üzerinde her yenilemede 16 RSS kaynağından otomatik dolar.</span><span class="lang-zh">实时流目前为空或网络受限。该板块在 GitHub Actions 上每次刷新时会从 16 个 RSS 源自动填充。</span></p>
+    <h2 class="section-title" id="live"><span class="lang-tr">📡 Canlı Sektör Akışı (RSS)</span><span class="lang-en">📡 Live Sector Feed (RSS)</span><span class="lang-zh">📡 实时行业资讯流（RSS）</span></h2>
+    <p class="live-empty"><span class="lang-tr">Canlı besleme şu an boş veya ağ erişimi kısıtlı. Bu bölüm GitHub Actions üzerinde her yenilemede 16 RSS kaynağından otomatik dolar.</span><span class="lang-en">The live feed is empty or network access is restricted. This section auto-fills from 16 RSS feeds on each GitHub Actions rebuild.</span><span class="lang-zh">实时流目前为空或网络受限。该板块在 GitHub Actions 上每次刷新时会从 16 个 RSS 源自动填充。</span></p>
 
-    <div class="no-results" id="no-results"><span class="lang-tr">Eşleşen sonuç yok. Aramayı temizleyin.</span><span class="lang-zh">无匹配结果，请清除搜索。</span></div>
+    <div class="no-results" id="no-results"><span class="lang-tr">Eşleşen sonuç yok. Aramayı temizleyin.</span><span class="lang-en">No matches. Clear the search.</span><span class="lang-zh">无匹配结果，请清除搜索。</span></div>
   </main>
 
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-title"><span class="lang-tr">📊 Önemli Rakamlar</span><span class="lang-zh">📊 关键数字</span></div>
+      <div class="sidebar-title"><span class="lang-tr">📊 Önemli Rakamlar</span><span class="lang-en">📊 Key Numbers</span><span class="lang-zh">📊 关键数字</span></div>
       
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">Astor ABD Trafo Siparişi</span><span class="lang-zh">Astor 美国变压器订单</span></span>
+      <span class="stat-label"><span class="lang-tr">Astor ABD Trafo Siparişi</span><span class="lang-en">Astor US Transformer Order</span><span class="lang-zh">Astor 美国变压器订单</span></span>
       <span class="stat-value green">$71,98M</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">TR Güneş Kurulu Güç</span><span class="lang-zh">土耳其光伏装机</span></span>
+      <span class="stat-label"><span class="lang-tr">TR Güneş Kurulu Güç</span><span class="lang-en">Türkiye Solar Capacity</span><span class="lang-zh">土耳其光伏装机</span></span>
       <span class="stat-value ">26.339 MW</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">TR Rüzgar Kurulu Güç</span><span class="lang-zh">土耳其风电装机</span></span>
+      <span class="stat-label"><span class="lang-tr">TR Rüzgar Kurulu Güç</span><span class="lang-en">Türkiye Wind Capacity</span><span class="lang-zh">土耳其风电装机</span></span>
       <span class="stat-value ">~16.000 MW</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">TR Yenilenebilir Toplam</span><span class="lang-zh">土耳其可再生总装机</span></span>
+      <span class="stat-label"><span class="lang-tr">TR Yenilenebilir Toplam</span><span class="lang-en">Türkiye Renewable Total</span><span class="lang-zh">土耳其可再生总装机</span></span>
       <span class="stat-value ">~74.686 MW</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">Offshore Rüzgar Hedefi 2035</span><span class="lang-zh">2035 海上风电目标</span></span>
+      <span class="stat-label"><span class="lang-tr">Offshore Rüzgar Hedefi 2035</span><span class="lang-en">Offshore Wind Target 2035</span><span class="lang-zh">2035 海上风电目标</span></span>
       <span class="stat-value green">5 GW</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">2026 YEKA Rüzgar Tahsisi</span><span class="lang-zh">2026 YEKA 风电配额</span></span>
+      <span class="stat-label"><span class="lang-tr">2026 YEKA Rüzgar Tahsisi</span><span class="lang-en">2026 YEKA Wind Allocation</span><span class="lang-zh">2026 YEKA 风电配额</span></span>
       <span class="stat-value ">1.500 MW</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">Güç Trafosu Teslim Süresi</span><span class="lang-zh">电力变压器交货期</span></span>
+      <span class="stat-label"><span class="lang-tr">Güç Trafosu Teslim Süresi</span><span class="lang-en">Power Transformer Lead Time</span><span class="lang-zh">电力变压器交货期</span></span>
       <span class="stat-value red">~4 yıl</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">Trafo Fiyat Artışı (2019→)</span><span class="lang-zh">变压器涨价（2019起）</span></span>
+      <span class="stat-label"><span class="lang-tr">Trafo Fiyat Artışı (2019→)</span><span class="lang-en">Transformer Price Rise (2019→)</span><span class="lang-zh">变压器涨价（2019起）</span></span>
       <span class="stat-value red">+%75</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">Şebeke Yatırım İhtiyacı</span><span class="lang-zh">电网投资需求</span></span>
+      <span class="stat-label"><span class="lang-tr">Şebeke Yatırım İhtiyacı</span><span class="lang-en">Grid Investment Need</span><span class="lang-zh">电网投资需求</span></span>
       <span class="stat-value ">$200B+/yıl</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label"><span class="lang-tr">2035 Güneş+Rüzgar Hedefi</span><span class="lang-zh">2035 光伏+风电目标</span></span>
+      <span class="stat-label"><span class="lang-tr">2035 Güneş+Rüzgar Hedefi</span><span class="lang-en">2035 Solar+Wind Target</span><span class="lang-zh">2035 光伏+风电目标</span></span>
       <span class="stat-value green">120 GW</span>
     </div>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-title"><span class="lang-tr">🚨 Acil Takip Listesi</span><span class="lang-zh">🚨 紧急跟进清单</span></div>
+      <div class="sidebar-title"><span class="lang-tr">🚨 Acil Takip Listesi</span><span class="lang-en">🚨 Urgent Follow-ups</span><span class="lang-zh">🚨 紧急跟进清单</span></div>
       
     <div class="action-item">
-      <div class="action-title"><span class="lang-tr">İTM.79 — 6x 380/154 kV TM Yapımı</span><span class="lang-zh">İTM.79 — 6 座 380/154 kV 变电站新建</span></div>
-      <div class="action-desc"><span class="lang-tr">BETAŞ çekirdek iş. EKAP şartnamelerini incele, teklif dosyasını hazırla.</span><span class="lang-zh">BETAŞ 核心业务。研究 EKAP 招标文件，准备投标资料。</span></div>
-      <div class="action-deadline">⏰ <span class="lang-tr">EKAP takvimini doğrula</span><span class="lang-zh">核对 EKAP 时间表</span></div>
+      <div class="action-title"><span class="lang-tr">İTM.79 — 6x 380/154 kV TM Yapımı</span><span class="lang-en">İTM.79 — 6x 380/154 kV SS Construction</span><span class="lang-zh">İTM.79 — 6 座 380/154 kV 变电站新建</span></div>
+      <div class="action-desc"><span class="lang-tr">BETAŞ çekirdek iş. EKAP şartnamelerini incele, teklif dosyasını hazırla.</span><span class="lang-en">Core BETAŞ work. Study the EKAP specs, prepare the bid file.</span><span class="lang-zh">BETAŞ 核心业务。研究 EKAP 招标文件，准备投标资料。</span></div>
+      <div class="action-deadline">⏰ <span class="lang-tr">EKAP takvimini doğrula</span><span class="lang-en">Verify EKAP schedule</span><span class="lang-zh">核对 EKAP 时间表</span></div>
     </div>
     <div class="action-item">
-      <div class="action-title"><span class="lang-tr">Seyhan GIS / Yeşilhisar TM</span><span class="lang-zh">Seyhan GIS / Yeşilhisar 变电站</span></div>
-      <div class="action-desc"><span class="lang-tr">GIS yenileme ve 400+154 kV bağlantı hatları. Şartname ve benzer iş şartını kontrol et.</span><span class="lang-zh">GIS 改造及 400+154 kV 接入线路。核对招标文件与类似业绩要求。</span></div>
-      <div class="action-deadline">⏰ <span class="lang-tr">Aktif — EKAP'tan teyit et</span><span class="lang-zh">进行中 — 在 EKAP 确认</span></div>
+      <div class="action-title"><span class="lang-tr">Seyhan GIS / Yeşilhisar TM</span><span class="lang-en">Seyhan GIS / Yeşilhisar SS</span><span class="lang-zh">Seyhan GIS / Yeşilhisar 变电站</span></div>
+      <div class="action-desc"><span class="lang-tr">GIS yenileme ve 400+154 kV bağlantı hatları. Şartname ve benzer iş şartını kontrol et.</span><span class="lang-en">GIS renewal and 400+154 kV connection lines. Check specs and similar-work requirements.</span><span class="lang-zh">GIS 改造及 400+154 kV 接入线路。核对招标文件与类似业绩要求。</span></div>
+      <div class="action-deadline">⏰ <span class="lang-tr">Aktif — EKAP'tan teyit et</span><span class="lang-en">Active — confirm on EKAP</span><span class="lang-zh">进行中 — 在 EKAP 确认</span></div>
     </div>
     <div class="action-item">
-      <div class="action-title"><span class="lang-tr">Offshore Rüzgar YEKA Hazırlığı</span><span class="lang-zh">海上风电 YEKA 准备</span></div>
-      <div class="action-desc"><span class="lang-tr">Deniz üstü trafo merkezi + deniz altı kablo EPC'si yeni iş kolu. Teknik kapasite ve ortaklık araştırmasına şimdi başla.</span><span class="lang-zh">海上变电站 + 海底电缆 EPC 是新业务线。现在就开始技术能力建设与合作伙伴调研。</span></div>
-      <div class="action-deadline">⏰ <span class="lang-tr">İlk ihale 2026</span><span class="lang-zh">首拍 2026</span></div>
+      <div class="action-title"><span class="lang-tr">Offshore Rüzgar YEKA Hazırlığı</span><span class="lang-en">Offshore Wind YEKA Prep</span><span class="lang-zh">海上风电 YEKA 准备</span></div>
+      <div class="action-desc"><span class="lang-tr">Deniz üstü trafo merkezi + deniz altı kablo EPC'si yeni iş kolu. Teknik kapasite ve ortaklık araştırmasına şimdi başla.</span><span class="lang-en">Offshore substation + submarine cable EPC is a new line. Start technical-capacity and partnership research now.</span><span class="lang-zh">海上变电站 + 海底电缆 EPC 是新业务线。现在就开始技术能力建设与合作伙伴调研。</span></div>
+      <div class="action-deadline">⏰ <span class="lang-tr">İlk ihale 2026</span><span class="lang-en">First tender 2026</span><span class="lang-zh">首拍 2026</span></div>
     </div>
     <div class="action-item">
-      <div class="action-title"><span class="lang-tr">Hitachi Dijital TM Yetkinliği</span><span class="lang-zh">Hitachi 数字变电站能力</span></div>
-      <div class="action-desc"><span class="lang-tr">IEC 61850 process-bus pilotu referans. BETAŞ ekibinde dijital TM yetkinliği geliştir.</span><span class="lang-zh">以 IEC 61850 process-bus 试点为参照，在 BETAŞ 团队培养数字变电站能力。</span></div>
-      <div class="action-deadline">⏰ <span class="lang-tr">Bu çeyrek</span><span class="lang-zh">本季度</span></div>
+      <div class="action-title"><span class="lang-tr">Hitachi Dijital TM Yetkinliği</span><span class="lang-en">Hitachi Digital SS Capability</span><span class="lang-zh">Hitachi 数字变电站能力</span></div>
+      <div class="action-desc"><span class="lang-tr">IEC 61850 process-bus pilotu referans. BETAŞ ekibinde dijital TM yetkinliği geliştir.</span><span class="lang-en">Use the IEC 61850 process-bus pilot as reference. Build digital-SS capability in the BETAŞ team.</span><span class="lang-zh">以 IEC 61850 process-bus 试点为参照，在 BETAŞ 团队培养数字变电站能力。</span></div>
+      <div class="action-deadline">⏰ <span class="lang-tr">Bu çeyrek</span><span class="lang-en">This quarter</span><span class="lang-zh">本季度</span></div>
     </div>
     <div class="action-item">
-      <div class="action-title"><span class="lang-tr">Cezayir Sonelgaz Takibi</span><span class="lang-zh">阿尔及利亚 Sonelgaz 跟踪</span></div>
-      <div class="action-desc"><span class="lang-tr">10 mobil TM ihalesi sonrası takip ihaleleri ve 15.000 MW güneş planını izle.</span><span class="lang-zh">跟踪 10 座移动变电站招标之后的后续招标，以及 15,000 MW 光伏计划。</span></div>
-      <div class="action-deadline">⏰ <span class="lang-tr">Sürekli izle</span><span class="lang-zh">持续跟踪</span></div>
+      <div class="action-title"><span class="lang-tr">Cezayir Sonelgaz Takibi</span><span class="lang-en">Algeria Sonelgaz Tracking</span><span class="lang-zh">阿尔及利亚 Sonelgaz 跟踪</span></div>
+      <div class="action-desc"><span class="lang-tr">10 mobil TM ihalesi sonrası takip ihaleleri ve 15.000 MW güneş planını izle.</span><span class="lang-en">Track follow-on tenders after the 10 mobile-SS tender and the 15,000 MW solar plan.</span><span class="lang-zh">跟踪 10 座移动变电站招标之后的后续招标，以及 15,000 MW 光伏计划。</span></div>
+      <div class="action-deadline">⏰ <span class="lang-tr">Sürekli izle</span><span class="lang-en">Track continuously</span><span class="lang-zh">持续跟踪</span></div>
     </div>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-title"><span class="lang-tr">🎯 Ati İçin Strateji</span><span class="lang-zh">🎯 给 Ati 的策略</span></div>
-      <div class="strategy-box"><p><strong><span class="lang-tr">1. İTM.79'a Agresif Teklif</span><span class="lang-zh">1. 对 İTM.79 积极投标</span>:</strong> <span class="lang-tr">6 trafo merkezi yapımı doğrudan BETAŞ core business'ı. Altınkaya, Refahiye, Tirebolu gibi sahalarda lojistik ve saha deneyimi öne çıkar. TEİAŞ sicil avantajını kullan.</span><span class="lang-zh">6 座变电站新建直接属 BETAŞ 核心业务。在 Altınkaya、Refahiye、Tirebolu 等场区，物流与现场经验是优势。善用 TEİAŞ 业绩记录优势。</span></p><p><strong><span class="lang-tr">2. Dijital TM'ye Erken Konumlan</span><span class="lang-zh">2. 提前布局数字变电站</span>:</strong> <span class="lang-tr">Hitachi-TEİAŞ pilotu, IEC 61850 dijital trafo merkezinin Türkiye'de standart olacağının sinyali. BETAŞ ekibinde process-bus / OCT yetkinliği geliştirip ihalelerde fark yarat.</span><span class="lang-zh">Hitachi-TEİAŞ 试点表明 IEC 61850 数字变电站将在土耳其成为标准。在 BETAŞ 团队培养 process-bus / OCT 能力，在招标中拉开差距。</span></p><p><strong><span class="lang-tr">3. Trafo Tedarik Zincirini Kilitle</span><span class="lang-zh">3. 锁定变压器供应链</span>:</strong> <span class="lang-tr">Küresel teslim süresi 4 yıl, fiyat +%75. Astor, Hitachi TR ve PTTX (Bursa nüve) ile erken tedarik anlaşmaları yaparak proje takvimini koru.</span><span class="lang-zh">全球交货期 4 年、价格 +75%。与 Astor、Hitachi 土耳其及 PTTX（布尔萨铁芯）提前签供货协议，保住项目工期。</span></p><p><strong><span class="lang-tr">4. Offshore Rüzgar Yeni İş Kolu</span><span class="lang-zh">4. 海上风电新业务线</span>:</strong> <span class="lang-tr">Saros-Edremit eksenindeki 4 saha, deniz üstü TM ve deniz altı kablo EPC'si açacak. 2026 ihalesinden önce teknik ortak ve referans hazırlığına başla.</span><span class="lang-zh">萨罗斯-埃德雷米特一线的 4 个海域将催生海上变电站与海底电缆 EPC。在 2026 招标前启动技术合作伙伴与业绩准备。</span></p><p><strong><span class="lang-tr">5. Körfez &amp; Afrika İhracatı</span><span class="lang-zh">5. 海湾与非洲出口</span>:</strong> <span class="lang-tr">Linxon'un Suudi 380 kV modeli ve Türk firmalarının Afrika'daki $100B birikimi, BETAŞ için Körfez/Kuzey Afrika TM EPC ihracat penceresi. Cezayir Sonelgaz takip ihalelerini hedefle.</span><span class="lang-zh">Linxon 的沙特 380 kV 模式，加上土耳其企业在非洲 1,000 亿美元的积累，为 BETAŞ 打开海湾/北非变电站 EPC 出口窗口。瞄准阿尔及利亚 Sonelgaz 的后续招标。</span></p></div>
+      <div class="sidebar-title"><span class="lang-tr">🎯 Ati İçin Strateji</span><span class="lang-en">🎯 Strategy for Ati</span><span class="lang-zh">🎯 给 Ati 的策略</span></div>
+      <div class="strategy-box"><p><strong><span class="lang-tr">1. İTM.79'a Agresif Teklif</span><span class="lang-en">1. Bid Aggressively on İTM.79</span><span class="lang-zh">1. 对 İTM.79 积极投标</span>:</strong> <span class="lang-tr">6 trafo merkezi yapımı doğrudan BETAŞ core business'ı. Altınkaya, Refahiye, Tirebolu gibi sahalarda lojistik ve saha deneyimi öne çıkar. TEİAŞ sicil avantajını kullan.</span><span class="lang-en">Building 6 substations is squarely BETAŞ core business. At sites like Altınkaya, Refahiye, Tirebolu, logistics and field experience stand out. Use the TEİAŞ track-record advantage.</span><span class="lang-zh">6 座变电站新建直接属 BETAŞ 核心业务。在 Altınkaya、Refahiye、Tirebolu 等场区，物流与现场经验是优势。善用 TEİAŞ 业绩记录优势。</span></p><p><strong><span class="lang-tr">2. Dijital TM'ye Erken Konumlan</span><span class="lang-en">2. Position Early for Digital SS</span><span class="lang-zh">2. 提前布局数字变电站</span>:</strong> <span class="lang-tr">Hitachi-TEİAŞ pilotu, IEC 61850 dijital trafo merkezinin Türkiye'de standart olacağının sinyali. BETAŞ ekibinde process-bus / OCT yetkinliği geliştirip ihalelerde fark yarat.</span><span class="lang-en">The Hitachi-TEİAŞ pilot signals that IEC 61850 digital substations will become standard in Türkiye. Build process-bus / OCT capability in the BETAŞ team to stand out in tenders.</span><span class="lang-zh">Hitachi-TEİAŞ 试点表明 IEC 61850 数字变电站将在土耳其成为标准。在 BETAŞ 团队培养 process-bus / OCT 能力，在招标中拉开差距。</span></p><p><strong><span class="lang-tr">3. Trafo Tedarik Zincirini Kilitle</span><span class="lang-en">3. Lock the Transformer Supply Chain</span><span class="lang-zh">3. 锁定变压器供应链</span>:</strong> <span class="lang-tr">Küresel teslim süresi 4 yıl, fiyat +%75. Astor, Hitachi TR ve PTTX (Bursa nüve) ile erken tedarik anlaşmaları yaparak proje takvimini koru.</span><span class="lang-en">Global lead time is 4 years, price +75%. Sign early supply deals with Astor, Hitachi TR and PTTX (Bursa core) to protect project schedules.</span><span class="lang-zh">全球交货期 4 年、价格 +75%。与 Astor、Hitachi 土耳其及 PTTX（布尔萨铁芯）提前签供货协议，保住项目工期。</span></p><p><strong><span class="lang-tr">4. Offshore Rüzgar Yeni İş Kolu</span><span class="lang-en">4. Offshore Wind as a New Line</span><span class="lang-zh">4. 海上风电新业务线</span>:</strong> <span class="lang-tr">Saros-Edremit eksenindeki 4 saha, deniz üstü TM ve deniz altı kablo EPC'si açacak. 2026 ihalesinden önce teknik ortak ve referans hazırlığına başla.</span><span class="lang-en">The 4 sites along the Saros-Edremit axis will open offshore-substation and submarine-cable EPC. Start technical-partner and reference prep before the 2026 tender.</span><span class="lang-zh">萨罗斯-埃德雷米特一线的 4 个海域将催生海上变电站与海底电缆 EPC。在 2026 招标前启动技术合作伙伴与业绩准备。</span></p><p><strong><span class="lang-tr">5. Körfez &amp; Afrika İhracatı</span><span class="lang-en">5. Gulf &amp; Africa Exports</span><span class="lang-zh">5. 海湾与非洲出口</span>:</strong> <span class="lang-tr">Linxon'un Suudi 380 kV modeli ve Türk firmalarının Afrika'daki $100B birikimi, BETAŞ için Körfez/Kuzey Afrika TM EPC ihracat penceresi. Cezayir Sonelgaz takip ihalelerini hedefle.</span><span class="lang-en">Linxon's Saudi 380 kV model and Turkish firms' $100bn of Africa experience open a Gulf/North-Africa substation EPC export window for BETAŞ. Target Algeria Sonelgaz follow-on tenders.</span><span class="lang-zh">Linxon 的沙特 380 kV 模式，加上土耳其企业在非洲 1,000 亿美元的积累，为 BETAŞ 打开海湾/北非变电站 EPC 出口窗口。瞄准阿尔及利亚 Sonelgaz 的后续招标。</span></p></div>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-title"><span class="lang-tr">📰 Kaynaklar</span><span class="lang-zh">📰 信息来源</span></div>
+      <div class="sidebar-title"><span class="lang-tr">📰 Kaynaklar</span><span class="lang-en">📰 Sources</span><span class="lang-zh">📰 信息来源</span></div>
       <div class="action-item"><div class="action-desc">Anadolu Ajansı Enerji Terminali • Hitachi Energy • IEA • Ember • Transformers Magazine • Borsa Gündem • Yatırımx • Atlantic Council • Linxon • TotalEnergies • OffshoreWind.biz • Intercon • EKAP / İhale Rapor • GWEC • Rüzgar Enerjisi Dergisi</div></div>
     </div>
   </aside>
 </div>
 
 <footer class="footer">
-  <p><span class="lang-tr">Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.</span><span class="lang-zh">所有新闻均基于真实来源，每条卡片附来源链接。实时流板块由 GitHub Actions 从 RSS 源自动更新。</span></p>
-  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-zh">生成时间</span>: 18.06.2026 17:16 <span class="lang-tr">(TSİ)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
+  <p><span class="lang-tr">Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.</span><span class="lang-en">All news is based on real sources; every card links to its source. The live feed auto-updates from RSS feeds on GitHub Actions.</span><span class="lang-zh">所有新闻均基于真实来源，每条卡片附来源链接。实时流板块由 GitHub Actions 从 RSS 源自动更新。</span></p>
+  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-en">Curated through</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-en">Generated</span><span class="lang-zh">生成时间</span>: 18.06.2026 17:36 <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-en">Auto-generated for Ati (BETAŞ).</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
 </footer>
 
 <script>
-// ---- language toggle (persisted) ----
+// ---- language toggle (3-way, persisted) ----
 (function(){
   var KEY='betas-dash-lang';
+  var MODES=['tr','en','zh'];
   var btns=document.querySelectorAll('.lang-btn');
   var search=document.getElementById('search');
   window.__lang='tr';
   function setLang(l){
-    if(l==='zh'){document.body.classList.add('show-zh');}else{document.body.classList.remove('show-zh');}
+    if(MODES.indexOf(l)<0)l='tr';
+    MODES.forEach(function(x){document.body.classList.remove('lmode-'+x);});
+    document.body.classList.add('lmode-'+l);
     btns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-lang')===l);});
-    if(search){search.setAttribute('placeholder',search.getAttribute(l==='zh'?'data-ph-zh':'data-ph-tr')||'');}
-    document.documentElement.setAttribute('lang',l==='zh'?'zh':'tr');
+    if(search){search.setAttribute('placeholder',search.getAttribute('data-ph-'+l)||'');}
+    document.documentElement.setAttribute('lang',l==='zh'?'zh':l);
     window.__lang=l;
     try{localStorage.setItem(KEY,l);}catch(e){}
   }
@@ -473,10 +481,13 @@ body.show-zh .lang-tr{display:none;}
 (function(){
   var el=document.getElementById('clock');
   function tick(){
-    var zh=document.body.classList.contains('show-zh');
+    var l=window.__lang||'tr';
+    var loc=l==='zh'?'zh-CN':(l==='en'?'en-US':'tr-TR');
+    var label=l==='zh'?'伊斯坦布尔 · ':'İstanbul · ';
+    var suffix=l==='en'?' TRT':(l==='tr'?' TSİ':'');
     try{
-      var s=new Intl.DateTimeFormat(zh?'zh-CN':'tr-TR',{timeZone:'Europe/Istanbul',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
-      el.textContent=(zh?'伊斯坦布尔 · ':'İstanbul · ')+s+(zh?'':' TSİ');
+      var s=new Intl.DateTimeFormat(loc,{timeZone:'Europe/Istanbul',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
+      el.textContent=label+s+suffix;
     }catch(e){ el.textContent=new Date().toLocaleTimeString(); }
   }
   tick(); setInterval(tick,1000);

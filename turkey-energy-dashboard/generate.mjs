@@ -1,11 +1,17 @@
 #!/usr/bin/env node
 /**
- * BETAŞ EPC Intelligence — bilingual (TR / 中文) dashboard generator.
+ * BETAŞ EPC Intelligence — trilingual (TR / EN / 中文) dashboard generator.
  *
- * Reads curated, sourced, bilingual data from data/news.json and (when network
- * egress is available, e.g. on GitHub Actions) aggregates live items from the
- * real energy RSS feeds in feeds.json. Emits a single self-contained index.html
- * with a live TR/中文 language toggle (choice persisted in localStorage).
+ * Reads curated, sourced, trilingual data from data/news.json and (on networked
+ * runners such as GitHub Actions) aggregates live items from the real energy RSS
+ * feeds in feeds.json. Emits a single self-contained index.html with a live
+ * TR/EN/中文 language toggle (choice persisted in localStorage).
+ *
+ * Optional machine translation of the live RSS headlines (off by default):
+ *   TRANSLATE=google node generate.mjs            # unofficial Google endpoint, no key
+ *   TRANSLATE=libre  LIBRETRANSLATE_URL=https://… [LIBRETRANSLATE_API_KEY=…] node generate.mjs
+ *   TRANSLATE_MAX=18                               # cap items translated per build
+ * When off, live headlines display in their source language across all modes.
  *
  * No dependencies. Run:  node generate.mjs
  */
@@ -15,6 +21,7 @@ import path from 'node:path';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const TZ = 'Europe/Istanbul';
+const LANGS = ['tr', 'en', 'zh'];
 
 // ---------- helpers ----------
 const esc = (s = '') =>
@@ -24,11 +31,13 @@ const esc = (s = '') =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
-// Bilingual span pair: TR + ZH. CSS shows exactly one based on body.show-zh.
-const bi = (tr, zh) =>
-  `<span class="lang-tr">${esc(tr)}</span><span class="lang-zh">${esc(zh != null && zh !== '' ? zh : tr)}</span>`;
-// Combined lowercased text so search matches in either language.
-const biLower = (tr, zh) => esc(((tr || '') + ' ' + (zh || '')).toLowerCase());
+// Trilingual span set: TR + EN + ZH. CSS shows exactly one based on body.lmode-*.
+const tri = (tr, en, zh) =>
+  `<span class="lang-tr">${esc(tr)}</span>` +
+  `<span class="lang-en">${esc(en != null && en !== '' ? en : tr)}</span>` +
+  `<span class="lang-zh">${esc(zh != null && zh !== '' ? zh : tr)}</span>`;
+// Combined lowercased text so search matches in any language.
+const triLower = (tr, en, zh) => esc(((tr || '') + ' ' + (en || '') + ' ' + (zh || '')).toLowerCase());
 
 function fmtDate(d, locale = 'tr-TR') {
   return new Intl.DateTimeFormat(locale, {
@@ -89,7 +98,7 @@ async function fetchFeed(feed, timeoutMs = 9000) {
 }
 async function aggregateLive(cfg) {
   if (process.env.NO_FETCH === '1' || !Array.isArray(cfg.feeds)) {
-    return { items: [], reachable: 0, total: (cfg.feeds || []).length };
+    return { items: [], reachable: 0, total: (cfg.feeds || []).length, translated: 0 };
   }
   const results = await Promise.allSettled(cfg.feeds.map((f) => fetchFeed(f)));
   const kw = (cfg.keywords || []).map((k) => k.toLowerCase());
@@ -113,28 +122,87 @@ async function aggregateLive(cfg) {
     out.push(it);
     if (out.length >= 36) break;
   }
-  return { items: out, reachable, total: cfg.feeds.length };
+  return { items: out, reachable, total: cfg.feeds.length, translated: 0 };
+}
+
+// ---------- optional machine translation (off by default) ----------
+async function translateOne(text, target) {
+  const provider = (process.env.TRANSLATE || '').toLowerCase();
+  if (!provider || !text) return null;
+  try {
+    if (provider === 'google') {
+      const tl = target === 'zh' ? 'zh-CN' : target;
+      const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl='
+        + encodeURIComponent(tl) + '&dt=t&q=' + encodeURIComponent(text);
+      const res = await fetch(url, { signal: AbortSignal.timeout(8000), headers: { 'user-agent': 'BETAS-EPC/1.0' } });
+      if (!res.ok) return null;
+      const j = await res.json();
+      if (!Array.isArray(j) || !Array.isArray(j[0])) return null;
+      const out = j[0].map((seg) => (Array.isArray(seg) ? seg[0] : '')).join('').trim();
+      return out || null;
+    }
+    if (provider === 'libre') {
+      const base = process.env.LIBRETRANSLATE_URL;
+      if (!base) return null;
+      const body = { q: text, source: 'auto', target: target === 'zh' ? 'zh' : target, format: 'text' };
+      if (process.env.LIBRETRANSLATE_API_KEY) body.api_key = process.env.LIBRETRANSLATE_API_KEY;
+      const res = await fetch(base.replace(/\/$/, '') + '/translate', {
+        method: 'POST', signal: AbortSignal.timeout(9000),
+        headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+      });
+      if (!res.ok) return null;
+      const j = await res.json();
+      return j && j.translatedText ? String(j.translatedText).trim() : null;
+    }
+  } catch { return null; }
+  return null;
+}
+
+async function translateLive(items) {
+  const provider = (process.env.TRANSLATE || '').toLowerCase();
+  if (!provider || !items.length) return 0;
+  const cap = Math.min(items.length, Number(process.env.TRANSLATE_MAX || 18));
+  let idx = 0;
+  let count = 0;
+  const conc = 4;
+  async function worker() {
+    while (idx < cap) {
+      const i = idx++;
+      const it = items[i];
+      const [tr, en, zh] = await Promise.all(LANGS.map((t) => translateOne(it.title, t)));
+      if (tr || en || zh) {
+        it.tr = tr || it.title;
+        it.en = en || it.title;
+        it.zh = zh || it.title;
+        it.translated = true;
+        count++;
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: conc }, () => worker()));
+  return count;
 }
 
 // ---------- section renderers ----------
 const badge = (imp) => {
-  const map = { high: ['badge-high', 'YÜKSEK', '高'], medium: ['badge-medium', 'ORTA', '中'], low: ['badge-low', 'DÜŞÜK', '低'] };
-  const [cls, tr, zh] = map[imp] || map.low;
-  return `<span class="badge ${cls}">${bi(tr, zh)}</span>`;
+  const map = { high: ['badge-high', 'YÜKSEK', 'HIGH', '高'], medium: ['badge-medium', 'ORTA', 'MED', '中'], low: ['badge-low', 'DÜŞÜK', 'LOW', '低'] };
+  const [cls, tr, en, zh] = map[imp] || map.low;
+  return `<span class="badge ${cls}">${tri(tr, en, zh)}</span>`;
 };
 
 function renderCards(items) {
   return items.map((n) => `
-    <article class="card" data-importance="${esc(n.importance)}" data-search="${biLower(
+    <article class="card" data-importance="${esc(n.importance)}" data-search="${triLower(
       n.title + ' ' + n.summary + ' ' + (n.tags || []).join(' '),
+      (n.title_en || '') + ' ' + (n.summary_en || '') + ' ' + (n.tags_en || []).join(' '),
       (n.title_zh || '') + ' ' + (n.summary_zh || '') + ' ' + (n.tags_zh || []).join(' '),
     )}">
       <div class="card-header">
-        <h3 class="card-title">${bi(n.title, n.title_zh)}</h3>
+        <h3 class="card-title">${tri(n.title, n.title_en, n.title_zh)}</h3>
         ${badge(n.importance)}
       </div>
-      <p class="card-body">${bi(n.summary, n.summary_zh)}</p>
-      <div class="card-tags">${(n.tags || []).map((t, i) => `<span class="tag">${bi(t, (n.tags_zh || [])[i])}</span>`).join('')}</div>
+      <p class="card-body">${tri(n.summary, n.summary_en, n.summary_zh)}</p>
+      <div class="card-tags">${(n.tags || []).map((t, i) => `<span class="tag">${tri(t, (n.tags_en || [])[i], (n.tags_zh || [])[i])}</span>`).join('')}</div>
       <div class="card-footer">
         <span class="card-date">${esc(n.date)}</span>
         <a href="${esc(n.source_url)}" target="_blank" rel="noopener">${esc(n.source_name)} →</a>
@@ -144,19 +212,19 @@ function renderCards(items) {
 
 function renderTenders(rows) {
   const st = {
-    active: ['status-active', 'Aktif', '进行中'],
-    upcoming: ['status-upcoming', 'Yaklaşan', '即将'],
-    result: ['status-result', 'Sonuçlandı', '已结束'],
+    active: ['status-active', 'Aktif', 'Active', '进行中'],
+    upcoming: ['status-upcoming', 'Yaklaşan', 'Upcoming', '即将'],
+    result: ['status-result', 'Sonuçlandı', 'Awarded', '已结束'],
   };
   return rows.map((r) => {
-    const [cls, trL, zhL] = st[r.status] || st.active;
-    return `<tr data-search="${biLower(r.project + ' ' + r.org + ' ' + r.scope + ' ' + r.ikn, (r.project_zh || '') + ' ' + (r.scope_zh || ''))}">
-      <td><strong>${bi(r.project, r.project_zh)}</strong></td>
+    const [cls, trL, enL, zhL] = st[r.status] || st.active;
+    return `<tr data-search="${triLower(r.project + ' ' + r.org + ' ' + r.scope + ' ' + r.ikn, (r.project_en || '') + ' ' + (r.scope_en || ''), (r.project_zh || '') + ' ' + (r.scope_zh || ''))}">
+      <td><strong>${tri(r.project, r.project_en, r.project_zh)}</strong></td>
       <td>${esc(r.org)}</td>
-      <td>${bi(r.scope, r.scope_zh)}</td>
+      <td>${tri(r.scope, r.scope_en, r.scope_zh)}</td>
       <td class="mono">${esc(r.ikn)}</td>
       <td>${esc(r.date)}</td>
-      <td class="${cls}">${bi(trL, zhL)}</td>
+      <td class="${cls}">${tri(trL, enL, zhL)}</td>
     </tr>`;
   }).join('');
 }
@@ -164,8 +232,8 @@ function renderTenders(rows) {
 function renderMfg(items) {
   return items.map((m) => `
     <div class="mfg-item">
-      <h4>${bi(m.title, m.title_zh)}</h4>
-      <p>${bi(m.body, m.body_zh)}</p>
+      <h4>${tri(m.title, m.title_en, m.title_zh)}</h4>
+      <p>${tri(m.body, m.body_en, m.body_zh)}</p>
       <div class="source"><a href="${esc(m.source_url)}" target="_blank" rel="noopener">${esc(m.source_name)} →</a></div>
     </div>`).join('');
 }
@@ -173,9 +241,9 @@ function renderMfg(items) {
 function renderYeka(items) {
   return items.map((y) => `
     <div class="yeka-item">
-      <div class="capacity">${bi(y.capacity, y.capacity_zh)}</div>
-      <h4>${bi(y.title, y.title_zh)}</h4>
-      <p>${bi(y.body, y.body_zh)}</p>
+      <div class="capacity">${tri(y.capacity, y.capacity_en, y.capacity_zh)}</div>
+      <h4>${tri(y.title, y.title_en, y.title_zh)}</h4>
+      <p>${tri(y.body, y.body_en, y.body_zh)}</p>
       <div class="source"><a href="${esc(y.source_url)}" target="_blank" rel="noopener">${esc(y.source_name)} →</a></div>
     </div>`).join('');
 }
@@ -183,16 +251,17 @@ function renderYeka(items) {
 function renderMena(items) {
   return items.map((m) => `
     <div class="mena-item">
-      <h4>${bi(m.title, m.title_zh)}</h4>
-      <p>${bi(m.body, m.body_zh)}</p>
+      <h4>${tri(m.title, m.title_en, m.title_zh)}</h4>
+      <p>${tri(m.body, m.body_en, m.body_zh)}</p>
       <div class="source"><a href="${esc(m.source_url)}" target="_blank" rel="noopener">${esc(m.source_name)} →</a></div>
     </div>`).join('');
 }
 
 function renderLive(live) {
   if (!live.items.length) {
-    return `<p class="live-empty">${bi(
+    return `<p class="live-empty">${tri(
       `Canlı besleme şu an boş veya ağ erişimi kısıtlı. Bu bölüm GitHub Actions üzerinde her yenilemede ${live.total} RSS kaynağından otomatik dolar.`,
+      `The live feed is empty or network access is restricted. This section auto-fills from ${live.total} RSS feeds on each GitHub Actions rebuild.`,
       `实时流目前为空或网络受限。该板块在 GitHub Actions 上每次刷新时会从 ${live.total} 个 RSS 源自动填充。`,
     )}</p>`;
   }
@@ -200,8 +269,12 @@ function renderLive(live) {
     let d = '';
     const t = Date.parse(it.date);
     if (!Number.isNaN(t)) d = fmtStamp(new Date(t));
-    return `<li data-search="${esc(it.title.toLowerCase())}">
-      <a href="${esc(it.link)}" target="_blank" rel="noopener">${esc(it.title)}</a>
+    const titleHtml = it.translated
+      ? `<a href="${esc(it.link)}" target="_blank" rel="noopener">${tri(it.tr, it.en, it.zh)}</a>`
+      : `<a href="${esc(it.link)}" target="_blank" rel="noopener">${esc(it.title)}</a>`;
+    const search = it.translated ? triLower(it.tr, it.en, it.zh) : esc(it.title.toLowerCase());
+    return `<li data-search="${search}">
+      ${titleHtml}
       <span class="live-meta">${esc(it.source)}${d ? ' · ' + esc(d) : ''}</span>
     </li>`;
   }).join('') + `</ul>`;
@@ -210,7 +283,7 @@ function renderLive(live) {
 function renderStats(stats) {
   return stats.map((s) => `
     <div class="stat-item">
-      <span class="stat-label">${bi(s.label, s.label_zh)}</span>
+      <span class="stat-label">${tri(s.label, s.label_en, s.label_zh)}</span>
       <span class="stat-value ${esc(s.accent || '')}">${esc(s.value)}</span>
     </div>`).join('');
 }
@@ -218,19 +291,19 @@ function renderStats(stats) {
 function renderActions(items) {
   return items.map((a) => `
     <div class="action-item">
-      <div class="action-title">${bi(a.title, a.title_zh)}</div>
-      <div class="action-desc">${bi(a.desc, a.desc_zh)}</div>
-      <div class="action-deadline">⏰ ${bi(a.deadline, a.deadline_zh)}</div>
+      <div class="action-title">${tri(a.title, a.title_en, a.title_zh)}</div>
+      <div class="action-desc">${tri(a.desc, a.desc_en, a.desc_zh)}</div>
+      <div class="action-deadline">⏰ ${tri(a.deadline, a.deadline_en, a.deadline_zh)}</div>
     </div>`).join('');
 }
 
 function renderStrategy(items) {
-  return items.map((s) => `<p><strong>${bi(s.title, s.title_zh)}:</strong> ${bi(s.body, s.body_zh)}</p>`).join('');
+  return items.map((s) => `<p><strong>${tri(s.title, s.title_en, s.title_zh)}:</strong> ${tri(s.body, s.body_en, s.body_zh)}</p>`).join('');
 }
 
 function renderTicker(tickers) {
   const cls = { hot: 'hot', new: 'new', info: '' };
-  const one = tickers.map((t) => `<span class="${cls[t.type] || ''}">${bi(t.text, t.text_zh)}</span>`).join('');
+  const one = tickers.map((t) => `<span class="${cls[t.type] || ''}">${tri(t.text, t.text_en, t.text_zh)}</span>`).join('');
   return one + one; // duplicate for seamless marquee loop
 }
 
@@ -239,8 +312,11 @@ function page(data, live, now) {
   const m = data.meta || {};
   const highCount = (data.epc || []).filter((x) => x.importance === 'high').length;
   const liveBadge = live.reachable > 0
-    ? `<span class="live-on">${bi(`● CANLI · ${live.reachable}/${live.total} kaynak`, `● 实时 · ${live.reachable}/${live.total} 源`)}</span>`
-    : `<span class="live-off">${bi('○ Canlı besleme beklemede', '○ 实时流待启用')}</span>`;
+    ? `<span class="live-on">${tri(`● CANLI · ${live.reachable}/${live.total} kaynak`, `● LIVE · ${live.reachable}/${live.total} feeds`, `● 实时 · ${live.reachable}/${live.total} 源`)}</span>`
+    : `<span class="live-off">${tri('○ Canlı besleme beklemede', '○ Live feed pending', '○ 实时流待启用')}</span>`;
+  const trBadge = live.translated > 0
+    ? `<span class="tr-on">${tri(`🌐 ${live.translated} başlık çevrildi`, `🌐 ${live.translated} headlines translated`, `🌐 ${live.translated} 条已翻译`)}</span>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="tr">
@@ -248,23 +324,24 @@ function page(data, live, now) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(m.report_title || 'EPC Intelligence')} — ${esc(fmtDate(now))}</title>
-<meta name="description" content="Türkiye EPC & enerji sektörü canlı istihbarat panosu (TR/中文). Gerçek kaynaklı, kaynak bağlantılı.">
+<meta name="description" content="Türkiye EPC & energy live intelligence dashboard (TR/EN/中文). Real sources, linked.">
 <style>
 :root{--bg:#0a0e17;--panel:#111827;--card:#1a2332;--line:#1e293b;--accent:#00d4aa;--muted:#94a3b8;--dim:#64748b;--text:#e0e6ed;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
 a{color:var(--accent);}
-/* language toggle visibility */
-body:not(.show-zh) .lang-zh{display:none;}
-body.show-zh .lang-tr{display:none;}
+/* language visibility (3-way) */
+.lang-tr,.lang-en,.lang-zh{display:none;}
+body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inline;}
 .header{background:linear-gradient(135deg,#0f1923 0%,#1a2332 50%,#0d1b2a 100%);padding:26px 36px;border-bottom:3px solid var(--accent);}
 .header-content{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
 .header-left h1{font-size:26px;color:var(--accent);font-weight:800;letter-spacing:.5px;}
 .header-left .subtitle{font-size:13px;color:#8899aa;margin-top:5px;}
 .header-right{text-align:right;}
-.lang-toggle{display:inline-flex;gap:0;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;margin-bottom:8px;}
-.lang-btn{background:var(--card);border:none;color:var(--muted);padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+.lang-toggle{display:inline-flex;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.lang-btn{background:var(--card);border:none;border-left:1px solid #2a3a4a;color:var(--muted);padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;}
+.lang-btn:first-child{border-left:none;}
 .lang-btn.active{background:var(--accent);color:#0a0e17;}
 .header-right .date{font-size:17px;color:#fff;font-weight:600;}
 .header-right .time-badge{display:inline-block;background:var(--accent);color:#0a0e17;padding:4px 12px;border-radius:4px;font-size:13px;font-weight:700;margin-top:6px;}
@@ -272,6 +349,7 @@ body.show-zh .lang-tr{display:none;}
 .status-bar{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:#0d1117;padding:8px 36px;border-bottom:1px solid var(--line);font-size:12px;color:var(--dim);}
 .live-on{color:var(--accent);font-weight:700;}
 .live-off{color:#d97706;font-weight:600;}
+.tr-on{color:#8b5cf6;font-weight:600;}
 .refresh-note{margin-left:auto;}
 .marquee-container{background:var(--panel);padding:11px 0;border-bottom:1px solid var(--line);overflow:hidden;}
 .marquee-content{display:inline-block;white-space:nowrap;animation:marquee 60s linear infinite;font-size:13px;color:var(--muted);}
@@ -346,21 +424,22 @@ body.show-zh .lang-tr{display:none;}
 @media (max-width:1024px){.main-layout{grid-template-columns:1fr;}.sidebar{border-left:none;border-top:1px solid var(--line);}}
 </style>
 </head>
-<body>
+<body class="lmode-tr">
 
 <header class="header">
   <div class="header-content">
     <div class="header-left">
       <h1>${esc(m.report_title || 'EPC Intelligence')}</h1>
-      <div class="subtitle">${bi(m.subtitle, m.subtitle_zh)}</div>
+      <div class="subtitle">${tri(m.subtitle, m.subtitle_en, m.subtitle_zh)}</div>
     </div>
     <div class="header-right">
       <div class="lang-toggle">
         <button class="lang-btn" data-lang="tr">TR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
         <button class="lang-btn" data-lang="zh">中文</button>
       </div>
-      <div class="date"><span class="lang-tr">${esc(fmtDate(now, 'tr-TR'))}</span><span class="lang-zh">${esc(fmtDate(now, 'zh-CN'))}</span></div>
-      <div class="time-badge">${bi('⚡ CANLI İSTİHBARAT PANOSU', '⚡ 全天候实时情报面板')}</div>
+      <div class="date"><span class="lang-tr">${esc(fmtDate(now, 'tr-TR'))}</span><span class="lang-en">${esc(fmtDate(now, 'en-US'))}</span><span class="lang-zh">${esc(fmtDate(now, 'zh-CN'))}</span></div>
+      <div class="time-badge">${tri('⚡ CANLI İSTİHBARAT PANOSU', '⚡ LIVE INTELLIGENCE DASHBOARD', '⚡ 全天候实时情报面板')}</div>
       <div class="clock" id="clock">…</div>
     </div>
   </div>
@@ -368,9 +447,10 @@ body.show-zh .lang-tr{display:none;}
 
 <div class="status-bar">
   ${liveBadge}
-  <span>${bi('Son güncelleme:', '最后更新：')} <strong>${esc(fmtStamp(now))}</strong> ${bi('(TSİ)', '（土耳其时间）')}</span>
-  <span>${bi(`${highCount} yüksek öncelikli başlık`, `${highCount} 条高优先级头条`)}</span>
-  <span class="refresh-note">${bi('Sayfa açık kaldığında her 15 dk\'da bir otomatik yenilenir.', '页面保持打开时每 15 分钟自动刷新。')}</span>
+  ${trBadge}
+  <span>${tri('Son güncelleme:', 'Last updated:', '最后更新：')} <strong>${esc(fmtStamp(now))}</strong> ${tri('(TSİ)', '(TRT)', '（土耳其时间）')}</span>
+  <span>${tri(`${highCount} yüksek öncelikli başlık`, `${highCount} high-priority items`, `${highCount} 条高优先级头条`)}</span>
+  <span class="refresh-note">${tri('Sayfa açık kaldığında her 15 dk\'da bir otomatik yenilenir.', 'Auto-refreshes every 15 min while open.', '页面保持打开时每 15 分钟自动刷新。')}</span>
 </div>
 
 <div class="marquee-container">
@@ -380,88 +460,92 @@ body.show-zh .lang-tr{display:none;}
 <div class="toolbar">
   <input type="search" id="search"
     data-ph-tr="🔎 Haber, ihale, kurum, kV, MW ara… (örn: 380 kV, Astor, offshore)"
+    data-ph-en="🔎 Search news, tenders, orgs, kV, MW… (e.g. 380 kV, Astor, offshore)"
     data-ph-zh="🔎 搜索新闻、招标、机构、kV、MW…（如：380 kV、Astor、offshore）"
     placeholder="🔎 …">
-  <button class="filter-btn active" data-filter="all">${bi('Tümü', '全部')}</button>
-  <button class="filter-btn" data-filter="high">${bi('Yüksek', '高')}</button>
-  <button class="filter-btn" data-filter="medium">${bi('Orta', '中')}</button>
+  <button class="filter-btn active" data-filter="all">${tri('Tümü', 'All', '全部')}</button>
+  <button class="filter-btn" data-filter="high">${tri('Yüksek', 'High', '高')}</button>
+  <button class="filter-btn" data-filter="medium">${tri('Orta', 'Med', '中')}</button>
   <nav class="nav-links">
     <a href="#epc">EPC</a>
-    <a href="#tenders">${bi('İhaleler', '招标')}</a>
-    <a href="#mfg">${bi('Üreticiler', '制造商')}</a>
+    <a href="#tenders">${tri('İhaleler', 'Tenders', '招标')}</a>
+    <a href="#mfg">${tri('Üreticiler', 'Makers', '制造商')}</a>
     <a href="#yeka">YEKA</a>
     <a href="#mena">MENA</a>
-    <a href="#live">${bi('Canlı', '实时')}</a>
+    <a href="#live">${tri('Canlı', 'Live', '实时')}</a>
   </nav>
 </div>
 
 <div class="main-layout">
   <main class="content-area">
 
-    <h2 class="section-title" id="epc">${bi('EPC Projeleri & Sözleşmeler', 'EPC 项目与合同')}</h2>
+    <h2 class="section-title" id="epc">${tri('EPC Projeleri & Sözleşmeler', 'EPC Projects & Contracts', 'EPC 项目与合同')}</h2>
     <div class="card-grid" id="cards">${renderCards(data.epc || [])}</div>
 
-    <h2 class="section-title" id="tenders">${bi('TEİAŞ / EÜAŞ İhale Takip Tablosu', 'TEİAŞ / EÜAŞ 招标跟踪表')}</h2>
+    <h2 class="section-title" id="tenders">${tri('TEİAŞ / EÜAŞ İhale Takip Tablosu', 'TEİAŞ / EÜAŞ Tender Tracker', 'TEİAŞ / EÜAŞ 招标跟踪表')}</h2>
     <table class="tender-table">
       <thead><tr>
-        <th>${bi('Proje', '项目')}</th><th>${bi('Kurum', '机构')}</th><th>${bi('Kapsam', '范围')}</th>
-        <th>${bi('İKN', '招标号')}</th><th>${bi('Yıl', '年份')}</th><th>${bi('Durum', '状态')}</th>
+        <th>${tri('Proje', 'Project', '项目')}</th><th>${tri('Kurum', 'Org', '机构')}</th><th>${tri('Kapsam', 'Scope', '范围')}</th>
+        <th>${tri('İKN', 'Ref', '招标号')}</th><th>${tri('Yıl', 'Year', '年份')}</th><th>${tri('Durum', 'Status', '状态')}</th>
       </tr></thead>
       <tbody id="tender-rows">${renderTenders(data.tenders || [])}</tbody>
     </table>
 
-    <h2 class="section-title" id="mfg">${bi('Transformatör & Ekipman Üreticileri', '变压器与设备制造商动态')}</h2>
+    <h2 class="section-title" id="mfg">${tri('Transformatör & Ekipman Üreticileri', 'Transformer & Equipment Makers', '变压器与设备制造商动态')}</h2>
     <div class="mfg-grid">${renderMfg(data.manufacturers || [])}</div>
 
-    <h2 class="section-title" id="yeka">${bi('YEKA & Yenilenebilir Enerji', 'YEKA 与可再生能源')}</h2>
+    <h2 class="section-title" id="yeka">${tri('YEKA & Yenilenebilir Enerji', 'YEKA & Renewables', 'YEKA 与可再生能源')}</h2>
     <div class="yeka-grid">${renderYeka(data.yeka || [])}</div>
 
-    <h2 class="section-title" id="mena">${bi('Kuzey Afrika & Ortadoğu EPC Pazarı', '北非与中东 EPC 市场')}</h2>
+    <h2 class="section-title" id="mena">${tri('Kuzey Afrika & Ortadoğu EPC Pazarı', 'North Africa & Middle East EPC Market', '北非与中东 EPC 市场')}</h2>
     <div class="mena-grid">${renderMena(data.mena || [])}</div>
 
-    <h2 class="section-title" id="live">${bi('📡 Canlı Sektör Akışı (RSS)', '📡 实时行业资讯流（RSS）')}</h2>
+    <h2 class="section-title" id="live">${tri('📡 Canlı Sektör Akışı (RSS)', '📡 Live Sector Feed (RSS)', '📡 实时行业资讯流（RSS）')}</h2>
     ${renderLive(live)}
 
-    <div class="no-results" id="no-results">${bi('Eşleşen sonuç yok. Aramayı temizleyin.', '无匹配结果，请清除搜索。')}</div>
+    <div class="no-results" id="no-results">${tri('Eşleşen sonuç yok. Aramayı temizleyin.', 'No matches. Clear the search.', '无匹配结果，请清除搜索。')}</div>
   </main>
 
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-title">${bi('📊 Önemli Rakamlar', '📊 关键数字')}</div>
+      <div class="sidebar-title">${tri('📊 Önemli Rakamlar', '📊 Key Numbers', '📊 关键数字')}</div>
       ${renderStats(data.stats || [])}
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-title">${bi('🚨 Acil Takip Listesi', '🚨 紧急跟进清单')}</div>
+      <div class="sidebar-title">${tri('🚨 Acil Takip Listesi', '🚨 Urgent Follow-ups', '🚨 紧急跟进清单')}</div>
       ${renderActions(data.actions || [])}
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-title">${bi('🎯 Ati İçin Strateji', '🎯 给 Ati 的策略')}</div>
+      <div class="sidebar-title">${tri('🎯 Ati İçin Strateji', '🎯 Strategy for Ati', '🎯 给 Ati 的策略')}</div>
       <div class="strategy-box">${renderStrategy(data.strategy || [])}</div>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-title">${bi('📰 Kaynaklar', '📰 信息来源')}</div>
+      <div class="sidebar-title">${tri('📰 Kaynaklar', '📰 Sources', '📰 信息来源')}</div>
       <div class="action-item"><div class="action-desc">${(data.sources_footer || []).map(esc).join(' • ')}</div></div>
     </div>
   </aside>
 </div>
 
 <footer class="footer">
-  <p>${bi(m.note, m.note_zh)}</p>
-  <p style="margin-top:6px;">${bi('Veri küratörlüğü', '数据核校至')}: ${esc(m.curated_through || '')} · ${bi('Oluşturulma', '生成时间')}: ${esc(fmtStamp(now))} ${bi('(TSİ)', '（土耳其时间）')} · ${bi('Ati (BETAŞ) için otomatik hazırlanmıştır.', '为 Ati (BETAŞ) 自动生成。')}</p>
+  <p>${tri(m.note, m.note_en, m.note_zh)}</p>
+  <p style="margin-top:6px;">${tri('Veri küratörlüğü', 'Curated through', '数据核校至')}: ${esc(m.curated_through || '')} · ${tri('Oluşturulma', 'Generated', '生成时间')}: ${esc(fmtStamp(now))} ${tri('(TSİ)', '(TRT)', '（土耳其时间）')} · ${tri('Ati (BETAŞ) için otomatik hazırlanmıştır.', 'Auto-generated for Ati (BETAŞ).', '为 Ati (BETAŞ) 自动生成。')}</p>
 </footer>
 
 <script>
-// ---- language toggle (persisted) ----
+// ---- language toggle (3-way, persisted) ----
 (function(){
   var KEY='betas-dash-lang';
+  var MODES=['tr','en','zh'];
   var btns=document.querySelectorAll('.lang-btn');
   var search=document.getElementById('search');
   window.__lang='tr';
   function setLang(l){
-    if(l==='zh'){document.body.classList.add('show-zh');}else{document.body.classList.remove('show-zh');}
+    if(MODES.indexOf(l)<0)l='tr';
+    MODES.forEach(function(x){document.body.classList.remove('lmode-'+x);});
+    document.body.classList.add('lmode-'+l);
     btns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-lang')===l);});
-    if(search){search.setAttribute('placeholder',search.getAttribute(l==='zh'?'data-ph-zh':'data-ph-tr')||'');}
-    document.documentElement.setAttribute('lang',l==='zh'?'zh':'tr');
+    if(search){search.setAttribute('placeholder',search.getAttribute('data-ph-'+l)||'');}
+    document.documentElement.setAttribute('lang',l==='zh'?'zh':l);
     window.__lang=l;
     try{localStorage.setItem(KEY,l);}catch(e){}
   }
@@ -474,10 +558,13 @@ body.show-zh .lang-tr{display:none;}
 (function(){
   var el=document.getElementById('clock');
   function tick(){
-    var zh=document.body.classList.contains('show-zh');
+    var l=window.__lang||'tr';
+    var loc=l==='zh'?'zh-CN':(l==='en'?'en-US':'tr-TR');
+    var label=l==='zh'?'伊斯坦布尔 · ':'İstanbul · ';
+    var suffix=l==='en'?' TRT':(l==='tr'?' TSİ':'');
     try{
-      var s=new Intl.DateTimeFormat(zh?'zh-CN':'tr-TR',{timeZone:'Europe/Istanbul',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
-      el.textContent=(zh?'伊斯坦布尔 · ':'İstanbul · ')+s+(zh?'':' TSİ');
+      var s=new Intl.DateTimeFormat(loc,{timeZone:'Europe/Istanbul',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());
+      el.textContent=label+s+suffix;
     }catch(e){ el.textContent=new Date().toLocaleTimeString(); }
   }
   tick(); setInterval(tick,1000);
@@ -539,21 +626,22 @@ async function main() {
   } catch { /* feeds optional */ }
 
   const live = await aggregateLive(feedCfg);
+  live.translated = await translateLive(live.items);
   const now = new Date();
   const html = page(data, live, now);
 
   await writeFile(path.join(DIR, 'index.html'), html, 'utf-8');
   await writeFile(
     path.join(DIR, 'data', 'last-build.json'),
-    JSON.stringify({ built_at: now.toISOString(), live_reachable: live.reachable, live_total: live.total, live_items: live.items.length }, null, 2),
+    JSON.stringify({ built_at: now.toISOString(), live_reachable: live.reachable, live_total: live.total, live_items: live.items.length, translated: live.translated, translate_provider: process.env.TRANSLATE || 'off' }, null, 2),
     'utf-8',
   );
 
-  console.log(`[ok] index.html yazıldı / 已生成 — ${fmtStamp(now)} (TSİ)`);
-  console.log(`[live] ${live.reachable}/${live.total} RSS kaynağı erişildi, ${live.items.length} canlı başlık`);
+  console.log(`[ok] index.html yazıldı / generated / 已生成 — ${fmtStamp(now)} (TSİ)`);
+  console.log(`[live] ${live.reachable}/${live.total} RSS feeds, ${live.items.length} items, ${live.translated} translated (${process.env.TRANSLATE || 'off'})`);
 }
 
 main().catch((err) => {
-  console.error('[hata/错误] üretim başarısız:', err);
+  console.error('[hata/error/错误] generation failed:', err);
   process.exit(1);
 });

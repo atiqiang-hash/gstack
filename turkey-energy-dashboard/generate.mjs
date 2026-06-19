@@ -301,6 +301,52 @@ function renderStrategy(items) {
   return items.map((s) => `<p><strong>${tri(s.title, s.title_en, s.title_zh)}:</strong> ${tri(s.body, s.body_en, s.body_zh)}</p>`).join('');
 }
 
+function renderAnalytics(data) {
+  const epc = data.epc || [];
+  const tenders = data.tenders || [];
+  const mfg = data.manufacturers || [];
+  const yeka = data.yeka || [];
+  const mena = data.mena || [];
+
+  const cImp = { high: 0, medium: 0, low: 0 };
+  epc.forEach((x) => { cImp[x.importance] = (cImp[x.importance] || 0) + 1; });
+  const cTen = { active: 0, upcoming: 0, result: 0 };
+  tenders.forEach((x) => { cTen[x.status] = (cTen[x.status] || 0) + 1; });
+
+  const totalTracked = epc.length + tenders.length + mfg.length + yeka.length + mena.length;
+  const sources = new Set();
+  [...epc, ...mfg, ...yeka, ...mena].forEach((x) => { if (x.source_name) sources.add(x.source_name); });
+
+  const pct = (n, t) => (t > 0 ? Math.round((n / t) * 100) : 0);
+  const bar = (label, n, t, color) =>
+    `<div class="an-row"><span class="an-label">${label}</span><div class="an-bar"><span style="width:${pct(n, t)}%;background:${color}"></span></div><span class="an-val">${n}</span></div>`;
+
+  const impCard = `<div class="an-card"><h4>${tri('Önem Dağılımı (EPC)', 'Importance Split (EPC)', '重要性分布 (EPC)')}</h4>
+    ${bar(tri('Yüksek', 'High', '高'), cImp.high, epc.length, '#dc2626')}
+    ${bar(tri('Orta', 'Med', '中'), cImp.medium, epc.length, '#d97706')}
+    ${bar(tri('Düşük', 'Low', '低'), cImp.low, epc.length, '#059669')}</div>`;
+
+  const tenCard = `<div class="an-card"><h4>${tri('İhale Durumu', 'Tender Status', '招标状态')}</h4>
+    ${bar(tri('Aktif', 'Active', '进行中'), cTen.active, tenders.length, '#00d4aa')}
+    ${bar(tri('Yaklaşan', 'Upcoming', '即将'), cTen.upcoming, tenders.length, '#f59e0b')}
+    ${bar(tri('Sonuç', 'Done', '已结束'), cTen.result, tenders.length, '#8b5cf6')}</div>`;
+
+  const covMax = Math.max(epc.length, mfg.length, yeka.length, mena.length, 1);
+  const covCard = `<div class="an-card"><h4>${tri('Sektör Kapsamı', 'Sector Coverage', '板块覆盖')}</h4>
+    ${bar('EPC', epc.length, covMax, '#00d4aa')}
+    ${bar(tri('Üretici', 'Makers', '制造商'), mfg.length, covMax, '#38bdf8')}
+    ${bar('YEKA', yeka.length, covMax, '#8b5cf6')}
+    ${bar('MENA', mena.length, covMax, '#f59e0b')}</div>`;
+
+  const totCard = `<div class="an-card an-totals">
+    <div><div class="an-big">${totalTracked}</div><div class="an-big-label">${tri('Takip edilen başlık', 'Tracked items', '跟踪条目')}</div></div>
+    <div><div class="an-big">${sources.size}</div><div class="an-big-label">${tri('Farklı kaynak', 'Distinct sources', '不同来源')}</div></div>
+    <div><div class="an-big">${cImp.high}</div><div class="an-big-label">${tri('Yüksek öncelik', 'High priority', '高优先级')}</div></div>
+  </div>`;
+
+  return impCard + tenCard + covCard + totCard;
+}
+
 function renderTicker(tickers) {
   const cls = { hot: 'hot', new: 'new', info: '' };
   const one = tickers.map((t) => `<span class="${cls[t.type] || ''}">${tri(t.text, t.text_en, t.text_zh)}</span>`).join('');
@@ -401,6 +447,17 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .mena-item{background:var(--card);border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:16px;}
 .mena-item h4{font-size:14px;color:#fff;margin-bottom:6px;}.mena-item p{font-size:12px;color:var(--muted);}
 .mena-item .source{font-size:11px;margin-top:8px;}.mena-item .source a{text-decoration:none;}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:34px;}
+.an-card{background:var(--card);border:1px solid #2a3a4a;border-radius:8px;padding:16px;}
+.an-card h4{font-size:13px;color:#fff;margin-bottom:12px;font-weight:700;}
+.an-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
+.an-label{width:58px;color:var(--muted);flex-shrink:0;}
+.an-bar{flex:1;height:8px;background:#0d1117;border-radius:4px;overflow:hidden;}
+.an-bar>span{display:block;height:100%;border-radius:4px;min-width:2px;transition:width .5s ease;}
+.an-val{width:26px;text-align:right;color:#fff;font-weight:700;flex-shrink:0;}
+.an-totals{display:flex;justify-content:space-around;text-align:center;gap:10px;}
+.an-big{font-size:30px;font-weight:800;color:var(--accent);line-height:1.1;}
+.an-big-label{font-size:10px;color:var(--muted);margin-top:4px;}
 .live-list{list-style:none;margin-bottom:34px;}
 .live-list li{padding:11px 0;border-bottom:1px solid var(--line);}
 .live-list a{font-size:13px;color:#e0e6ed;text-decoration:none;font-weight:500;}
@@ -467,6 +524,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
   <button class="filter-btn" data-filter="high">${tri('Yüksek', 'High', '高')}</button>
   <button class="filter-btn" data-filter="medium">${tri('Orta', 'Med', '中')}</button>
   <nav class="nav-links">
+    <a href="#overview">${tri('Genel Bakış', 'Overview', '概览')}</a>
     <a href="#epc">EPC</a>
     <a href="#tenders">${tri('İhaleler', 'Tenders', '招标')}</a>
     <a href="#mfg">${tri('Üreticiler', 'Makers', '制造商')}</a>
@@ -478,6 +536,9 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 
 <div class="main-layout">
   <main class="content-area">
+
+    <h2 class="section-title" id="overview">${tri('📈 Genel Bakış', '📈 Overview', '📈 数据概览')}</h2>
+    <div class="analytics-grid">${renderAnalytics(data)}</div>
 
     <h2 class="section-title" id="epc">${tri('EPC Projeleri & Sözleşmeler', 'EPC Projects & Contracts', 'EPC 项目与合同')}</h2>
     <div class="card-grid" id="cards">${renderCards(data.epc || [])}</div>

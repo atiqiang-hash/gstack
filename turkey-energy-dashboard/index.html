@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BETAŞ EPC Intelligence — 18 Haziran 2026 Perşembe</title>
+<title>BETAŞ EPC Intelligence — 19 Haziran 2026 Cuma</title>
 <meta name="description" content="Türkiye EPC & energy live intelligence dashboard (TR/EN/中文). Real sources, linked.">
 <style>
 :root{--bg:#0a0e17;--panel:#111827;--card:#1a2332;--line:#1e293b;--accent:#00d4aa;--muted:#94a3b8;--dim:#64748b;--text:#e0e6ed;}
@@ -81,6 +81,17 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .mena-item{background:var(--card);border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:16px;}
 .mena-item h4{font-size:14px;color:#fff;margin-bottom:6px;}.mena-item p{font-size:12px;color:var(--muted);}
 .mena-item .source{font-size:11px;margin-top:8px;}.mena-item .source a{text-decoration:none;}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:34px;}
+.an-card{background:var(--card);border:1px solid #2a3a4a;border-radius:8px;padding:16px;}
+.an-card h4{font-size:13px;color:#fff;margin-bottom:12px;font-weight:700;}
+.an-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
+.an-label{width:58px;color:var(--muted);flex-shrink:0;}
+.an-bar{flex:1;height:8px;background:#0d1117;border-radius:4px;overflow:hidden;}
+.an-bar>span{display:block;height:100%;border-radius:4px;min-width:2px;transition:width .5s ease;}
+.an-val{width:26px;text-align:right;color:#fff;font-weight:700;flex-shrink:0;}
+.an-totals{display:flex;justify-content:space-around;text-align:center;gap:10px;}
+.an-big{font-size:30px;font-weight:800;color:var(--accent);line-height:1.1;}
+.an-big-label{font-size:10px;color:var(--muted);margin-top:4px;}
 .live-list{list-style:none;margin-bottom:34px;}
 .live-list li{padding:11px 0;border-bottom:1px solid var(--line);}
 .live-list a{font-size:13px;color:#e0e6ed;text-decoration:none;font-weight:500;}
@@ -118,7 +129,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
         <button class="lang-btn" data-lang="en">EN</button>
         <button class="lang-btn" data-lang="zh">中文</button>
       </div>
-      <div class="date"><span class="lang-tr">18 Haziran 2026 Perşembe</span><span class="lang-en">Thursday, June 18, 2026</span><span class="lang-zh">2026年6月18日星期四</span></div>
+      <div class="date"><span class="lang-tr">19 Haziran 2026 Cuma</span><span class="lang-en">Friday, June 19, 2026</span><span class="lang-zh">2026年6月19日星期五</span></div>
       <div class="time-badge"><span class="lang-tr">⚡ CANLI İSTİHBARAT PANOSU</span><span class="lang-en">⚡ LIVE INTELLIGENCE DASHBOARD</span><span class="lang-zh">⚡ 全天候实时情报面板</span></div>
       <div class="clock" id="clock">…</div>
     </div>
@@ -128,7 +139,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 <div class="status-bar">
   <span class="live-off"><span class="lang-tr">○ Canlı besleme beklemede</span><span class="lang-en">○ Live feed pending</span><span class="lang-zh">○ 实时流待启用</span></span>
   
-  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-en">Last updated:</span><span class="lang-zh">最后更新：</span> <strong>18.06.2026 17:36</strong> <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span></span>
+  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-en">Last updated:</span><span class="lang-zh">最后更新：</span> <strong>19.06.2026 08:02</strong> <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span></span>
   <span><span class="lang-tr">3 yüksek öncelikli başlık</span><span class="lang-en">3 high-priority items</span><span class="lang-zh">3 条高优先级头条</span></span>
   <span class="refresh-note"><span class="lang-tr">Sayfa açık kaldığında her 15 dk'da bir otomatik yenilenir.</span><span class="lang-en">Auto-refreshes every 15 min while open.</span><span class="lang-zh">页面保持打开时每 15 分钟自动刷新。</span></span>
 </div>
@@ -147,6 +158,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
   <button class="filter-btn" data-filter="high"><span class="lang-tr">Yüksek</span><span class="lang-en">High</span><span class="lang-zh">高</span></button>
   <button class="filter-btn" data-filter="medium"><span class="lang-tr">Orta</span><span class="lang-en">Med</span><span class="lang-zh">中</span></button>
   <nav class="nav-links">
+    <a href="#overview"><span class="lang-tr">Genel Bakış</span><span class="lang-en">Overview</span><span class="lang-zh">概览</span></a>
     <a href="#epc">EPC</a>
     <a href="#tenders"><span class="lang-tr">İhaleler</span><span class="lang-en">Tenders</span><span class="lang-zh">招标</span></a>
     <a href="#mfg"><span class="lang-tr">Üreticiler</span><span class="lang-en">Makers</span><span class="lang-zh">制造商</span></a>
@@ -158,6 +170,23 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 
 <div class="main-layout">
   <main class="content-area">
+
+    <h2 class="section-title" id="overview"><span class="lang-tr">📈 Genel Bakış</span><span class="lang-en">📈 Overview</span><span class="lang-zh">📈 数据概览</span></h2>
+    <div class="analytics-grid"><div class="an-card"><h4><span class="lang-tr">Önem Dağılımı (EPC)</span><span class="lang-en">Importance Split (EPC)</span><span class="lang-zh">重要性分布 (EPC)</span></h4>
+    <div class="an-row"><span class="an-label"><span class="lang-tr">Yüksek</span><span class="lang-en">High</span><span class="lang-zh">高</span></span><div class="an-bar"><span style="width:50%;background:#dc2626"></span></div><span class="an-val">3</span></div>
+    <div class="an-row"><span class="an-label"><span class="lang-tr">Orta</span><span class="lang-en">Med</span><span class="lang-zh">中</span></span><div class="an-bar"><span style="width:50%;background:#d97706"></span></div><span class="an-val">3</span></div>
+    <div class="an-row"><span class="an-label"><span class="lang-tr">Düşük</span><span class="lang-en">Low</span><span class="lang-zh">低</span></span><div class="an-bar"><span style="width:0%;background:#059669"></span></div><span class="an-val">0</span></div></div><div class="an-card"><h4><span class="lang-tr">İhale Durumu</span><span class="lang-en">Tender Status</span><span class="lang-zh">招标状态</span></h4>
+    <div class="an-row"><span class="an-label"><span class="lang-tr">Aktif</span><span class="lang-en">Active</span><span class="lang-zh">进行中</span></span><div class="an-bar"><span style="width:67%;background:#00d4aa"></span></div><span class="an-val">4</span></div>
+    <div class="an-row"><span class="an-label"><span class="lang-tr">Yaklaşan</span><span class="lang-en">Upcoming</span><span class="lang-zh">即将</span></span><div class="an-bar"><span style="width:17%;background:#f59e0b"></span></div><span class="an-val">1</span></div>
+    <div class="an-row"><span class="an-label"><span class="lang-tr">Sonuç</span><span class="lang-en">Done</span><span class="lang-zh">已结束</span></span><div class="an-bar"><span style="width:17%;background:#8b5cf6"></span></div><span class="an-val">1</span></div></div><div class="an-card"><h4><span class="lang-tr">Sektör Kapsamı</span><span class="lang-en">Sector Coverage</span><span class="lang-zh">板块覆盖</span></h4>
+    <div class="an-row"><span class="an-label">EPC</span><div class="an-bar"><span style="width:100%;background:#00d4aa"></span></div><span class="an-val">6</span></div>
+    <div class="an-row"><span class="an-label"><span class="lang-tr">Üretici</span><span class="lang-en">Makers</span><span class="lang-zh">制造商</span></span><div class="an-bar"><span style="width:67%;background:#38bdf8"></span></div><span class="an-val">4</span></div>
+    <div class="an-row"><span class="an-label">YEKA</span><div class="an-bar"><span style="width:67%;background:#8b5cf6"></span></div><span class="an-val">4</span></div>
+    <div class="an-row"><span class="an-label">MENA</span><div class="an-bar"><span style="width:67%;background:#f59e0b"></span></div><span class="an-val">4</span></div></div><div class="an-card an-totals">
+    <div><div class="an-big">24</div><div class="an-big-label"><span class="lang-tr">Takip edilen başlık</span><span class="lang-en">Tracked items</span><span class="lang-zh">跟踪条目</span></div></div>
+    <div><div class="an-big">13</div><div class="an-big-label"><span class="lang-tr">Farklı kaynak</span><span class="lang-en">Distinct sources</span><span class="lang-zh">不同来源</span></div></div>
+    <div><div class="an-big">3</div><div class="an-big-label"><span class="lang-tr">Yüksek öncelik</span><span class="lang-en">High priority</span><span class="lang-zh">高优先级</span></div></div>
+  </div></div>
 
     <h2 class="section-title" id="epc"><span class="lang-tr">EPC Projeleri &amp; Sözleşmeler</span><span class="lang-en">EPC Projects &amp; Contracts</span><span class="lang-zh">EPC 项目与合同</span></h2>
     <div class="card-grid" id="cards">
@@ -451,7 +480,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 
 <footer class="footer">
   <p><span class="lang-tr">Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.</span><span class="lang-en">All news is based on real sources; every card links to its source. The live feed auto-updates from RSS feeds on GitHub Actions.</span><span class="lang-zh">所有新闻均基于真实来源，每条卡片附来源链接。实时流板块由 GitHub Actions 从 RSS 源自动更新。</span></p>
-  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-en">Curated through</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-en">Generated</span><span class="lang-zh">生成时间</span>: 18.06.2026 17:36 <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-en">Auto-generated for Ati (BETAŞ).</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
+  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-en">Curated through</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-en">Generated</span><span class="lang-zh">生成时间</span>: 19.06.2026 08:02 <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-en">Auto-generated for Ati (BETAŞ).</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
 </footer>
 
 <script>

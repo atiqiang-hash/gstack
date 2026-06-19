@@ -16,6 +16,9 @@ canlı bir web panosu. Manus'taki tek seferlik statik raporun yükseltilmiş hal
 - **Tek dosya, her yerde açılır.** `index.html` bağımsızdır — çift tıklayıp yerelde
   de açabilirsiniz, internet olmasa bile küratörlü veri görünür.
 - **Arama + filtre.** Başlık/ihale/kurum/kV/MW araması ve öncelik (Yüksek/Orta) filtresi.
+- **Analitik / Genel Bakış.** Üstte, verilerden canlı hesaplanan panel: EPC önem dağılımı,
+  ihale durumu kırılımı, sektör kapsamı ve toplam takip edilen başlık + farklı kaynak sayısı.
+  Saf CSS çubuklar, bağımlılıksız; veri değişince otomatik güncellenir.
 
 ## Klasör yapısı
 

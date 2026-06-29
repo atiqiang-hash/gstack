@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BETAŞ EPC Intelligence — 19 Haziran 2026 Cuma</title>
+<title>BETAŞ EPC Intelligence — 29 Haziran 2026 Pazartesi</title>
 <meta name="description" content="Türkiye EPC & energy live intelligence dashboard (TR/EN/中文). Real sources, linked.">
 <style>
 :root{--bg:#0a0e17;--panel:#111827;--card:#1a2332;--line:#1e293b;--accent:#00d4aa;--muted:#94a3b8;--dim:#64748b;--text:#e0e6ed;}
@@ -11,7 +11,6 @@
 html{scroll-behavior:smooth;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
 a{color:var(--accent);}
-/* language visibility (3-way) */
 .lang-tr,.lang-en,.lang-zh{display:none;}
 body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inline;}
 .header{background:linear-gradient(135deg,#0f1923 0%,#1a2332 50%,#0d1b2a 100%);padding:26px 36px;border-bottom:3px solid var(--accent);}
@@ -19,10 +18,13 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .header-left h1{font-size:26px;color:var(--accent);font-weight:800;letter-spacing:.5px;}
 .header-left .subtitle{font-size:13px;color:#8899aa;margin-top:5px;}
 .header-right{text-align:right;}
-.lang-toggle{display:inline-flex;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;margin-bottom:8px;}
-.lang-btn{background:var(--card);border:none;border-left:1px solid #2a3a4a;color:var(--muted);padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;}
+.header-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+.lang-toggle{display:inline-flex;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;}
+.lang-btn{background:var(--card);border:none;border-left:1px solid #2a3a4a;color:var(--muted);padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;}
 .lang-btn:first-child{border-left:none;}
 .lang-btn.active{background:var(--accent);color:#0a0e17;}
+.print-btn{background:var(--card);border:1px solid #2a3a4a;color:var(--muted);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;border-radius:6px;}
+.print-btn:hover{border-color:var(--accent);color:var(--accent);}
 .header-right .date{font-size:17px;color:#fff;font-weight:600;}
 .header-right .time-badge{display:inline-block;background:var(--accent);color:#0a0e17;padding:4px 12px;border-radius:4px;font-size:13px;font-weight:700;margin-top:6px;}
 .header-right .clock{font-size:13px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;}
@@ -68,6 +70,21 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .tender-table tr:hover td{background:var(--card);}
 .mono{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:#a5b4cf;}
 .status-active{color:var(--accent);font-weight:600;}.status-upcoming{color:#f59e0b;font-weight:600;}.status-result{color:#8b5cf6;font-weight:600;}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:34px;}
+.an-card{background:var(--card);border:1px solid #2a3a4a;border-radius:8px;padding:16px;}
+.an-card h4{font-size:13px;color:#fff;margin-bottom:12px;font-weight:700;}
+.an-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
+.an-label{width:58px;color:var(--muted);flex-shrink:0;}
+.an-bar{flex:1;height:8px;background:#0d1117;border-radius:4px;overflow:hidden;}
+.an-bar>span{display:block;height:100%;border-radius:4px;min-width:2px;transition:width .5s ease;}
+.an-val{width:26px;text-align:right;color:#fff;font-weight:700;flex-shrink:0;}
+.an-totals{display:flex;justify-content:space-around;text-align:center;gap:10px;}
+.an-big{font-size:30px;font-weight:800;color:var(--accent);line-height:1.1;}
+.an-big-label{font-size:10px;color:var(--muted);margin-top:4px;}
+.spark{display:block;margin:4px 0;}
+.spark-x{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);}
+.spark-last{color:var(--accent);font-weight:800;font-size:13px;}
+.spark-note{font-size:10px;color:var(--dim);margin-top:6px;}
 .mfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;margin-bottom:34px;}
 .mfg-item{background:var(--card);border:1px solid #2a3a4a;border-radius:6px;padding:16px;}
 .mfg-item h4{font-size:14px;color:#fff;margin-bottom:8px;}.mfg-item p{font-size:12px;color:var(--muted);}
@@ -81,22 +98,13 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .mena-item{background:var(--card);border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:16px;}
 .mena-item h4{font-size:14px;color:#fff;margin-bottom:6px;}.mena-item p{font-size:12px;color:var(--muted);}
 .mena-item .source{font-size:11px;margin-top:8px;}.mena-item .source a{text-decoration:none;}
-.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:34px;}
-.an-card{background:var(--card);border:1px solid #2a3a4a;border-radius:8px;padding:16px;}
-.an-card h4{font-size:13px;color:#fff;margin-bottom:12px;font-weight:700;}
-.an-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
-.an-label{width:58px;color:var(--muted);flex-shrink:0;}
-.an-bar{flex:1;height:8px;background:#0d1117;border-radius:4px;overflow:hidden;}
-.an-bar>span{display:block;height:100%;border-radius:4px;min-width:2px;transition:width .5s ease;}
-.an-val{width:26px;text-align:right;color:#fff;font-weight:700;flex-shrink:0;}
-.an-totals{display:flex;justify-content:space-around;text-align:center;gap:10px;}
-.an-big{font-size:30px;font-weight:800;color:var(--accent);line-height:1.1;}
-.an-big-label{font-size:10px;color:var(--muted);margin-top:4px;}
 .live-list{list-style:none;margin-bottom:34px;}
 .live-list li{padding:11px 0;border-bottom:1px solid var(--line);}
 .live-list a{font-size:13px;color:#e0e6ed;text-decoration:none;font-weight:500;}
 .live-list a:hover{color:var(--accent);}
-.live-meta{display:block;font-size:11px;color:var(--dim);margin-top:3px;}
+.live-meta{display:block;font-size:11px;color:var(--dim);margin-top:4px;}
+.live-flag{font-size:13px;margin-right:5px;}
+.cat-tag{display:inline-block;font-size:9px;font-weight:800;padding:1px 7px;border-radius:9px;border:1px solid;margin-right:6px;text-transform:uppercase;letter-spacing:.3px;}
 .live-empty{font-size:13px;color:var(--dim);background:var(--card);border:1px dashed #2a3a4a;border-radius:6px;padding:16px;margin-bottom:34px;}
 .sidebar-section{margin-bottom:28px;}
 .sidebar-title{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);}
@@ -113,7 +121,33 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .footer a{text-decoration:none;}
 .no-results{display:none;color:var(--dim);font-size:13px;padding:20px;text-align:center;}
 @media (max-width:1024px){.main-layout{grid-template-columns:1fr;}.sidebar{border-left:none;border-top:1px solid var(--line);}}
+@media print{
+  @page{margin:12mm;}
+  .toolbar,.marquee-container,.lang-toggle,.print-btn,.clock,.refresh-note,.nav-links,.no-results{display:none!important;}
+  html,body{background:#fff!important;color:#111!important;}
+  .header{background:#fff!important;border-bottom:2px solid #067a5b!important;padding:10px 0!important;}
+  .header-left h1{color:#067a5b!important;}
+  .header-left .subtitle,.header-right .date{color:#333!important;}
+  .time-badge{background:#067a5b!important;color:#fff!important;}
+  .status-bar{background:#fff!important;color:#333!important;padding:6px 0!important;}
+  .status-bar .live-on,.status-bar .live-off,.status-bar .tr-on{color:#067a5b!important;}
+  .main-layout{display:block!important;}
+  .content-area{padding:0!important;}
+  .sidebar{background:#fff!important;border-left:none!important;border-top:1px solid #ccc!important;padding:12px 0!important;}
+  .section-title{color:#067a5b!important;border-bottom:1px solid #999!important;}
+  .card,.an-card,.mfg-item,.yeka-item,.mena-item,.strategy-box{background:#fff!important;border:1px solid #ccc!important;break-inside:avoid;page-break-inside:avoid;}
+  .card-title,.an-card h4,.mfg-item h4,.yeka-item h4,.mena-item h4,.sidebar-title,.action-title,.stat-value,.an-big{color:#111!important;}
+  .yeka-item .capacity{color:#6b21a8!important;}
+  .card-body,.card-footer,.card-date,.mfg-item p,.yeka-item p,.mena-item p,.stat-label,.action-desc,.strategy-box p,.an-label,.an-big-label,.live-meta{color:#333!important;}
+  .strategy-box{border:1px solid #067a5b!important;}
+  a{color:#0645ad!important;}
+  .tender-table th{background:#eee!important;color:#067a5b!important;}
+  .tender-table td{color:#222!important;}
+  .an-bar{background:#eee!important;}
+  .marquee-content{animation:none!important;}
+}
 </style>
+
 </head>
 <body class="lmode-tr">
 
@@ -124,12 +158,15 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
       <div class="subtitle"><span class="lang-tr">Türkiye EPC &amp; Enerji Sektörü — Canlı İstihbarat Panosu | Ati'ye Özel</span><span class="lang-en">Türkiye EPC &amp; Energy Sector — Live Intelligence Dashboard | For Ati</span><span class="lang-zh">土耳其 EPC 与能源行业 — 全天候实时情报面板 | Ati 专属</span></div>
     </div>
     <div class="header-right">
-      <div class="lang-toggle">
-        <button class="lang-btn" data-lang="tr">TR</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="zh">中文</button>
+      <div class="header-actions">
+        <div class="lang-toggle" title="Dil / Language / 语言">
+          <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
+          <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+          <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
+        </div>
+        <button class="print-btn" type="button" onclick="window.print()"><span class="lang-tr">🖨 Yazdır</span><span class="lang-en">🖨 Print</span><span class="lang-zh">🖨 打印 / PDF</span></button>
       </div>
-      <div class="date"><span class="lang-tr">19 Haziran 2026 Cuma</span><span class="lang-en">Friday, June 19, 2026</span><span class="lang-zh">2026年6月19日星期五</span></div>
+      <div class="date"><span class="lang-tr">29 Haziran 2026 Pazartesi</span><span class="lang-en">Monday, June 29, 2026</span><span class="lang-zh">2026年6月29日星期一</span></div>
       <div class="time-badge"><span class="lang-tr">⚡ CANLI İSTİHBARAT PANOSU</span><span class="lang-en">⚡ LIVE INTELLIGENCE DASHBOARD</span><span class="lang-zh">⚡ 全天候实时情报面板</span></div>
       <div class="clock" id="clock">…</div>
     </div>
@@ -139,7 +176,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 <div class="status-bar">
   <span class="live-off"><span class="lang-tr">○ Canlı besleme beklemede</span><span class="lang-en">○ Live feed pending</span><span class="lang-zh">○ 实时流待启用</span></span>
   
-  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-en">Last updated:</span><span class="lang-zh">最后更新：</span> <strong>19.06.2026 08:02</strong> <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span></span>
+  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-en">Last updated:</span><span class="lang-zh">最后更新：</span> <strong>29.06.2026 07:51</strong> <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span></span>
   <span><span class="lang-tr">3 yüksek öncelikli başlık</span><span class="lang-en">3 high-priority items</span><span class="lang-zh">3 条高优先级头条</span></span>
   <span class="refresh-note"><span class="lang-tr">Sayfa açık kaldığında her 15 dk'da bir otomatik yenilenir.</span><span class="lang-en">Auto-refreshes every 15 min while open.</span><span class="lang-zh">页面保持打开时每 15 分钟自动刷新。</span></span>
 </div>
@@ -186,7 +223,10 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
     <div><div class="an-big">24</div><div class="an-big-label"><span class="lang-tr">Takip edilen başlık</span><span class="lang-en">Tracked items</span><span class="lang-zh">跟踪条目</span></div></div>
     <div><div class="an-big">13</div><div class="an-big-label"><span class="lang-tr">Farklı kaynak</span><span class="lang-en">Distinct sources</span><span class="lang-zh">不同来源</span></div></div>
     <div><div class="an-big">3</div><div class="an-big-label"><span class="lang-tr">Yüksek öncelik</span><span class="lang-en">High priority</span><span class="lang-zh">高优先级</span></div></div>
-  </div></div>
+  </div><div class="an-card"><h4><span class="lang-tr">Trend — Takip Edilen Başlık</span><span class="lang-en">Trend — Tracked Items</span><span class="lang-zh">趋势 — 跟踪条目</span></h4>
+    <svg class="spark" viewBox="0 0 240 54" preserveAspectRatio="none" width="100%" height="54" role="img"><path d="M5.0 5.0" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linejoin="round"/><circle cx="5.0" cy="5.0" r="2.2" fill="#00d4aa"/></svg>
+    <div class="spark-x"><span>06-29</span><span class="spark-last">24</span><span>06-29</span></div>
+    <div class="spark-note"><span class="lang-tr">Trend, günlük arşivle dolacak.</span><span class="lang-en">The trend fills in with the daily archive.</span><span class="lang-zh">趋势将随每日归档逐步累积。</span></div></div></div>
 
     <h2 class="section-title" id="epc"><span class="lang-tr">EPC Projeleri &amp; Sözleşmeler</span><span class="lang-en">EPC Projects &amp; Contracts</span><span class="lang-zh">EPC 项目与合同</span></h2>
     <div class="card-grid" id="cards">
@@ -480,7 +520,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 
 <footer class="footer">
   <p><span class="lang-tr">Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.</span><span class="lang-en">All news is based on real sources; every card links to its source. The live feed auto-updates from RSS feeds on GitHub Actions.</span><span class="lang-zh">所有新闻均基于真实来源，每条卡片附来源链接。实时流板块由 GitHub Actions 从 RSS 源自动更新。</span></p>
-  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-en">Curated through</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-en">Generated</span><span class="lang-zh">生成时间</span>: 19.06.2026 08:02 <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-en">Auto-generated for Ati (BETAŞ).</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
+  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-en">Curated through</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-en">Generated</span><span class="lang-zh">生成时间</span>: 29.06.2026 07:51 <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-en">Auto-generated for Ati (BETAŞ).</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
 </footer>
 
 <script>

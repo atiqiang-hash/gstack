@@ -4,18 +4,24 @@
  *
  * Reads curated, sourced, trilingual data from data/news.json and (on networked
  * runners such as GitHub Actions) aggregates live items from the real energy RSS
- * feeds in feeds.json. Emits a single self-contained index.html with a live
- * TR/EN/中文 language toggle (choice persisted in localStorage).
+ * feeds in feeds.json. Emits a single self-contained index.html with:
+ *   - TR/EN/中文 language toggle (flag buttons, persisted in localStorage)
+ *   - computed Overview/analytics panel + a daily-history trend sparkline
+ *   - live RSS headlines with source-country flags and category tags
+ *   - one-click Print / Export-PDF (print-optimized stylesheet)
+ *   - optional, privacy-friendly visitor analytics (off by default)
  *
- * Optional machine translation of the live RSS headlines (off by default):
+ * Daily history: each run records a metrics snapshot in data/history.json and a
+ * full snapshot in data/archive/<date>.json (archive dir is gitignored).
+ *
+ * Optional live-headline machine translation (off by default):
  *   TRANSLATE=google node generate.mjs            # unofficial Google endpoint, no key
- *   TRANSLATE=libre  LIBRETRANSLATE_URL=https://… [LIBRETRANSLATE_API_KEY=…] node generate.mjs
- *   TRANSLATE_MAX=18                               # cap items translated per build
- * When off, live headlines display in their source language across all modes.
+ *   TRANSLATE=libre  LIBRETRANSLATE_URL=https://… node generate.mjs
+ * Local preview of the live section without network:  MOCK_LIVE=1 node generate.mjs
  *
  * No dependencies. Run:  node generate.mjs
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -36,7 +42,6 @@ const tri = (tr, en, zh) =>
   `<span class="lang-tr">${esc(tr)}</span>` +
   `<span class="lang-en">${esc(en != null && en !== '' ? en : tr)}</span>` +
   `<span class="lang-zh">${esc(zh != null && zh !== '' ? zh : tr)}</span>`;
-// Combined lowercased text so search matches in any language.
 const triLower = (tr, en, zh) => esc(((tr || '') + ' ' + (en || '') + ' ' + (zh || '')).toLowerCase());
 
 function fmtDate(d, locale = 'tr-TR') {
@@ -49,6 +54,24 @@ function fmtStamp(d = new Date()) {
     timeZone: TZ, day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   }).format(d);
+}
+function isoDate(d = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+}
+
+// Category tagging for live RSS headlines (matched on the source-language title).
+const CATS = [
+  { re: /trafo|transformat|transformer|nüve|nuve|reakt|reactor/i, tr: 'Trafo', en: 'Transformer', zh: '变压器', c: '#00d4aa' },
+  { re: /ihale|tender|ekap|teklif|procurement|sözleşme|sozlesme|contract|award/i, tr: 'İhale', en: 'Tender', zh: '招标', c: '#f59e0b' },
+  { re: /offshore|rüzgar|ruzgar|wind|türbin|turbin|\bres\b/i, tr: 'Rüzgar', en: 'Wind', zh: '风电', c: '#38bdf8' },
+  { re: /güneş|gunes|solar|\bges\b|fotovolt|photovolt|\bpv\b/i, tr: 'Güneş', en: 'Solar', zh: '光伏', c: '#fbbf24' },
+  { re: /depolama|batar|battery|bess|storage/i, tr: 'Depolama', en: 'Storage', zh: '储能', c: '#a78bfa' },
+  { re: /\bgis\b|şalt|salt|switchgear|kesici|ayırıc|ayiric/i, tr: 'GIS', en: 'GIS', zh: '开关', c: '#34d399' },
+  { re: /şebeke|sebeke|iletim|grid|transmission|\bkv\b|enterkonek|interconnect|\bhat\b/i, tr: 'Şebeke', en: 'Grid', zh: '电网', c: '#22d3ee' },
+];
+function categorize(title = '') {
+  for (const c of CATS) if (c.re.test(title)) return c;
+  return { tr: 'Enerji', en: 'Energy', zh: '能源', c: '#94a3b8' };
 }
 
 // ---------- tiny resilient RSS parser (no deps) ----------
@@ -97,8 +120,25 @@ async function fetchFeed(feed, timeoutMs = 9000) {
   }
 }
 async function aggregateLive(cfg) {
+  const flagMap = {};
+  (cfg.feeds || []).forEach((f) => { flagMap[f.name] = f.flag || '🌐'; });
+  const total = (cfg.feeds || []).length;
+
+  // Local preview without network: fake a few realistic items.
+  if (process.env.MOCK_LIVE === '1') {
+    const mock = [
+      { title: 'TEİAŞ 380 kV trafo merkezi tevsiatı ihalesi açıldı', link: '#', date: '', source: 'Enerji Günlüğü' },
+      { title: 'Offshore wind YEKA tender timeline confirmed for 2026', link: '#', date: '', source: 'Offshore Wind' },
+      { title: 'Yeni güneş GES projesine BESS depolama entegrasyonu', link: '#', date: '', source: 'Enerji Portalı' },
+      { title: 'SF6-free GIS switchgear order signed in Europe', link: '#', date: '', source: 'Transformers Magazine' },
+      { title: 'Astor Enerji yeni transformatör ihracat anlaşması imzaladı', link: '#', date: '', source: 'Anadolu Ajansı — Enerji (TR)' },
+    ];
+    mock.forEach((it) => { it.flag = flagMap[it.source] || '🌐'; });
+    return { items: mock, reachable: 0, total, translated: 0, mock: true };
+  }
+
   if (process.env.NO_FETCH === '1' || !Array.isArray(cfg.feeds)) {
-    return { items: [], reachable: 0, total: (cfg.feeds || []).length, translated: 0 };
+    return { items: [], reachable: 0, total, translated: 0 };
   }
   const results = await Promise.allSettled(cfg.feeds.map((f) => fetchFeed(f)));
   const kw = (cfg.keywords || []).map((k) => k.toLowerCase());
@@ -122,7 +162,8 @@ async function aggregateLive(cfg) {
     out.push(it);
     if (out.length >= 36) break;
   }
-  return { items: out, reachable, total: cfg.feeds.length, translated: 0 };
+  out.forEach((it) => { it.flag = flagMap[it.source] || '🌐'; });
+  return { items: out, reachable, total, translated: 0 };
 }
 
 // ---------- optional machine translation (off by default) ----------
@@ -157,7 +198,6 @@ async function translateOne(text, target) {
   } catch { return null; }
   return null;
 }
-
 async function translateLive(items) {
   const provider = (process.env.TRANSLATE || '').toLowerCase();
   if (!provider || !items.length) return 0;
@@ -181,6 +221,67 @@ async function translateLive(items) {
   }
   await Promise.all(Array.from({ length: conc }, () => worker()));
   return count;
+}
+
+// ---------- metrics + history ----------
+function computeMetrics(data) {
+  const epc = data.epc || [];
+  const tenders = data.tenders || [];
+  const mfg = data.manufacturers || [];
+  const yeka = data.yeka || [];
+  const mena = data.mena || [];
+  const cImp = { high: 0, medium: 0, low: 0 };
+  epc.forEach((x) => { cImp[x.importance] = (cImp[x.importance] || 0) + 1; });
+  const cTen = { active: 0, upcoming: 0, result: 0 };
+  tenders.forEach((x) => { cTen[x.status] = (cTen[x.status] || 0) + 1; });
+  const sources = new Set();
+  [...epc, ...mfg, ...yeka, ...mena].forEach((x) => { if (x.source_name) sources.add(x.source_name); });
+  const totalTracked = epc.length + tenders.length + mfg.length + yeka.length + mena.length;
+  return { epc, tenders, mfg, yeka, mena, cImp, cTen, sources, totalTracked };
+}
+
+async function updateHistory(metrics, now) {
+  const histPath = path.join(DIR, 'data', 'history.json');
+  let hist = { snapshots: [] };
+  try { hist = JSON.parse(await readFile(histPath, 'utf-8')); } catch { /* first run */ }
+  if (!Array.isArray(hist.snapshots)) hist.snapshots = [];
+  const date = isoDate(now);
+  const entry = { date, tracked: metrics.tracked, high: metrics.high, activeTenders: metrics.activeTenders, sources: metrics.sources };
+  const i = hist.snapshots.findIndex((s) => s.date === date);
+  if (i >= 0) hist.snapshots[i] = entry; else hist.snapshots.push(entry);
+  hist.snapshots.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  if (hist.snapshots.length > 60) hist.snapshots = hist.snapshots.slice(-60);
+  await writeFile(histPath, JSON.stringify(hist, null, 2) + '\n', 'utf-8');
+  return hist.snapshots;
+}
+
+async function writeArchive(data, metrics, now) {
+  if (process.env.NO_ARCHIVE === '1') return;
+  try {
+    const dir = path.join(DIR, 'data', 'archive');
+    await mkdir(dir, { recursive: true });
+    await writeFile(path.join(dir, isoDate(now) + '.json'),
+      JSON.stringify({ date: isoDate(now), generated_at: now.toISOString(), metrics, data }, null, 2), 'utf-8');
+  } catch { /* archive is best-effort */ }
+}
+
+// ---------- privacy-friendly analytics (off by default) ----------
+function analyticsScript(cfg) {
+  if (!cfg || !cfg.provider) return '';
+  const p = String(cfg.provider).toLowerCase();
+  if (p === 'goatcounter' && cfg.goatcounter_code) {
+    return `<script data-goatcounter="https://${esc(cfg.goatcounter_code)}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>`;
+  }
+  if (p === 'plausible' && cfg.plausible_domain) {
+    return `<script defer data-domain="${esc(cfg.plausible_domain)}" src="https://plausible.io/js/script.js"></script>`;
+  }
+  if (p === 'umami' && cfg.umami_src && cfg.umami_id) {
+    return `<script defer src="${esc(cfg.umami_src)}" data-website-id="${esc(cfg.umami_id)}"></script>`;
+  }
+  if (p === 'cloudflare' && cfg.cloudflare_token) {
+    return `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${esc(cfg.cloudflare_token)}"}'></script>`;
+  }
+  return '';
 }
 
 // ---------- section renderers ----------
@@ -269,13 +370,15 @@ function renderLive(live) {
     let d = '';
     const t = Date.parse(it.date);
     if (!Number.isNaN(t)) d = fmtStamp(new Date(t));
+    const cat = categorize(it.title);
+    const flag = it.flag || '🌐';
     const titleHtml = it.translated
-      ? `<a href="${esc(it.link)}" target="_blank" rel="noopener">${tri(it.tr, it.en, it.zh)}</a>`
-      : `<a href="${esc(it.link)}" target="_blank" rel="noopener">${esc(it.title)}</a>`;
+      ? tri(it.tr, it.en, it.zh)
+      : esc(it.title);
     const search = it.translated ? triLower(it.tr, it.en, it.zh) : esc(it.title.toLowerCase());
-    return `<li data-search="${search}">
-      ${titleHtml}
-      <span class="live-meta">${esc(it.source)}${d ? ' · ' + esc(d) : ''}</span>
+    return `<li data-search="${search} ${esc(cat.en.toLowerCase())}">
+      <a href="${esc(it.link)}" target="_blank" rel="noopener">${titleHtml}</a>
+      <span class="live-meta"><span class="live-flag">${flag}</span><span class="cat-tag" style="background:${cat.c}22;border-color:${cat.c}66;color:${cat.c}">${tri(cat.tr, cat.en, cat.zh)}</span> ${esc(it.source)}${d ? ' · ' + esc(d) : ''}</span>
     </li>`;
   }).join('') + `</ul>`;
 }
@@ -301,50 +404,65 @@ function renderStrategy(items) {
   return items.map((s) => `<p><strong>${tri(s.title, s.title_en, s.title_zh)}:</strong> ${tri(s.body, s.body_en, s.body_zh)}</p>`).join('');
 }
 
-function renderAnalytics(data) {
-  const epc = data.epc || [];
-  const tenders = data.tenders || [];
-  const mfg = data.manufacturers || [];
-  const yeka = data.yeka || [];
-  const mena = data.mena || [];
+function renderTrend(snapshots) {
+  const pts = (snapshots || []).slice(-30);
+  const w = 240, h = 54, pad = 5;
+  const title = tri('Trend — Takip Edilen Başlık', 'Trend — Tracked Items', '趋势 — 跟踪条目');
+  if (!pts.length) return '';
+  const vals = pts.map((s) => s.tracked || 0);
+  const max = Math.max(...vals, 1);
+  const min = Math.min(...vals, 0);
+  const span = Math.max(max - min, 1);
+  const stepX = pts.length > 1 ? (w - 2 * pad) / (pts.length - 1) : 0;
+  const coords = pts.map((s, i) => [
+    pad + i * stepX,
+    h - pad - ((s.tracked - min) / span) * (h - 2 * pad),
+  ]);
+  const d = coords.map((c, i) => (i === 0 ? 'M' : 'L') + c[0].toFixed(1) + ' ' + c[1].toFixed(1)).join(' ');
+  const area = coords.length > 1
+    ? `<path d="${d} L ${coords[coords.length - 1][0].toFixed(1)} ${h - pad} L ${coords[0][0].toFixed(1)} ${h - pad} Z" fill="rgba(0,212,170,0.12)"/>`
+    : '';
+  const line = `<path d="${d}" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linejoin="round"/>`;
+  const dots = coords.map((c) => `<circle cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="2.2" fill="#00d4aa"/>`).join('');
+  const note = pts.length < 2
+    ? `<div class="spark-note">${tri('Trend, günlük arşivle dolacak.', 'The trend fills in with the daily archive.', '趋势将随每日归档逐步累积。')}</div>`
+    : '';
+  return `<div class="an-card"><h4>${title}</h4>
+    <svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" width="100%" height="${h}" role="img">${area}${line}${dots}</svg>
+    <div class="spark-x"><span>${esc(pts[0].date.slice(5))}</span><span class="spark-last">${vals[vals.length - 1]}</span><span>${esc(pts[pts.length - 1].date.slice(5))}</span></div>
+    ${note}</div>`;
+}
 
-  const cImp = { high: 0, medium: 0, low: 0 };
-  epc.forEach((x) => { cImp[x.importance] = (cImp[x.importance] || 0) + 1; });
-  const cTen = { active: 0, upcoming: 0, result: 0 };
-  tenders.forEach((x) => { cTen[x.status] = (cTen[x.status] || 0) + 1; });
-
-  const totalTracked = epc.length + tenders.length + mfg.length + yeka.length + mena.length;
-  const sources = new Set();
-  [...epc, ...mfg, ...yeka, ...mena].forEach((x) => { if (x.source_name) sources.add(x.source_name); });
-
+function renderAnalytics(data, snapshots) {
+  const m = computeMetrics(data);
   const pct = (n, t) => (t > 0 ? Math.round((n / t) * 100) : 0);
   const bar = (label, n, t, color) =>
     `<div class="an-row"><span class="an-label">${label}</span><div class="an-bar"><span style="width:${pct(n, t)}%;background:${color}"></span></div><span class="an-val">${n}</span></div>`;
 
   const impCard = `<div class="an-card"><h4>${tri('Önem Dağılımı (EPC)', 'Importance Split (EPC)', '重要性分布 (EPC)')}</h4>
-    ${bar(tri('Yüksek', 'High', '高'), cImp.high, epc.length, '#dc2626')}
-    ${bar(tri('Orta', 'Med', '中'), cImp.medium, epc.length, '#d97706')}
-    ${bar(tri('Düşük', 'Low', '低'), cImp.low, epc.length, '#059669')}</div>`;
+    ${bar(tri('Yüksek', 'High', '高'), m.cImp.high, m.epc.length, '#dc2626')}
+    ${bar(tri('Orta', 'Med', '中'), m.cImp.medium, m.epc.length, '#d97706')}
+    ${bar(tri('Düşük', 'Low', '低'), m.cImp.low, m.epc.length, '#059669')}</div>`;
 
   const tenCard = `<div class="an-card"><h4>${tri('İhale Durumu', 'Tender Status', '招标状态')}</h4>
-    ${bar(tri('Aktif', 'Active', '进行中'), cTen.active, tenders.length, '#00d4aa')}
-    ${bar(tri('Yaklaşan', 'Upcoming', '即将'), cTen.upcoming, tenders.length, '#f59e0b')}
-    ${bar(tri('Sonuç', 'Done', '已结束'), cTen.result, tenders.length, '#8b5cf6')}</div>`;
+    ${bar(tri('Aktif', 'Active', '进行中'), m.cTen.active, m.tenders.length, '#00d4aa')}
+    ${bar(tri('Yaklaşan', 'Upcoming', '即将'), m.cTen.upcoming, m.tenders.length, '#f59e0b')}
+    ${bar(tri('Sonuç', 'Done', '已结束'), m.cTen.result, m.tenders.length, '#8b5cf6')}</div>`;
 
-  const covMax = Math.max(epc.length, mfg.length, yeka.length, mena.length, 1);
+  const covMax = Math.max(m.epc.length, m.mfg.length, m.yeka.length, m.mena.length, 1);
   const covCard = `<div class="an-card"><h4>${tri('Sektör Kapsamı', 'Sector Coverage', '板块覆盖')}</h4>
-    ${bar('EPC', epc.length, covMax, '#00d4aa')}
-    ${bar(tri('Üretici', 'Makers', '制造商'), mfg.length, covMax, '#38bdf8')}
-    ${bar('YEKA', yeka.length, covMax, '#8b5cf6')}
-    ${bar('MENA', mena.length, covMax, '#f59e0b')}</div>`;
+    ${bar('EPC', m.epc.length, covMax, '#00d4aa')}
+    ${bar(tri('Üretici', 'Makers', '制造商'), m.mfg.length, covMax, '#38bdf8')}
+    ${bar('YEKA', m.yeka.length, covMax, '#8b5cf6')}
+    ${bar('MENA', m.mena.length, covMax, '#f59e0b')}</div>`;
 
   const totCard = `<div class="an-card an-totals">
-    <div><div class="an-big">${totalTracked}</div><div class="an-big-label">${tri('Takip edilen başlık', 'Tracked items', '跟踪条目')}</div></div>
-    <div><div class="an-big">${sources.size}</div><div class="an-big-label">${tri('Farklı kaynak', 'Distinct sources', '不同来源')}</div></div>
-    <div><div class="an-big">${cImp.high}</div><div class="an-big-label">${tri('Yüksek öncelik', 'High priority', '高优先级')}</div></div>
+    <div><div class="an-big">${m.totalTracked}</div><div class="an-big-label">${tri('Takip edilen başlık', 'Tracked items', '跟踪条目')}</div></div>
+    <div><div class="an-big">${m.sources.size}</div><div class="an-big-label">${tri('Farklı kaynak', 'Distinct sources', '不同来源')}</div></div>
+    <div><div class="an-big">${m.cImp.high}</div><div class="an-big-label">${tri('Yüksek öncelik', 'High priority', '高优先级')}</div></div>
   </div>`;
 
-  return impCard + tenCard + covCard + totCard;
+  return impCard + tenCard + covCard + totCard + renderTrend(snapshots);
 }
 
 function renderTicker(tickers) {
@@ -354,7 +472,7 @@ function renderTicker(tickers) {
 }
 
 // ---------- page ----------
-function page(data, live, now) {
+function page(data, live, now, snapshots) {
   const m = data.meta || {};
   const highCount = (data.epc || []).filter((x) => x.importance === 'high').length;
   const liveBadge = live.reachable > 0
@@ -377,7 +495,6 @@ function page(data, live, now) {
 html{scroll-behavior:smooth;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
 a{color:var(--accent);}
-/* language visibility (3-way) */
 .lang-tr,.lang-en,.lang-zh{display:none;}
 body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inline;}
 .header{background:linear-gradient(135deg,#0f1923 0%,#1a2332 50%,#0d1b2a 100%);padding:26px 36px;border-bottom:3px solid var(--accent);}
@@ -385,10 +502,13 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .header-left h1{font-size:26px;color:var(--accent);font-weight:800;letter-spacing:.5px;}
 .header-left .subtitle{font-size:13px;color:#8899aa;margin-top:5px;}
 .header-right{text-align:right;}
-.lang-toggle{display:inline-flex;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;margin-bottom:8px;}
-.lang-btn{background:var(--card);border:none;border-left:1px solid #2a3a4a;color:var(--muted);padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;}
+.header-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+.lang-toggle{display:inline-flex;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;}
+.lang-btn{background:var(--card);border:none;border-left:1px solid #2a3a4a;color:var(--muted);padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;}
 .lang-btn:first-child{border-left:none;}
 .lang-btn.active{background:var(--accent);color:#0a0e17;}
+.print-btn{background:var(--card);border:1px solid #2a3a4a;color:var(--muted);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;border-radius:6px;}
+.print-btn:hover{border-color:var(--accent);color:var(--accent);}
 .header-right .date{font-size:17px;color:#fff;font-weight:600;}
 .header-right .time-badge{display:inline-block;background:var(--accent);color:#0a0e17;padding:4px 12px;border-radius:4px;font-size:13px;font-weight:700;margin-top:6px;}
 .header-right .clock{font-size:13px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;}
@@ -434,6 +554,21 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .tender-table tr:hover td{background:var(--card);}
 .mono{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:#a5b4cf;}
 .status-active{color:var(--accent);font-weight:600;}.status-upcoming{color:#f59e0b;font-weight:600;}.status-result{color:#8b5cf6;font-weight:600;}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:34px;}
+.an-card{background:var(--card);border:1px solid #2a3a4a;border-radius:8px;padding:16px;}
+.an-card h4{font-size:13px;color:#fff;margin-bottom:12px;font-weight:700;}
+.an-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
+.an-label{width:58px;color:var(--muted);flex-shrink:0;}
+.an-bar{flex:1;height:8px;background:#0d1117;border-radius:4px;overflow:hidden;}
+.an-bar>span{display:block;height:100%;border-radius:4px;min-width:2px;transition:width .5s ease;}
+.an-val{width:26px;text-align:right;color:#fff;font-weight:700;flex-shrink:0;}
+.an-totals{display:flex;justify-content:space-around;text-align:center;gap:10px;}
+.an-big{font-size:30px;font-weight:800;color:var(--accent);line-height:1.1;}
+.an-big-label{font-size:10px;color:var(--muted);margin-top:4px;}
+.spark{display:block;margin:4px 0;}
+.spark-x{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);}
+.spark-last{color:var(--accent);font-weight:800;font-size:13px;}
+.spark-note{font-size:10px;color:var(--dim);margin-top:6px;}
 .mfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;margin-bottom:34px;}
 .mfg-item{background:var(--card);border:1px solid #2a3a4a;border-radius:6px;padding:16px;}
 .mfg-item h4{font-size:14px;color:#fff;margin-bottom:8px;}.mfg-item p{font-size:12px;color:var(--muted);}
@@ -447,22 +582,13 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .mena-item{background:var(--card);border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:16px;}
 .mena-item h4{font-size:14px;color:#fff;margin-bottom:6px;}.mena-item p{font-size:12px;color:var(--muted);}
 .mena-item .source{font-size:11px;margin-top:8px;}.mena-item .source a{text-decoration:none;}
-.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:34px;}
-.an-card{background:var(--card);border:1px solid #2a3a4a;border-radius:8px;padding:16px;}
-.an-card h4{font-size:13px;color:#fff;margin-bottom:12px;font-weight:700;}
-.an-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
-.an-label{width:58px;color:var(--muted);flex-shrink:0;}
-.an-bar{flex:1;height:8px;background:#0d1117;border-radius:4px;overflow:hidden;}
-.an-bar>span{display:block;height:100%;border-radius:4px;min-width:2px;transition:width .5s ease;}
-.an-val{width:26px;text-align:right;color:#fff;font-weight:700;flex-shrink:0;}
-.an-totals{display:flex;justify-content:space-around;text-align:center;gap:10px;}
-.an-big{font-size:30px;font-weight:800;color:var(--accent);line-height:1.1;}
-.an-big-label{font-size:10px;color:var(--muted);margin-top:4px;}
 .live-list{list-style:none;margin-bottom:34px;}
 .live-list li{padding:11px 0;border-bottom:1px solid var(--line);}
 .live-list a{font-size:13px;color:#e0e6ed;text-decoration:none;font-weight:500;}
 .live-list a:hover{color:var(--accent);}
-.live-meta{display:block;font-size:11px;color:var(--dim);margin-top:3px;}
+.live-meta{display:block;font-size:11px;color:var(--dim);margin-top:4px;}
+.live-flag{font-size:13px;margin-right:5px;}
+.cat-tag{display:inline-block;font-size:9px;font-weight:800;padding:1px 7px;border-radius:9px;border:1px solid;margin-right:6px;text-transform:uppercase;letter-spacing:.3px;}
 .live-empty{font-size:13px;color:var(--dim);background:var(--card);border:1px dashed #2a3a4a;border-radius:6px;padding:16px;margin-bottom:34px;}
 .sidebar-section{margin-bottom:28px;}
 .sidebar-title{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);}
@@ -479,7 +605,33 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .footer a{text-decoration:none;}
 .no-results{display:none;color:var(--dim);font-size:13px;padding:20px;text-align:center;}
 @media (max-width:1024px){.main-layout{grid-template-columns:1fr;}.sidebar{border-left:none;border-top:1px solid var(--line);}}
+@media print{
+  @page{margin:12mm;}
+  .toolbar,.marquee-container,.lang-toggle,.print-btn,.clock,.refresh-note,.nav-links,.no-results{display:none!important;}
+  html,body{background:#fff!important;color:#111!important;}
+  .header{background:#fff!important;border-bottom:2px solid #067a5b!important;padding:10px 0!important;}
+  .header-left h1{color:#067a5b!important;}
+  .header-left .subtitle,.header-right .date{color:#333!important;}
+  .time-badge{background:#067a5b!important;color:#fff!important;}
+  .status-bar{background:#fff!important;color:#333!important;padding:6px 0!important;}
+  .status-bar .live-on,.status-bar .live-off,.status-bar .tr-on{color:#067a5b!important;}
+  .main-layout{display:block!important;}
+  .content-area{padding:0!important;}
+  .sidebar{background:#fff!important;border-left:none!important;border-top:1px solid #ccc!important;padding:12px 0!important;}
+  .section-title{color:#067a5b!important;border-bottom:1px solid #999!important;}
+  .card,.an-card,.mfg-item,.yeka-item,.mena-item,.strategy-box{background:#fff!important;border:1px solid #ccc!important;break-inside:avoid;page-break-inside:avoid;}
+  .card-title,.an-card h4,.mfg-item h4,.yeka-item h4,.mena-item h4,.sidebar-title,.action-title,.stat-value,.an-big{color:#111!important;}
+  .yeka-item .capacity{color:#6b21a8!important;}
+  .card-body,.card-footer,.card-date,.mfg-item p,.yeka-item p,.mena-item p,.stat-label,.action-desc,.strategy-box p,.an-label,.an-big-label,.live-meta{color:#333!important;}
+  .strategy-box{border:1px solid #067a5b!important;}
+  a{color:#0645ad!important;}
+  .tender-table th{background:#eee!important;color:#067a5b!important;}
+  .tender-table td{color:#222!important;}
+  .an-bar{background:#eee!important;}
+  .marquee-content{animation:none!important;}
+}
 </style>
+${analyticsScript(m.analytics)}
 </head>
 <body class="lmode-tr">
 
@@ -490,10 +642,13 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
       <div class="subtitle">${tri(m.subtitle, m.subtitle_en, m.subtitle_zh)}</div>
     </div>
     <div class="header-right">
-      <div class="lang-toggle">
-        <button class="lang-btn" data-lang="tr">TR</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="zh">中文</button>
+      <div class="header-actions">
+        <div class="lang-toggle" title="Dil / Language / 语言">
+          <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
+          <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+          <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
+        </div>
+        <button class="print-btn" type="button" onclick="window.print()">${tri('🖨 Yazdır', '🖨 Print', '🖨 打印 / PDF')}</button>
       </div>
       <div class="date"><span class="lang-tr">${esc(fmtDate(now, 'tr-TR'))}</span><span class="lang-en">${esc(fmtDate(now, 'en-US'))}</span><span class="lang-zh">${esc(fmtDate(now, 'zh-CN'))}</span></div>
       <div class="time-badge">${tri('⚡ CANLI İSTİHBARAT PANOSU', '⚡ LIVE INTELLIGENCE DASHBOARD', '⚡ 全天候实时情报面板')}</div>
@@ -538,7 +693,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
   <main class="content-area">
 
     <h2 class="section-title" id="overview">${tri('📈 Genel Bakış', '📈 Overview', '📈 数据概览')}</h2>
-    <div class="analytics-grid">${renderAnalytics(data)}</div>
+    <div class="analytics-grid">${renderAnalytics(data, snapshots)}</div>
 
     <h2 class="section-title" id="epc">${tri('EPC Projeleri & Sözleşmeler', 'EPC Projects & Contracts', 'EPC 项目与合同')}</h2>
     <div class="card-grid" id="cards">${renderCards(data.epc || [])}</div>
@@ -688,18 +843,24 @@ async function main() {
 
   const live = await aggregateLive(feedCfg);
   live.translated = await translateLive(live.items);
-  const now = new Date();
-  const html = page(data, live, now);
 
+  const now = new Date();
+  const m = computeMetrics(data);
+  const metrics = { tracked: m.totalTracked, high: m.cImp.high, activeTenders: m.cTen.active, sources: m.sources.size };
+  const snapshots = await updateHistory(metrics, now);
+  await writeArchive(data, metrics, now);
+
+  const html = page(data, live, now, snapshots);
   await writeFile(path.join(DIR, 'index.html'), html, 'utf-8');
   await writeFile(
     path.join(DIR, 'data', 'last-build.json'),
-    JSON.stringify({ built_at: now.toISOString(), live_reachable: live.reachable, live_total: live.total, live_items: live.items.length, translated: live.translated, translate_provider: process.env.TRANSLATE || 'off' }, null, 2),
+    JSON.stringify({ built_at: now.toISOString(), live_reachable: live.reachable, live_total: live.total, live_items: live.items.length, translated: live.translated, translate_provider: process.env.TRANSLATE || 'off', snapshots: snapshots.length }, null, 2),
     'utf-8',
   );
 
   console.log(`[ok] index.html yazıldı / generated / 已生成 — ${fmtStamp(now)} (TSİ)`);
   console.log(`[live] ${live.reachable}/${live.total} RSS feeds, ${live.items.length} items, ${live.translated} translated (${process.env.TRANSLATE || 'off'})`);
+  console.log(`[history] ${snapshots.length} snapshot(s) in data/history.json`);
 }
 
 main().catch((err) => {

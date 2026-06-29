@@ -9,7 +9,16 @@
     "note": "Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.",
     "note_en": "All news is based on real sources; every card links to its source. The live feed auto-updates from RSS feeds on GitHub Actions.",
     "note_zh": "所有新闻均基于真实来源，每条卡片附来源链接。实时流板块由 GitHub Actions 从 RSS 源自动更新。",
-    "curated_through": "2026-06-18"
+    "curated_through": "2026-06-18",
+    "analytics": {
+      "_comment": "Gizlilik dostu ziyaretçi sayacı. provider boşsa hiçbir izleyici yüklenmez (varsayılan). Etkinleştirmek için provider'ı 'goatcounter'|'plausible'|'umami'|'cloudflare' yapıp ilgili alanı doldurun.",
+      "provider": "",
+      "goatcounter_code": "",
+      "plausible_domain": "",
+      "umami_src": "",
+      "umami_id": "",
+      "cloudflare_token": ""
+    }
   },
   "tickers": [
     { "type": "hot", "text": "Astor Enerji ABD'ye 71,98 milyon dolarlık güç trafosu ihracat sözleşmesi imzaladı (8 Haziran 2026) — 132-220 MVA, teslim 2027 Q2-Q3", "text_en": "Astor Enerji signs $71.98M power transformer export contract to the US (8 June 2026) — 132-220 MVA, delivery 2027 Q2-Q3", "text_zh": "Astor Enerji 向美国签下 7,198 万美元电力变压器出口合同（2026年6月8日）— 132-220 MVA，2027年Q2-Q3交货" },

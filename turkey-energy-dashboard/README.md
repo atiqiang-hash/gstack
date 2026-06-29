@@ -19,6 +19,14 @@ canlı bir web panosu. Manus'taki tek seferlik statik raporun yükseltilmiş hal
 - **Analitik / Genel Bakış.** Üstte, verilerden canlı hesaplanan panel: EPC önem dağılımı,
   ihale durumu kırılımı, sektör kapsamı ve toplam takip edilen başlık + farklı kaynak sayısı.
   Saf CSS çubuklar, bağımlılıksız; veri değişince otomatik güncellenir.
+- **Mini trend grafiği + günlük arşiv.** Her derleme, metrikleri `data/history.json`'a
+  (commit'lenir) ve tam anlık görüntüyü `data/archive/<tarih>.json`'a (gitignore) yazar.
+  Genel Bakış'taki SVG sparkline zamanla dolar; CI her gün bir veri noktası ekler.
+- **Canlı akışta kaynak bayrağı + kategori etiketi.** Her RSS başlığı, beslemenin ülke
+  bayrağını (🇹🇷/🇬🇧/🌐/🌍/🌊) ve başlıktan çıkarılan renkli kategori etiketini
+  (Trafo, İhale, Rüzgar, Güneş, Depolama, GIS, Şebeke) gösterir.
+- **Tek tık Yazdır / PDF.** Üstteki 🖨 düğmesi, baskıya optimize (açık tema, tek sütun,
+  arayüz gizli) bir çıktı üretir — tarayıcıdan "PDF olarak kaydet" ile rapor olur.
 
 ## Klasör yapısı
 
@@ -81,6 +89,25 @@ GitHub Actions'ta açmak için: **Settings → Secrets and variables → Actions
 altında `DASH_TRANSLATE` değişkenini `google` (veya `libre`) yapın. Libre için ayrıca
 `LIBRETRANSLATE_URL` değişkenini ve gerekiyorsa `LIBRETRANSLATE_API_KEY` secret'ını ekleyin.
 Değişken boşsa çeviri kapalı kalır.
+
+## Gizlilik dostu ziyaretçi sayacı (isteğe bağlı, varsayılan KAPALI)
+
+Pano hiçbir izleyici yüklemeden çalışır. İsterseniz gizlilik dostu (çerezsiz, kişisel
+veri toplamayan) bir sayaç ekleyebilirsiniz. `data/news.json` → `meta.analytics`
+içinde `provider` boş olduğu sürece **hiçbir üçüncü taraf script yüklenmez**.
+
+Etkinleştirmek için `provider`'ı seçip ilgili alanı doldurun:
+
+| provider | Doldurulacak alan | Not |
+|----------|-------------------|-----|
+| `goatcounter` | `goatcounter_code` (örn. `betas` → `betas.goatcounter.com`) | **Önerilen.** Ücretsiz, çerezsiz, açık kaynak. |
+| `plausible` | `plausible_domain` (örn. `betas.github.io`) | Barındırılan/öz-barındırılan. |
+| `umami` | `umami_src` + `umami_id` | Öz-barındırılan. |
+| `cloudflare` | `cloudflare_token` | Cloudflare Web Analytics. |
+
+Örnek (GoatCounter): goatcounter.com'da ücretsiz hesap açın, kodunuzu (`betas`) alın,
+`meta.analytics.provider`'ı `"goatcounter"`, `goatcounter_code`'u `"betas"` yapın,
+`node generate.mjs` çalıştırın. İstatistikler `betas.goatcounter.com` panelinde görünür.
 
 ## 7/24 yayına alma (GitHub Pages) — tek seferlik kurulum
 

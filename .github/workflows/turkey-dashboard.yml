@@ -9,7 +9,9 @@ name: Turkey Energy Dashboard
 
 on:
   schedule:
-    - cron: '0 */3 * * *'   # every 3 hours, 24/7
+    # Daily at 09:00, 10:00, 11:00, 12:00 and 14:00 Europe/Istanbul (UTC+3, no DST)
+    # = 06:00, 07:00, 08:00, 09:00, 11:00 UTC. GitHub cron is always UTC.
+    - cron: '0 6,7,8,9,11 * * *'
   workflow_dispatch: {}
   push:
     branches: [ main, master ]

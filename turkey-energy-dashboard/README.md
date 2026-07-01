@@ -15,13 +15,16 @@ canlı bir web panosu. Manus'taki tek seferlik statik raporun yükseltilmiş hal
   yayımlar. Açık bırakılan sekme her 15 dakikada bir kendini yeniler.
 - **Tek dosya, her yerde açılır.** `index.html` bağımsızdır — çift tıklayıp yerelde
   de açabilirsiniz, internet olmasa bile küratörlü veri görünür.
-- **Arama + filtre.** Başlık/ihale/kurum/kV/MW araması ve öncelik (Yüksek/Orta) filtresi.
+- **Arama + filtre + kısayollar.** Başlık/ihale/kurum/kV/MW araması ve öncelik
+  (Yüksek/Orta) filtresi. Canlı akışı kategori çipleriyle süz (Trafo, İhale, Rüzgar…).
+  Klavye kısayolları: `/` aramaya odaklanır, `Esc` arama + filtreleri sıfırlar.
 - **Analitik / Genel Bakış.** Üstte, verilerden canlı hesaplanan panel: EPC önem dağılımı,
   ihale durumu kırılımı, sektör kapsamı ve toplam takip edilen başlık + farklı kaynak sayısı.
   Saf CSS çubuklar, bağımlılıksız; veri değişince otomatik güncellenir.
 - **Mini trend grafiği + günlük arşiv.** Her derleme, metrikleri `data/history.json`'a
   (commit'lenir) ve tam anlık görüntüyü `data/archive/<tarih>.json`'a (gitignore) yazar.
-  Genel Bakış'taki SVG sparkline zamanla dolar; CI her gün bir veri noktası ekler.
+  Genel Bakış'taki iki çizgili SVG sparkline (takip edilen başlık + yüksek öncelik)
+  zamanla dolar; CI her gün bir veri noktası ekler.
 - **Canlı akışta kaynak bayrağı + kategori etiketi.** Her RSS başlığı, beslemenin ülke
   bayrağını (🇹🇷/🇬🇧/🌐/🌍/🌊) ve başlıktan çıkarılan renkli kategori etiketini
   (Trafo, İhale, Rüzgar, Güneş, Depolama, GIS, Şebeke) gösterir.

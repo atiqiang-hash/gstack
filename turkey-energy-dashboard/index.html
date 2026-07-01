@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BETAŞ EPC Intelligence — 29 Haziran 2026 Pazartesi</title>
+<title>BETAŞ EPC Intelligence — 1 Temmuz 2026 Çarşamba</title>
 <meta name="description" content="Türkiye EPC & energy live intelligence dashboard (TR/EN/中文). Real sources, linked.">
 <style>
 :root{--bg:#0a0e17;--panel:#111827;--card:#1a2332;--line:#1e293b;--accent:#00d4aa;--muted:#94a3b8;--dim:#64748b;--text:#e0e6ed;}
@@ -85,6 +85,11 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .spark-x{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);}
 .spark-last{color:var(--accent);font-weight:800;font-size:13px;}
 .spark-note{font-size:10px;color:var(--dim);margin-top:6px;}
+.spark-legend{display:flex;gap:12px;align-items:center;font-size:10px;color:var(--muted);margin-top:4px;}
+.lg{display:inline-flex;align-items:center;gap:5px;}
+.lg::before{content:'';width:10px;height:3px;border-radius:2px;flex-shrink:0;}
+.lg-tracked::before{background:#00d4aa;}
+.lg-high::before{background:#f59e0b;}
 .mfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;margin-bottom:34px;}
 .mfg-item{background:var(--card);border:1px solid #2a3a4a;border-radius:6px;padding:16px;}
 .mfg-item h4{font-size:14px;color:#fff;margin-bottom:8px;}.mfg-item p{font-size:12px;color:var(--muted);}
@@ -105,6 +110,10 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .live-meta{display:block;font-size:11px;color:var(--dim);margin-top:4px;}
 .live-flag{font-size:13px;margin-right:5px;}
 .cat-tag{display:inline-block;font-size:9px;font-weight:800;padding:1px 7px;border-radius:9px;border:1px solid;margin-right:6px;text-transform:uppercase;letter-spacing:.3px;}
+.live-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.live-chip{background:var(--card);border:1px solid #2a3a4a;color:var(--muted);font-size:11px;font-weight:700;padding:4px 11px;border-radius:14px;cursor:pointer;}
+.live-chip:hover{border-color:var(--c);color:var(--c);}
+.live-chip.active{background:var(--c);border-color:var(--c);color:#0a0e17;}
 .live-empty{font-size:13px;color:var(--dim);background:var(--card);border:1px dashed #2a3a4a;border-radius:6px;padding:16px;margin-bottom:34px;}
 .sidebar-section{margin-bottom:28px;}
 .sidebar-title{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);}
@@ -123,7 +132,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 @media (max-width:1024px){.main-layout{grid-template-columns:1fr;}.sidebar{border-left:none;border-top:1px solid var(--line);}}
 @media print{
   @page{margin:12mm;}
-  .toolbar,.marquee-container,.lang-toggle,.print-btn,.clock,.refresh-note,.nav-links,.no-results{display:none!important;}
+  .toolbar,.marquee-container,.lang-toggle,.print-btn,.clock,.refresh-note,.nav-links,.no-results,.live-chips{display:none!important;}
   html,body{background:#fff!important;color:#111!important;}
   .header{background:#fff!important;border-bottom:2px solid #067a5b!important;padding:10px 0!important;}
   .header-left h1{color:#067a5b!important;}
@@ -166,7 +175,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
         </div>
         <button class="print-btn" type="button" onclick="window.print()"><span class="lang-tr">🖨 Yazdır</span><span class="lang-en">🖨 Print</span><span class="lang-zh">🖨 打印 / PDF</span></button>
       </div>
-      <div class="date"><span class="lang-tr">29 Haziran 2026 Pazartesi</span><span class="lang-en">Monday, June 29, 2026</span><span class="lang-zh">2026年6月29日星期一</span></div>
+      <div class="date"><span class="lang-tr">1 Temmuz 2026 Çarşamba</span><span class="lang-en">Wednesday, July 1, 2026</span><span class="lang-zh">2026年7月1日星期三</span></div>
       <div class="time-badge"><span class="lang-tr">⚡ CANLI İSTİHBARAT PANOSU</span><span class="lang-en">⚡ LIVE INTELLIGENCE DASHBOARD</span><span class="lang-zh">⚡ 全天候实时情报面板</span></div>
       <div class="clock" id="clock">…</div>
     </div>
@@ -176,7 +185,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 <div class="status-bar">
   <span class="live-off"><span class="lang-tr">○ Canlı besleme beklemede</span><span class="lang-en">○ Live feed pending</span><span class="lang-zh">○ 实时流待启用</span></span>
   
-  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-en">Last updated:</span><span class="lang-zh">最后更新：</span> <strong>29.06.2026 07:51</strong> <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span></span>
+  <span><span class="lang-tr">Son güncelleme:</span><span class="lang-en">Last updated:</span><span class="lang-zh">最后更新：</span> <strong>01.07.2026 09:21</strong> <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span></span>
   <span><span class="lang-tr">3 yüksek öncelikli başlık</span><span class="lang-en">3 high-priority items</span><span class="lang-zh">3 条高优先级头条</span></span>
   <span class="refresh-note"><span class="lang-tr">Sayfa açık kaldığında her 15 dk'da bir otomatik yenilenir.</span><span class="lang-en">Auto-refreshes every 15 min while open.</span><span class="lang-zh">页面保持打开时每 15 分钟自动刷新。</span></span>
 </div>
@@ -223,10 +232,11 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
     <div><div class="an-big">24</div><div class="an-big-label"><span class="lang-tr">Takip edilen başlık</span><span class="lang-en">Tracked items</span><span class="lang-zh">跟踪条目</span></div></div>
     <div><div class="an-big">13</div><div class="an-big-label"><span class="lang-tr">Farklı kaynak</span><span class="lang-en">Distinct sources</span><span class="lang-zh">不同来源</span></div></div>
     <div><div class="an-big">3</div><div class="an-big-label"><span class="lang-tr">Yüksek öncelik</span><span class="lang-en">High priority</span><span class="lang-zh">高优先级</span></div></div>
-  </div><div class="an-card"><h4><span class="lang-tr">Trend — Takip Edilen Başlık</span><span class="lang-en">Trend — Tracked Items</span><span class="lang-zh">趋势 — 跟踪条目</span></h4>
-    <svg class="spark" viewBox="0 0 240 54" preserveAspectRatio="none" width="100%" height="54" role="img"><path d="M5.0 5.0" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linejoin="round"/><circle cx="5.0" cy="5.0" r="2.2" fill="#00d4aa"/></svg>
-    <div class="spark-x"><span>06-29</span><span class="spark-last">24</span><span>06-29</span></div>
-    <div class="spark-note"><span class="lang-tr">Trend, günlük arşivle dolacak.</span><span class="lang-en">The trend fills in with the daily archive.</span><span class="lang-zh">趋势将随每日归档逐步累积。</span></div></div></div>
+  </div><div class="an-card"><h4><span class="lang-tr">Trend — Takip / Yüksek</span><span class="lang-en">Trend — Tracked / High</span><span class="lang-zh">趋势 — 跟踪 / 高优先</span></h4>
+    <svg class="spark" viewBox="0 0 240 54" preserveAspectRatio="none" width="100%" height="54" role="img"><path d="M5.0 5.0 L235.0 5.0 L 235.0 49 L 5.0 49 Z" fill="#00d4aa1f"/><path d="M5.0 5.0 L235.0 5.0" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linejoin="round"/><circle cx="5.0" cy="5.0" r="2" fill="#00d4aa"/><circle cx="235.0" cy="5.0" r="2" fill="#00d4aa"/><path d="M5.0 5.0 L235.0 5.0" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/><circle cx="5.0" cy="5.0" r="2" fill="#f59e0b"/><circle cx="235.0" cy="5.0" r="2" fill="#f59e0b"/></svg>
+    <div class="spark-legend"><span class="lg lg-tracked"><span class="lang-tr">Takip</span><span class="lang-en">Tracked</span><span class="lang-zh">跟踪</span></span><span class="lg lg-high"><span class="lang-tr">Yüksek</span><span class="lang-en">High</span><span class="lang-zh">高</span></span></div>
+    <div class="spark-x"><span>06-29</span><span>07-01</span></div>
+    </div></div>
 
     <h2 class="section-title" id="epc"><span class="lang-tr">EPC Projeleri &amp; Sözleşmeler</span><span class="lang-en">EPC Projects &amp; Contracts</span><span class="lang-zh">EPC 项目与合同</span></h2>
     <div class="card-grid" id="cards">
@@ -520,7 +530,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 
 <footer class="footer">
   <p><span class="lang-tr">Tüm haberler gerçek kaynaklara dayanır; her kart kaynak bağlantısı içerir. Canlı akış bölümü GitHub Actions üzerinde RSS beslemelerinden otomatik güncellenir.</span><span class="lang-en">All news is based on real sources; every card links to its source. The live feed auto-updates from RSS feeds on GitHub Actions.</span><span class="lang-zh">所有新闻均基于真实来源，每条卡片附来源链接。实时流板块由 GitHub Actions 从 RSS 源自动更新。</span></p>
-  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-en">Curated through</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-en">Generated</span><span class="lang-zh">生成时间</span>: 29.06.2026 07:51 <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-en">Auto-generated for Ati (BETAŞ).</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
+  <p style="margin-top:6px;"><span class="lang-tr">Veri küratörlüğü</span><span class="lang-en">Curated through</span><span class="lang-zh">数据核校至</span>: 2026-06-18 · <span class="lang-tr">Oluşturulma</span><span class="lang-en">Generated</span><span class="lang-zh">生成时间</span>: 01.07.2026 09:21 <span class="lang-tr">(TSİ)</span><span class="lang-en">(TRT)</span><span class="lang-zh">（土耳其时间）</span> · <span class="lang-tr">Ati (BETAŞ) için otomatik hazırlanmıştır.</span><span class="lang-en">Auto-generated for Ati (BETAŞ).</span><span class="lang-zh">为 Ati (BETAŞ) 自动生成。</span></p>
 </footer>
 
 <script>
@@ -565,15 +575,17 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 // ---- auto-refresh every 15 minutes ----
 setTimeout(function(){ location.reload(); }, 15*60*1000);
 
-// ---- search + importance filter ----
+// ---- search + importance filter + live category chips + keyboard shortcuts ----
 (function(){
   var search=document.getElementById('search');
   var buttons=document.querySelectorAll('.filter-btn');
+  var liveChips=document.querySelectorAll('.live-chip');
   var cards=Array.prototype.slice.call(document.querySelectorAll('#cards .card'));
   var rows=Array.prototype.slice.call(document.querySelectorAll('#tender-rows tr'));
   var liveItems=Array.prototype.slice.call(document.querySelectorAll('.live-list li'));
   var noRes=document.getElementById('no-results');
   var activeFilter='all';
+  var activeCat='all';
   function apply(){
     var q=(search.value||'').toLowerCase().trim();
     var shown=0;
@@ -590,7 +602,8 @@ setTimeout(function(){ location.reload(); }, 15*60*1000);
     });
     liveItems.forEach(function(li){
       var matchQ=!q||(li.getAttribute('data-search')||'').indexOf(q)>-1;
-      li.style.display=matchQ?'':'none';
+      var matchC=activeCat==='all'||li.getAttribute('data-cat')===activeCat;
+      li.style.display=(matchQ&&matchC)?'':'none';
     });
     noRes.style.display=(shown===0&&q)?'block':'none';
   }
@@ -602,6 +615,27 @@ setTimeout(function(){ location.reload(); }, 15*60*1000);
       activeFilter=b.getAttribute('data-filter');
       apply();
     });
+  });
+  liveChips.forEach(function(ch){
+    ch.addEventListener('click',function(){
+      liveChips.forEach(function(x){x.classList.remove('active');});
+      ch.classList.add('active');
+      activeCat=ch.getAttribute('data-cat');
+      apply();
+    });
+  });
+  document.addEventListener('keydown',function(e){
+    var tag=((e.target&&e.target.tagName)||'').toLowerCase();
+    if(e.key==='/'&&tag!=='input'&&tag!=='textarea'&&tag!=='select'){
+      e.preventDefault(); search.focus();
+    }else if(e.key==='Escape'){
+      var changed=false;
+      if(search.value){search.value='';changed=true;}
+      if(activeFilter!=='all'){buttons.forEach(function(x){x.classList.toggle('active',x.getAttribute('data-filter')==='all');});activeFilter='all';changed=true;}
+      if(activeCat!=='all'){liveChips.forEach(function(x){x.classList.toggle('active',x.getAttribute('data-cat')==='all');});activeCat='all';changed=true;}
+      if(changed)apply();
+      if(document.activeElement===search)search.blur();
+    }
   });
 })();
 </script>

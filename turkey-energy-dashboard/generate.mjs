@@ -61,17 +61,18 @@ function isoDate(d = new Date()) {
 
 // Category tagging for live RSS headlines (matched on the source-language title).
 const CATS = [
-  { re: /trafo|transformat|transformer|nüve|nuve|reakt|reactor/i, tr: 'Trafo', en: 'Transformer', zh: '变压器', c: '#00d4aa' },
-  { re: /ihale|tender|ekap|teklif|procurement|sözleşme|sozlesme|contract|award/i, tr: 'İhale', en: 'Tender', zh: '招标', c: '#f59e0b' },
-  { re: /offshore|rüzgar|ruzgar|wind|türbin|turbin|\bres\b/i, tr: 'Rüzgar', en: 'Wind', zh: '风电', c: '#38bdf8' },
-  { re: /güneş|gunes|solar|\bges\b|fotovolt|photovolt|\bpv\b/i, tr: 'Güneş', en: 'Solar', zh: '光伏', c: '#fbbf24' },
-  { re: /depolama|batar|battery|bess|storage/i, tr: 'Depolama', en: 'Storage', zh: '储能', c: '#a78bfa' },
-  { re: /\bgis\b|şalt|salt|switchgear|kesici|ayırıc|ayiric/i, tr: 'GIS', en: 'GIS', zh: '开关', c: '#34d399' },
-  { re: /şebeke|sebeke|iletim|grid|transmission|\bkv\b|enterkonek|interconnect|\bhat\b/i, tr: 'Şebeke', en: 'Grid', zh: '电网', c: '#22d3ee' },
+  { key: 'transformer', re: /trafo|transformat|transformer|nüve|nuve|reakt|reactor/i, tr: 'Trafo', en: 'Transformer', zh: '变压器', c: '#00d4aa' },
+  { key: 'tender', re: /ihale|tender|ekap|teklif|procurement|sözleşme|sozlesme|contract|award/i, tr: 'İhale', en: 'Tender', zh: '招标', c: '#f59e0b' },
+  { key: 'wind', re: /offshore|rüzgar|ruzgar|wind|türbin|turbin|\bres\b/i, tr: 'Rüzgar', en: 'Wind', zh: '风电', c: '#38bdf8' },
+  { key: 'solar', re: /güneş|gunes|solar|\bges\b|fotovolt|photovolt|\bpv\b/i, tr: 'Güneş', en: 'Solar', zh: '光伏', c: '#fbbf24' },
+  { key: 'storage', re: /depolama|batar|battery|bess|storage/i, tr: 'Depolama', en: 'Storage', zh: '储能', c: '#a78bfa' },
+  { key: 'gis', re: /\bgis\b|şalt|salt|switchgear|kesici|ayırıc|ayiric/i, tr: 'GIS', en: 'GIS', zh: '开关', c: '#34d399' },
+  { key: 'grid', re: /şebeke|sebeke|iletim|grid|transmission|\bkv\b|enterkonek|interconnect|\bhat\b/i, tr: 'Şebeke', en: 'Grid', zh: '电网', c: '#22d3ee' },
 ];
+const CAT_DEFAULT = { key: 'energy', tr: 'Enerji', en: 'Energy', zh: '能源', c: '#94a3b8' };
 function categorize(title = '') {
   for (const c of CATS) if (c.re.test(title)) return c;
-  return { tr: 'Enerji', en: 'Energy', zh: '能源', c: '#94a3b8' };
+  return CAT_DEFAULT;
 }
 
 // ---------- tiny resilient RSS parser (no deps) ----------
@@ -358,6 +359,16 @@ function renderMena(items) {
     </div>`).join('');
 }
 
+function liveCatChips(items) {
+  const present = new Set(items.map((it) => categorize(it.title).key));
+  const defs = [{ key: 'all', tr: 'Tümü', en: 'All', zh: '全部', c: '#00d4aa' }, ...CATS, CAT_DEFAULT]
+    .filter((ch) => ch.key === 'all' || present.has(ch.key));
+  if (defs.length <= 2) return ''; // only "All" + one category: no point showing chips
+  return `<div class="live-chips" id="live-chips">` + defs.map((ch, i) =>
+    `<button class="live-chip${i === 0 ? ' active' : ''}" data-cat="${ch.key}" style="--c:${ch.c}">${tri(ch.tr, ch.en, ch.zh)}</button>`,
+  ).join('') + `</div>`;
+}
+
 function renderLive(live) {
   if (!live.items.length) {
     return `<p class="live-empty">${tri(
@@ -366,7 +377,7 @@ function renderLive(live) {
       `实时流目前为空或网络受限。该板块在 GitHub Actions 上每次刷新时会从 ${live.total} 个 RSS 源自动填充。`,
     )}</p>`;
   }
-  return `<ul class="live-list">` + live.items.map((it) => {
+  const list = `<ul class="live-list">` + live.items.map((it) => {
     let d = '';
     const t = Date.parse(it.date);
     if (!Number.isNaN(t)) d = fmtStamp(new Date(t));
@@ -376,11 +387,12 @@ function renderLive(live) {
       ? tri(it.tr, it.en, it.zh)
       : esc(it.title);
     const search = it.translated ? triLower(it.tr, it.en, it.zh) : esc(it.title.toLowerCase());
-    return `<li data-search="${search} ${esc(cat.en.toLowerCase())}">
+    return `<li data-cat="${cat.key}" data-search="${search} ${esc(cat.en.toLowerCase())}">
       <a href="${esc(it.link)}" target="_blank" rel="noopener">${titleHtml}</a>
       <span class="live-meta"><span class="live-flag">${flag}</span><span class="cat-tag" style="background:${cat.c}22;border-color:${cat.c}66;color:${cat.c}">${tri(cat.tr, cat.en, cat.zh)}</span> ${esc(it.source)}${d ? ' · ' + esc(d) : ''}</span>
     </li>`;
   }).join('') + `</ul>`;
+  return liveCatChips(live.items) + list;
 }
 
 function renderStats(stats) {
@@ -407,29 +419,33 @@ function renderStrategy(items) {
 function renderTrend(snapshots) {
   const pts = (snapshots || []).slice(-30);
   const w = 240, h = 54, pad = 5;
-  const title = tri('Trend — Takip Edilen Başlık', 'Trend — Tracked Items', '趋势 — 跟踪条目');
+  const title = tri('Trend — Takip / Yüksek', 'Trend — Tracked / High', '趋势 — 跟踪 / 高优先');
   if (!pts.length) return '';
-  const vals = pts.map((s) => s.tracked || 0);
-  const max = Math.max(...vals, 1);
-  const min = Math.min(...vals, 0);
-  const span = Math.max(max - min, 1);
-  const stepX = pts.length > 1 ? (w - 2 * pad) / (pts.length - 1) : 0;
-  const coords = pts.map((s, i) => [
-    pad + i * stepX,
-    h - pad - ((s.tracked - min) / span) * (h - 2 * pad),
-  ]);
-  const d = coords.map((c, i) => (i === 0 ? 'M' : 'L') + c[0].toFixed(1) + ' ' + c[1].toFixed(1)).join(' ');
-  const area = coords.length > 1
-    ? `<path d="${d} L ${coords[coords.length - 1][0].toFixed(1)} ${h - pad} L ${coords[0][0].toFixed(1)} ${h - pad} Z" fill="rgba(0,212,170,0.12)"/>`
-    : '';
-  const line = `<path d="${d}" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linejoin="round"/>`;
-  const dots = coords.map((c) => `<circle cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="2.2" fill="#00d4aa"/>`).join('');
+  // Each series is normalised to its own range so both trends stay visible.
+  const series = (getter, color, fill) => {
+    const vals = pts.map(getter);
+    const max = Math.max(...vals, 1);
+    const min = Math.min(...vals, 0);
+    const span = Math.max(max - min, 1);
+    const stepX = pts.length > 1 ? (w - 2 * pad) / (pts.length - 1) : 0;
+    const coords = pts.map((s, i) => [pad + i * stepX, h - pad - ((getter(s) - min) / span) * (h - 2 * pad)]);
+    const d = coords.map((c, i) => (i === 0 ? 'M' : 'L') + c[0].toFixed(1) + ' ' + c[1].toFixed(1)).join(' ');
+    const area = fill && coords.length > 1
+      ? `<path d="${d} L ${coords[coords.length - 1][0].toFixed(1)} ${h - pad} L ${coords[0][0].toFixed(1)} ${h - pad} Z" fill="${color}1f"/>`
+      : '';
+    const line = `<path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`;
+    const dots = coords.map((c) => `<circle cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="2" fill="${color}"/>`).join('');
+    return area + line + dots;
+  };
+  const tracked = series((s) => s.tracked || 0, '#00d4aa', true);
+  const high = series((s) => s.high || 0, '#f59e0b', false);
   const note = pts.length < 2
-    ? `<div class="spark-note">${tri('Trend, günlük arşivle dolacak.', 'The trend fills in with the daily archive.', '趋势将随每日归档逐步累积。')}</div>`
+    ? `<div class="spark-note">${tri('Trend, günlük arşivle dolacak. Diziler ayrı ölçeklidir.', 'The trend fills in with the daily archive. Series are independently scaled.', '趋势将随每日归档累积。两条线各自独立刻度。')}</div>`
     : '';
   return `<div class="an-card"><h4>${title}</h4>
-    <svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" width="100%" height="${h}" role="img">${area}${line}${dots}</svg>
-    <div class="spark-x"><span>${esc(pts[0].date.slice(5))}</span><span class="spark-last">${vals[vals.length - 1]}</span><span>${esc(pts[pts.length - 1].date.slice(5))}</span></div>
+    <svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" width="100%" height="${h}" role="img">${tracked}${high}</svg>
+    <div class="spark-legend"><span class="lg lg-tracked">${tri('Takip', 'Tracked', '跟踪')}</span><span class="lg lg-high">${tri('Yüksek', 'High', '高')}</span></div>
+    <div class="spark-x"><span>${esc(pts[0].date.slice(5))}</span><span>${esc(pts[pts.length - 1].date.slice(5))}</span></div>
     ${note}</div>`;
 }
 
@@ -569,6 +585,11 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .spark-x{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);}
 .spark-last{color:var(--accent);font-weight:800;font-size:13px;}
 .spark-note{font-size:10px;color:var(--dim);margin-top:6px;}
+.spark-legend{display:flex;gap:12px;align-items:center;font-size:10px;color:var(--muted);margin-top:4px;}
+.lg{display:inline-flex;align-items:center;gap:5px;}
+.lg::before{content:'';width:10px;height:3px;border-radius:2px;flex-shrink:0;}
+.lg-tracked::before{background:#00d4aa;}
+.lg-high::before{background:#f59e0b;}
 .mfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;margin-bottom:34px;}
 .mfg-item{background:var(--card);border:1px solid #2a3a4a;border-radius:6px;padding:16px;}
 .mfg-item h4{font-size:14px;color:#fff;margin-bottom:8px;}.mfg-item p{font-size:12px;color:var(--muted);}
@@ -589,6 +610,10 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .live-meta{display:block;font-size:11px;color:var(--dim);margin-top:4px;}
 .live-flag{font-size:13px;margin-right:5px;}
 .cat-tag{display:inline-block;font-size:9px;font-weight:800;padding:1px 7px;border-radius:9px;border:1px solid;margin-right:6px;text-transform:uppercase;letter-spacing:.3px;}
+.live-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.live-chip{background:var(--card);border:1px solid #2a3a4a;color:var(--muted);font-size:11px;font-weight:700;padding:4px 11px;border-radius:14px;cursor:pointer;}
+.live-chip:hover{border-color:var(--c);color:var(--c);}
+.live-chip.active{background:var(--c);border-color:var(--c);color:#0a0e17;}
 .live-empty{font-size:13px;color:var(--dim);background:var(--card);border:1px dashed #2a3a4a;border-radius:6px;padding:16px;margin-bottom:34px;}
 .sidebar-section{margin-bottom:28px;}
 .sidebar-title{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);}
@@ -607,7 +632,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 @media (max-width:1024px){.main-layout{grid-template-columns:1fr;}.sidebar{border-left:none;border-top:1px solid var(--line);}}
 @media print{
   @page{margin:12mm;}
-  .toolbar,.marquee-container,.lang-toggle,.print-btn,.clock,.refresh-note,.nav-links,.no-results{display:none!important;}
+  .toolbar,.marquee-container,.lang-toggle,.print-btn,.clock,.refresh-note,.nav-links,.no-results,.live-chips{display:none!important;}
   html,body{background:#fff!important;color:#111!important;}
   .header{background:#fff!important;border-bottom:2px solid #067a5b!important;padding:10px 0!important;}
   .header-left h1{color:#067a5b!important;}
@@ -789,15 +814,17 @@ ${analyticsScript(m.analytics)}
 // ---- auto-refresh every 15 minutes ----
 setTimeout(function(){ location.reload(); }, 15*60*1000);
 
-// ---- search + importance filter ----
+// ---- search + importance filter + live category chips + keyboard shortcuts ----
 (function(){
   var search=document.getElementById('search');
   var buttons=document.querySelectorAll('.filter-btn');
+  var liveChips=document.querySelectorAll('.live-chip');
   var cards=Array.prototype.slice.call(document.querySelectorAll('#cards .card'));
   var rows=Array.prototype.slice.call(document.querySelectorAll('#tender-rows tr'));
   var liveItems=Array.prototype.slice.call(document.querySelectorAll('.live-list li'));
   var noRes=document.getElementById('no-results');
   var activeFilter='all';
+  var activeCat='all';
   function apply(){
     var q=(search.value||'').toLowerCase().trim();
     var shown=0;
@@ -814,7 +841,8 @@ setTimeout(function(){ location.reload(); }, 15*60*1000);
     });
     liveItems.forEach(function(li){
       var matchQ=!q||(li.getAttribute('data-search')||'').indexOf(q)>-1;
-      li.style.display=matchQ?'':'none';
+      var matchC=activeCat==='all'||li.getAttribute('data-cat')===activeCat;
+      li.style.display=(matchQ&&matchC)?'':'none';
     });
     noRes.style.display=(shown===0&&q)?'block':'none';
   }
@@ -826,6 +854,27 @@ setTimeout(function(){ location.reload(); }, 15*60*1000);
       activeFilter=b.getAttribute('data-filter');
       apply();
     });
+  });
+  liveChips.forEach(function(ch){
+    ch.addEventListener('click',function(){
+      liveChips.forEach(function(x){x.classList.remove('active');});
+      ch.classList.add('active');
+      activeCat=ch.getAttribute('data-cat');
+      apply();
+    });
+  });
+  document.addEventListener('keydown',function(e){
+    var tag=((e.target&&e.target.tagName)||'').toLowerCase();
+    if(e.key==='/'&&tag!=='input'&&tag!=='textarea'&&tag!=='select'){
+      e.preventDefault(); search.focus();
+    }else if(e.key==='Escape'){
+      var changed=false;
+      if(search.value){search.value='';changed=true;}
+      if(activeFilter!=='all'){buttons.forEach(function(x){x.classList.toggle('active',x.getAttribute('data-filter')==='all');});activeFilter='all';changed=true;}
+      if(activeCat!=='all'){liveChips.forEach(function(x){x.classList.toggle('active',x.getAttribute('data-cat')==='all');});activeCat='all';changed=true;}
+      if(changed)apply();
+      if(document.activeElement===search)search.blur();
+    }
   });
 })();
 </script>

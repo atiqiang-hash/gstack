@@ -1,0 +1,5 @@
+# Build-timestamp artifact, regenerated on every `node generate.mjs` run.
+data/last-build.json
+
+# Per-day full snapshots (the trend reads the small data/history.json, which IS committed).
+data/archive/

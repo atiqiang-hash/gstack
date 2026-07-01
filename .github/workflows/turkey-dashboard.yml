@@ -1,0 +1,73 @@
+name: Turkey Energy Dashboard
+
+# Rebuilds the BETAŞ EPC Intelligence dashboard (curated data + live RSS) and
+# publishes it to GitHub Pages. Runs on a schedule for 24/7 freshness, on
+# manual dispatch, and whenever the dashboard sources change on the default branch.
+#
+# One-time setup (repo owner): Settings → Pages → Build and deployment →
+# Source = "GitHub Actions". After that this workflow keeps the site live.
+
+on:
+  schedule:
+    # Daily at 09:00, 10:00, 11:00, 12:00 and 14:00 Europe/Istanbul (UTC+3, no DST)
+    # = 06:00, 07:00, 08:00, 09:00, 11:00 UTC. GitHub cron is always UTC.
+    - cron: '0 6,7,8,9,11 * * *'
+  workflow_dispatch: {}
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'turkey-energy-dashboard/**'
+      - '.github/workflows/turkey-dashboard.yml'
+
+permissions:
+  contents: write   # commit the daily metrics history back so the trend accumulates
+  pages: write
+  id-token: write
+
+concurrency:
+  group: turkey-dashboard-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build dashboard (curated data + live RSS aggregation)
+        working-directory: turkey-energy-dashboard
+        # Optional live-headline machine translation (off unless you set the
+        # repo variable DASH_TRANSLATE to "google" or "libre"). Libre also reads
+        # the LIBRETRANSLATE_URL variable and LIBRETRANSLATE_API_KEY secret.
+        env:
+          TRANSLATE: ${{ vars.DASH_TRANSLATE }}
+          LIBRETRANSLATE_URL: ${{ vars.LIBRETRANSLATE_URL }}
+          LIBRETRANSLATE_API_KEY: ${{ secrets.LIBRETRANSLATE_API_KEY }}
+        run: node generate.mjs
+      - name: Persist daily metrics history (for the trend sparkline)
+        if: github.event_name != 'pull_request'
+        run: |
+          if git diff --quiet -- turkey-energy-dashboard/data/history.json; then
+            echo "No history change — skipping commit."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add turkey-energy-dashboard/data/history.json
+            git commit -m "chore(dashboard): update metrics history [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: turkey-energy-dashboard
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

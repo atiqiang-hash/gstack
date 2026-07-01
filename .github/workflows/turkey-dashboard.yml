@@ -4,10 +4,12 @@ name: Turkey Energy Dashboard
 # publishes it to GitHub Pages. Runs on a schedule for 24/7 freshness, on
 # manual dispatch, and whenever the dashboard sources change on the default branch.
 #
-# Pages is enabled automatically by the "Enable GitHub Pages" step below
-# (actions/configure-pages with enablement: true), so no manual Settings step
-# is needed. The site goes live at https://<owner>.github.io/<repo>/ after the
-# first successful run.
+# One-time setup (repo owner, REQUIRED once): open
+#   https://github.com/<owner>/<repo>/settings/pages
+# and set Build and deployment → Source = "GitHub Actions". The Actions
+# GITHUB_TOKEN cannot enable Pages itself ("Resource not accessible by
+# integration"), so this single click is unavoidable. After that, this workflow
+# keeps the site live at https://<owner>.github.io/<repo>/.
 
 on:
   schedule:
@@ -60,10 +62,6 @@ jobs:
             git commit -m "chore(dashboard): update metrics history [skip ci]"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
-      - name: Enable GitHub Pages (Source = GitHub Actions)
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: turkey-energy-dashboard

@@ -55,6 +55,13 @@ open index.html          # macOS  (Linux: xdg-open, Windows: start)
 `NO_FETCH=1 node generate.mjs` ile RSS'i atlayıp yalnızca küratörlü veriyi üretir
 (kısıtlı ağlarda hızlı yerel önizleme).
 
+## Masaüstü (indirip her gün otomatik yenile)
+
+Panoyu bilgisayarınızda tutup günde 5 kez (09/10/11/12/14) otomatik yenilemek için
+`desktop/` klasörüne bakın: macOS/Linux için cron, Windows için Zamanlanmış Görev
+kurulum betikleri ve adım adım Türkçe/Çince yönerge (`desktop/README.md`). Node 18+
+gerekir. Bakım istemeyen "her zaman güncel" seçenek için aşağıdaki GitHub Pages yolu.
+
 ## İçeriği güncelleme
 
 Tüm küratörlü içerik `data/news.json` içindedir — başka hiçbir yeri elle düzenlemeyin.
@@ -116,8 +123,9 @@ Etkinleştirmek için `provider`'ı seçip ilgili alanı doldurun:
 
 1. Bu dalı `main`'e birleştirin (workflow varsayılan dalda çalışır).
 2. **Settings → Pages → Build and deployment → Source = "GitHub Actions"** seçin.
-3. Hepsi bu. `.github/workflows/turkey-dashboard.yml` her 3 saatte bir derleyip
-   yayımlar. Hemen yayımlamak için **Actions → Turkey Energy Dashboard → Run workflow**.
+3. Hepsi bu. `.github/workflows/turkey-dashboard.yml` her gün **09:00, 10:00, 11:00,
+   12:00 ve 14:00 (Türkiye saati, UTC+3)** derleyip yayımlar. Hemen yayımlamak için
+   **Actions → Turkey Energy Dashboard → Run workflow**.
 
 Pano adresiniz: `https://<kullanıcı-adı>.github.io/<repo>/`. Telefon/masaüstü fark
 etmeden istediğiniz an açın. Actions açık ağda çalıştığı için canlı RSS akışı orada

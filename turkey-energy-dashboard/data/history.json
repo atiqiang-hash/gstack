@@ -1,13 +1,6 @@
 {
   "snapshots": [
     {
-      "date": "2026-07-01",
-      "tracked": 24,
-      "high": 3,
-      "activeTenders": 4,
-      "sources": 13
-    },
-    {
       "date": "2026-07-02",
       "tracked": 24,
       "high": 3,
@@ -415,6 +408,13 @@
     },
     {
       "date": "2026-08-29",
+      "tracked": 24,
+      "high": 3,
+      "activeTenders": 4,
+      "sources": 13
+    },
+    {
+      "date": "2026-08-30",
       "tracked": 24,
       "high": 3,
       "activeTenders": 4,

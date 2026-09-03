@@ -517,6 +517,7 @@ body.lmode-tr .lang-tr,body.lmode-en .lang-en,body.lmode-zh .lang-zh{display:inl
 .header-content{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
 .header-left h1{font-size:26px;color:var(--accent);font-weight:800;letter-spacing:.5px;}
 .header-left .subtitle{font-size:13px;color:#8899aa;margin-top:5px;}
+.header-left .byline{font-size:11px;color:var(--accent);margin-top:5px;font-weight:700;letter-spacing:.3px;}
 .header-right{text-align:right;}
 .header-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
 .lang-toggle{display:inline-flex;border:1px solid #2a3a4a;border-radius:6px;overflow:hidden;}
@@ -665,6 +666,7 @@ ${analyticsScript(m.analytics)}
     <div class="header-left">
       <h1>${esc(m.report_title || 'EPC Intelligence')}</h1>
       <div class="subtitle">${tri(m.subtitle, m.subtitle_en, m.subtitle_zh)}</div>
+      ${m.analyst ? `<div class="byline">🛰 ${tri(m.analyst, m.analyst_en, m.analyst_zh)}</div>` : ''}
     </div>
     <div class="header-right">
       <div class="header-actions">
@@ -900,14 +902,17 @@ async function main() {
   await writeArchive(data, metrics, now);
 
   const html = page(data, live, now, snapshots);
-  await writeFile(path.join(DIR, 'index.html'), html, 'utf-8');
+  // OUT lets callers (e.g. the Zhou Deng skill) write the report anywhere,
+  // e.g. OUT=~/Desktop/rapor.html node generate.mjs
+  const outPath = process.env.OUT ? path.resolve(process.env.OUT.replace(/^~(?=\/|$)/, process.env.HOME || '~')) : path.join(DIR, 'index.html');
+  await writeFile(outPath, html, 'utf-8');
   await writeFile(
     path.join(DIR, 'data', 'last-build.json'),
     JSON.stringify({ built_at: now.toISOString(), live_reachable: live.reachable, live_total: live.total, live_items: live.items.length, translated: live.translated, translate_provider: process.env.TRANSLATE || 'off', snapshots: snapshots.length }, null, 2),
     'utf-8',
   );
 
-  console.log(`[ok] index.html yazıldı / generated / 已生成 — ${fmtStamp(now)} (TSİ)`);
+  console.log(`[ok] ${outPath} yazıldı / generated / 已生成 — ${fmtStamp(now)} (TSİ)`);
   console.log(`[live] ${live.reachable}/${live.total} RSS feeds, ${live.items.length} items, ${live.translated} translated (${process.env.TRANSLATE || 'off'})`);
   console.log(`[history] ${snapshots.length} snapshot(s) in data/history.json`);
 }
